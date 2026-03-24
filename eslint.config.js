@@ -5,6 +5,16 @@ module.exports = [
     ignores: ['assets/vendor/mathjax/**']
   },
   {
+    files: ['**/*.test.js'],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        expect: 'readonly',
+        test: 'readonly'
+      }
+    }
+  },
+  {
     files: ['**/*.js'],
     languageOptions: {
       ecmaVersion: 'latest',

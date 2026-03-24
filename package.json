@@ -2,11 +2,34 @@
   "name": "algorithms",
   "private": true,
   "scripts": {
+    "lint": "npm run lint:js",
     "lint:js": "eslint .",
-    "lint:js:fix": "eslint . --fix"
+    "lint:js:fix": "eslint . --fix",
+    "lint:fix": "npm run lint:js:fix",
+    "check": "npm run workflow:ci",
+    "check:quick": "npm run workflow:smoke",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "npm run test:markdown-to-static-html:unit",
+    "test:integration": "npm run test:markdown-to-static-html:integration",
+    "test:parser": "jest tools/markdown-to-static-html/test/parser",
+    "test:rendering": "jest tools/markdown-to-static-html/test/rendering",
+    "test:markdown-to-static-html": "jest tools/markdown-to-static-html/test",
+    "test:markdown-to-static-html:unit": "jest tools/markdown-to-static-html/test/parser tools/markdown-to-static-html/test/rendering",
+    "test:markdown-to-static-html:integration": "jest tools/markdown-to-static-html/test/integration",
+    "test:markdown-to-static-html:watch": "jest tools/markdown-to-static-html/test --watch",
+    "test:markdown-to-static-html:coverage": "jest tools/markdown-to-static-html/test --coverage",
+    "generate:markdown-to-static-html": "node tools/markdown-to-static-html/generate.js",
+    "generate:markdown-to-static-html:fixture": "node tools/markdown-to-static-html/generate.js tools/markdown-to-static-html/test/fixtures/274-hindex.md",
+    "workflow:smoke": "npm run lint && npm run test:unit",
+    "workflow:markdown-to-static-html": "npm run lint && npm run test:parser && npm run test:rendering && npm run test:integration",
+    "workflow:ci": "npm run lint && npm test",
+    "workflow:fix-and-check": "npm run lint:fix && npm run workflow:ci"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^2.13.0",
-    "eslint": "^9.22.0"
+    "eslint": "^9.22.0",
+    "jest": "^30.3.0"
   }
 }
