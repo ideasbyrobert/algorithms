@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Formal Proof of the Two-Bound Triplet Detection Algorithm</title>
+  <link rel="stylesheet" href="assets/styles/document-page.css" />
+  <script src="assets/scripts/mathjax-config.js"></script>
+  <script src="assets/scripts/load-mathjax.js" data-cdn-source="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" data-local-source="assets/vendor/mathjax/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <main>
+    <article><h1>Formal Proof of the Two-Bound Triplet Detection Algorithm</h1>
+<p>To establish the correctness of the Two-Bound algorithm for detecting an increasing triplet subsequence, we must rigorously prove two properties: that the pair minimum of a growing sequence obeys a two-case recurrence governed by the new element's relationship with the prefix minimum, and that the algorithm's two accumulators faithfully implement this recurrence so that every triplet is detected and no false positive is reported. We will dismantle the problem into a pair-minimum recurrence (§2), a dual-bound tracking mechanism (§3), and a greedy bound invariant (§4).</p>
+<h2>1. First Principles &amp; System Definitions</h2>
+<p><strong>Problem objects.</strong> Let <span class="inline-math">$A = (a_0, a_1, \ldots, a_{n-1})$</span> be a finite sequence of integers. An <em>increasing triplet</em> in <span class="inline-math">$A$</span> is a triple of indices <span class="inline-math">$(i, j, k)$</span> with <span class="inline-math">$0 \le i &lt; j &lt; k &lt; n$</span> and <span class="inline-math">$a_i &lt; a_j &lt; a_k$</span>. Define the <em>triplet predicate</em>:</p>
+<div class="equation">$$\mathcal{T}(A) \iff \exists\; i, j, k \in \{0, \ldots, n-1\} : i &lt; j &lt; k \;\land\; a_i &lt; a_j &lt; a_k$$</div>
+<p>For any finite sequence <span class="inline-math">$B = (b_0, \ldots, b_{m-1})$</span>, define two quantities.</p>
+<p>The <em>prefix minimum</em>:</p>
+<div class="equation">$$\mu(B) = \min_{0 \le i &lt; m} b_i$$</div>
+<p>The <em>pair minimum</em> — the smallest value that serves as the larger element of a strictly increasing pair:</p>
+<div class="equation">$$\sigma(B) = \min\{b_j : 0 \le j &lt; m, \; \exists\; i &lt; j : b_i &lt; b_j\}$$</div>
+<p>with the conventions <span class="inline-math">$\mu(\emptyset) = +\infty$</span> and <span class="inline-math">$\sigma(\emptyset) = +\infty$</span> for the empty sequence.</p>
+<p><strong>Preconditions and contract assumptions.</strong></p>
+<ul><li><p><span class="inline-math">$n \ge 1$</span>.</p></li><li><p>The sequence is read-only.</p></li></ul>
+<p><strong>Postcondition.</strong></p>
+<div class="equation">$$\text{Return } \mathcal{T}(A).$$</div>
+<p><strong>State variables.</strong></p>
+<ul><li><p><span class="inline-math">$r \in \{0, 1, \ldots, n\}$</span> — read pointer, scanning left to right.</p></li><li><p><span class="inline-math">$f \in \mathbb{Z} \cup \{+\infty\}$</span> — first bound (tracks <span class="inline-math">$\mu$</span>).</p></li><li><p><span class="inline-math">$s \in \mathbb{Z} \cup \{+\infty\}$</span> — second bound (tracks <span class="inline-math">$\sigma$</span>).</p></li></ul>
+<p><strong>Initialization.</strong></p>
+<div class="equation">$$r = 0, \quad f = +\infty, \quad s = +\infty$$</div>
+<p>No mutation model is needed — <span class="inline-math">$A$</span> is not modified.</p>
+<h2>2. The Pair-Minimum Recurrence</h2>
+<p><strong>Theorem 1: The pair minimum of a sequence extended by one element is determined by a two-case recurrence.</strong></p>
+<p>Let <span class="inline-math">$B$</span> be a finite sequence (possibly empty) and let <span class="inline-math">$v$</span> be a value appended to form <span class="inline-math">$B' = B \| (v)$</span>.</p>
+<div class="equation">$$\sigma(B') = \begin{cases} \sigma(B) &amp; \text{if } v \le \mu(B) \\ \min(\sigma(B),\, v) &amp; \text{if } v &gt; \mu(B) \end{cases}$$</div>
+<p><em>Proof:</em></p>
+<p>Let <span class="inline-math">$m = |B|$</span> and let position <span class="inline-math">$m$</span> hold the appended value <span class="inline-math">$v$</span>.</p>
+<p><strong>Case 1 — <span class="inline-math">$v \le \mu(B)$</span>.</strong> For every <span class="inline-math">$i &lt; m$</span>, <span class="inline-math">$b_i \ge \mu(B) \ge v$</span>, so no index <span class="inline-math">$i$</span> satisfies <span class="inline-math">$b_i &lt; v$</span>. The new element <span class="inline-math">$v$</span> cannot serve as the larger element of any increasing pair. All pre-existing pairs within <span class="inline-math">$B$</span> remain valid in <span class="inline-math">$B'$</span> (appending does not alter earlier positions). The pair set of <span class="inline-math">$B'$</span> equals that of <span class="inline-math">$B$</span>, so <span class="inline-math">$\sigma(B') = \sigma(B)$</span>.</p>
+<p><strong>Case 2 — <span class="inline-math">$v &gt; \mu(B)$</span>.</strong> There exists <span class="inline-math">$i &lt; m$</span> with <span class="inline-math">$b_i = \mu(B) &lt; v$</span>, so the pair <span class="inline-math">$(i, m)$</span> is an increasing pair with <span class="inline-math">$v$</span> as its larger element. The pair set of <span class="inline-math">$B'$</span> is the pair set of <span class="inline-math">$B$</span> together with <span class="inline-math">$v$</span>. Therefore <span class="inline-math">$\sigma(B') = \min(\sigma(B), v)$</span>. <span class="inline-math">$\blacksquare$</span></p>
+<p><strong>Corollary 1.1: The pair minimum is non-increasing under extension.</strong></p>
+<div class="equation">$$\sigma(B') \le \sigma(B)$$</div>
+<p>In Case 1, <span class="inline-math">$\sigma(B') = \sigma(B)$</span>. In Case 2, <span class="inline-math">$\sigma(B') = \min(\sigma(B), v) \le \sigma(B)$</span>.</p>
+<p><strong>Corollary 1.2: A value exceeding a finite pair minimum completes a triplet.</strong></p>
+<p>If <span class="inline-math">$\sigma(B) \ne +\infty$</span> and <span class="inline-math">$v &gt; \sigma(B)$</span>, then <span class="inline-math">$\mathcal{T}(B') = \text{true}$</span>.</p>
+<p><em>Proof:</em></p>
+<p>Since <span class="inline-math">$\sigma(B) \ne +\infty$</span>, the pair set of <span class="inline-math">$B$</span> is non-empty: there exist indices <span class="inline-math">$p &lt; q &lt; m$</span> with <span class="inline-math">$b_p &lt; b_q$</span> and <span class="inline-math">$b_q = \sigma(B)$</span>. Then <span class="inline-math">$b_p &lt; b_q = \sigma(B) &lt; v = b_m$</span>, with <span class="inline-math">$p &lt; q &lt; m$</span>, forming an increasing triplet in <span class="inline-math">$B'$</span>. <span class="inline-math">$\blacksquare$</span></p>
+<h2>3. Algorithm Mapping: The Dual-Bound Tracker</h2>
+<p>The algorithm maintains two accumulators — <span class="inline-math">$f$</span> for the prefix minimum and <span class="inline-math">$s$</span> for the pair minimum — and processes each element <span class="inline-math">$a_r$</span> through a three-way branch:</p>
+<ol><li><p><strong>Refresh first</strong> (<span class="inline-math">$a_r \le f$</span>): Set <span class="inline-math">$f \gets a_r$</span>. The incoming value is at most the current prefix minimum, so it becomes the new minimum. The pair minimum is unchanged (Theorem 1, Case 1).</p></li><li><p><strong>Tighten second</strong> (<span class="inline-math">$f &lt; a_r \le s$</span>): Set <span class="inline-math">$s \gets a_r$</span>. The incoming value exceeds the prefix minimum — creating or improving an increasing pair — but does not exceed the current pair minimum. By Theorem 1 Case 2: <span class="inline-math">$\sigma' = \min(s, a_r) = a_r$</span>.</p></li><li><p><strong>Complete triplet</strong> (<span class="inline-math">$a_r &gt; s$</span>): Return true. Since <span class="inline-math">$a_r$</span> is a finite integer and <span class="inline-math">$a_r &gt; s$</span>, we have <span class="inline-math">$s \ne +\infty$</span>. By Corollary 1.2, an increasing triplet exists.</p></li></ol>
+<p><strong>Lemma 1: The first bound tracks the prefix minimum.</strong></p>
+<p>After processing <span class="inline-math">$A[0..r-1]$</span>, <span class="inline-math">$f = \mu(A[0..r-1])$</span>.</p>
+<p><em>Proof:</em></p>
+<p>By induction on <span class="inline-math">$r$</span>.</p>
+<p><em>Base case (<span class="inline-math">$r = 0$</span>).</em> <span class="inline-math">$f = +\infty = \mu(\emptyset)$</span>.</p>
+<p><em>Inductive step.</em> Assume <span class="inline-math">$f = \mu(A[0..r-1])$</span> before processing <span class="inline-math">$a_r$</span>.</p>
+<ul><li><p><em>Refresh first (<span class="inline-math">$a_r \le f$</span>):</em> <span class="inline-math">$f' = a_r = \min(f, a_r) = \min(\mu(A[0..r-1]), a_r) = \mu(A[0..r])$</span>.</p></li></ul>
+<ul><li><p><em>Tighten second or complete triplet (<span class="inline-math">$a_r &gt; f$</span>):</em> <span class="inline-math">$f' = f$</span>. Since <span class="inline-math">$a_r &gt; f = \mu(A[0..r-1])$</span>, the minimum is unchanged: <span class="inline-math">$\mu(A[0..r]) = \mu(A[0..r-1]) = f$</span>. <span class="inline-math">$\blacksquare$</span></p></li></ul>
+<h2>4. Proof of Correctness: The Greedy Bound Invariant</h2>
+<p><strong>Theorem 2: After processing <span class="inline-math">$A[0..r-1]$</span> (without early return), <span class="inline-math">$f = \mu(A[0..r-1])$</span> and <span class="inline-math">$s = \sigma(A[0..r-1])$</span>. The algorithm returns <span class="inline-math">$\mathcal{T}(A)$</span>.</strong></p>
+<p><em>Proof:</em></p>
+<p>Define the loop invariant:</p>
+<div class="equation">$$\text{INV}(r): \quad f = \mu(A[0..r-1]) \;\land\; s = \sigma(A[0..r-1])$$</div>
+<ol><li><p><em>Base case (<span class="inline-math">$r = 0$</span>).</em> <span class="inline-math">$f = +\infty = \mu(\emptyset)$</span> and <span class="inline-math">$s = +\infty = \sigma(\emptyset)$</span>. <span class="inline-math">$\text{INV}(0)$</span> holds.</p></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$\text{INV}(r)$</span> holds. Process <span class="inline-math">$a_r$</span>.</p>
+<p><em>Case 1 — Refresh first (<span class="inline-math">$a_r \le f$</span>):</em></p>
+<p>By Lemma 1, <span class="inline-math">$f' = \mu(A[0..r])$</span>. Since <span class="inline-math">$a_r \le f = \mu(A[0..r-1])$</span>, Theorem 1 Case 1 gives <span class="inline-math">$\sigma(A[0..r]) = \sigma(A[0..r-1]) = s$</span>. The algorithm leaves <span class="inline-math">$s$</span> unchanged. <span class="inline-math">$\text{INV}(r+1)$</span> holds.</p>
+<p><em>Case 2 — Tighten second (<span class="inline-math">$f &lt; a_r \le s$</span>):</em></p>
+<p>By Lemma 1, <span class="inline-math">$f' = f = \mu(A[0..r])$</span>. Since <span class="inline-math">$a_r &gt; f = \mu(A[0..r-1])$</span>, Theorem 1 Case 2 gives:</p>
+<div class="equation">$$\sigma(A[0..r]) = \min(\sigma(A[0..r-1]),\, a_r) = \min(s, a_r) = a_r$$</div>
+<p>The algorithm sets <span class="inline-math">$s' = a_r$</span>. <span class="inline-math">$\text{INV}(r+1)$</span> holds.</p>
+<p><em>Case 3 — Complete triplet (<span class="inline-math">$a_r &gt; s$</span>):</em></p>
+<p>Since <span class="inline-math">$a_r$</span> is finite and <span class="inline-math">$a_r &gt; s$</span>, <span class="inline-math">$s = \sigma(A[0..r-1]) \ne +\infty$</span>. By Corollary 1.2, <span class="inline-math">$\mathcal{T}(A[0..r]) = \text{true}$</span>. A triplet in a prefix is a triplet in <span class="inline-math">$A$</span>, so <span class="inline-math">$\mathcal{T}(A) = \text{true}$</span>. The algorithm correctly returns true.</p></li><li><p><em>Termination (<span class="inline-math">$r = n$</span>, no early return).</em></p>
+<p><span class="inline-math">$\text{INV}(n)$</span> gives <span class="inline-math">$s = \sigma(A)$</span>.</p>
+<p><em>Soundness.</em> Every true return occurs via Case 3, which is justified by Corollary 1.2.</p>
+<p><em>Completeness.</em> Suppose for contradiction that <span class="inline-math">$\mathcal{T}(A) = \text{true}$</span>: there exist <span class="inline-math">$i &lt; j &lt; k$</span> with <span class="inline-math">$a_i &lt; a_j &lt; a_k$</span>. The pair <span class="inline-math">$(i, j)$</span> places <span class="inline-math">$a_j$</span> into the pair set of <span class="inline-math">$A[0..j]$</span>, so:</p>
+<div class="equation">$$\sigma(A[0..j]) \le a_j$$</div>
+<p>By Corollary 1.1 applied iteratively from <span class="inline-math">$A[0..j]$</span> through <span class="inline-math">$A[0..k-1]$</span>:</p>
+<div class="equation">$$s_k = \sigma(A[0..k-1]) \le \sigma(A[0..j]) \le a_j &lt; a_k$$</div>
+<p>When processing <span class="inline-math">$a_k$</span>, the algorithm finds <span class="inline-math">$a_k &gt; s_k$</span> and enters Case 3, returning true — contradicting the assumption of no early return. Therefore <span class="inline-math">$\mathcal{T}(A) = \text{false}$</span>, and the algorithm correctly returns false. <span class="inline-math">$\blacksquare$</span></p></li></ol>
+<p><strong>Corollary 2.1:</strong> If <span class="inline-math">$n &lt; 3$</span>, fewer than three distinct indices exist, so <span class="inline-math">$\mathcal{T}(A) = \text{false}$</span>. The algorithm scans at most two elements without triggering Case 3.</p>
+<p><strong>Corollary 2.2:</strong> If <span class="inline-math">$A$</span> is non-increasing (<span class="inline-math">$a_0 \ge a_1 \ge \cdots \ge a_{n-1}$</span>), no increasing pair exists, <span class="inline-math">$\sigma(A) = +\infty$</span>, and the algorithm returns false.</p>
+<p><strong>Corollary 2.3:</strong> Equal values satisfy <span class="inline-math">$\le$</span> but not <span class="inline-math">$&lt;$</span>, so they may refresh or tighten bounds but never form the strictly increasing relationship needed for a pair or triplet.</p>
+<hr />
+<h2>5. Mechanical Execution (System Trace)</h2>
+<p><strong>Input System.</strong> <span class="inline-math">$A = (2, 1, 5, 0, 4, 6)$</span>, <span class="inline-math">$n = 6$</span>.</p>
+<div class="table-wrap"><table><thead><tr><th>Step</th><th><span class="inline-math">$r$</span></th><th><span class="inline-math">$a_r$</span></th><th>Branch</th><th><span class="inline-math">$f$</span></th><th><span class="inline-math">$s$</span></th></tr></thead><tbody><tr><td><strong>1</strong></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$2$</span></td><td>refresh first</td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$+\infty$</span></td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td>refresh first</td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$+\infty$</span></td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$5$</span></td><td>tighten second</td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$5$</span></td></tr><tr><td><strong>4</strong></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$0$</span></td><td>refresh first</td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$5$</span></td></tr><tr><td><strong>5</strong></td><td><span class="inline-math">$4$</span></td><td><span class="inline-math">$4$</span></td><td>tighten second</td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$4$</span></td></tr><tr><td><strong>6</strong></td><td><span class="inline-math">$5$</span></td><td><span class="inline-math">$6$</span></td><td>complete triplet</td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$4$</span></td></tr></tbody></table></div>
+<p><strong>Result:</strong> <span class="inline-math">$\mathcal{T}(A) = \text{true}$</span>. The pair minimum <span class="inline-math">$s = 4$</span> (at index <span class="inline-math">$4$</span>, with predecessor <span class="inline-math">$a_3 = 0 &lt; 4$</span>) is exceeded by <span class="inline-math">$a_5 = 6$</span>, yielding the triplet <span class="inline-math">$(3, 4, 5)$</span>: <span class="inline-math">$0 &lt; 4 &lt; 6$</span>.</p>
+<p><em>Note on Step 4: When <span class="inline-math">$a_3 = 0$</span> refreshes <span class="inline-math">$f$</span> from <span class="inline-math">$1$</span> to <span class="inline-math">$0$</span>, the second bound <span class="inline-math">$s$</span> remains at <span class="inline-math">$5$</span>. This is Theorem 1 Case 1 in action: a value at or below the prefix minimum cannot form the larger element of any new pair, so <span class="inline-math">$\sigma$</span> is unchanged. The historical witness for <span class="inline-math">$s = 5$</span> — the pair at indices <span class="inline-math">$(1, 2)$</span> with <span class="inline-math">$a_1 = 1 &lt; a_2 = 5$</span> — is immutable in the read-only sequence. The first bound has moved below the second bound's original predecessor, yet the second bound remains valid. This is the non-obvious safety property the algorithm depends on: refreshing <span class="inline-math">$f$</span> never invalidates the witness behind <span class="inline-math">$s$</span>.</em></p>
+<p>The theoretical guarantees translate into the mechanical result: Theorem 1's recurrence predicted that each step would update <span class="inline-math">$\sigma$</span> according to the new value's relationship with <span class="inline-math">$\mu$</span>, Lemma 1 confirmed <span class="inline-math">$f$</span> tracks <span class="inline-math">$\mu$</span> through every branch, and Theorem 2's invariant ensured that the triplet detection at Step 6 is sound via Corollary 1.2 and that no triplet could have been missed via Corollary 1.1.</p></article>
+  </main>
+</body>
+</html>

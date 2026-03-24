@@ -27,7 +27,7 @@ class InlineFormatter
         this.htmlEscaper.escape(match) +
         '</span>'
 
-      text = text.replace(token, replacement)
+      text = text.split(token).join(replacement)
     })
 
     return text
