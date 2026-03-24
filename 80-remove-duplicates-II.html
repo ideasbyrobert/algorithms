@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Formal Proof of the At-Most-Two Compaction Algorithm</title>
+  <link rel="stylesheet" href="assets/styles/document-page.css" />
+  <script src="assets/scripts/mathjax-config.js"></script>
+  <script src="assets/scripts/load-mathjax.js" data-cdn-source="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" data-local-source="assets/vendor/mathjax/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <main>
+    <article><h1>Formal Proof of the At-Most-Two Compaction Algorithm</h1>
+<p>To establish the correctness of the At-Most-Two Compaction algorithm, we must rigorously prove three properties: that the write pointer never corrupts unscanned data, that the lookback-two gate tracks original values through a pair of interlocking identities on consecutive write positions, and that the written region accumulates exactly the at-most-two compaction of the processed prefix. We will dismantle the problem into a safety invariant (§2), a lookback pair identity (§3), and the compaction invariant (§4).</p>
+<h2>1. First Principles &amp; System Definitions</h2>
+<p><strong>Problem objects.</strong> Let <span class="inline-math">$A = (a_0, a_1, \ldots, a_{n-1})$</span> be a finite sequence of integers. Define the <em>multiplicity function</em>:</p>
+<div class="equation">$$\mu(v) = |\{i \in \{0, 1, \ldots, n-1\} : a_i = v\}|$$</div>
+<p>The <em>at-most-two compaction</em> <span class="inline-math">$T = (t_0, t_1, \ldots, t_{k-1})$</span> is the unique non-decreasing sequence such that for each distinct value <span class="inline-math">$v$</span> in <span class="inline-math">$A$</span>, the multiplicity of <span class="inline-math">$v$</span> in <span class="inline-math">$T$</span> is <span class="inline-math">$\min(\mu(v), 2)$</span>. The length of the compaction is:</p>
+<div class="equation">$$k = \sum_{v \,:\, \mu(v) &gt; 0} \min(\mu(v), 2)$$</div>
+<p><strong>Preconditions and contract assumptions.</strong></p>
+<ul><li><p><em>Sortedness:</em> <span class="inline-math">$a_i \le a_{i+1}$</span> for all <span class="inline-math">$0 \le i &lt; n - 1$</span>.</p></li><li><p><em>Non-empty:</em> <span class="inline-math">$n \ge 1$</span>.</p></li><li><p><em>Mutation permitted:</em> In-place overwriting of <span class="inline-math">$A$</span> is allowed.</p></li></ul>
+<p><strong>Postcondition.</strong></p>
+<div class="equation">$$A^{(f)}[i] = t_i \quad \text{for each } 0 \le i &lt; k, \quad \text{and the algorithm returns } k.$$</div>
+<p><strong>State variables.</strong></p>
+<ul><li><p><span class="inline-math">$w \in \{2, 3, \ldots, n\}$</span> — write pointer; the next available write position.</p></li><li><p><span class="inline-math">$r \in \{2, 3, \ldots, n - 1\}$</span> — read pointer; scans each position exactly once.</p></li></ul>
+<p><strong>Initialization.</strong> For <span class="inline-math">$n \le 2$</span>, the algorithm returns <span class="inline-math">$n$</span> immediately — any sequence of at most two elements already satisfies the at-most-two constraint. For <span class="inline-math">$n \ge 3$</span>:</p>
+<div class="equation">$$w = 2, \quad r = 2$$</div>
+<p>The first two elements <span class="inline-math">$a_0, a_1$</span> are unconditionally retained — regardless of whether they are equal or distinct, they contribute at most two copies of any single value.</p>
+<p><strong>Mutation model.</strong> <span class="inline-math">$A^{(0)}$</span> is the input sequence. <span class="inline-math">$A^{(t)}$</span> is the state after step <span class="inline-math">$t$</span>. Each write step sets <span class="inline-math">$A^{(t+1)}[w] \gets A^{(t)}[r]$</span>, leaving all other positions unchanged. <span class="inline-math">$A^{(f)}$</span> is the final state after the loop terminates.</p>
+<h2>2. The Write-Read Safety Invariant</h2>
+<p><strong>Theorem 1: The write pointer never exceeds the read pointer.</strong></p>
+<div class="equation">$$w \le r \quad \text{at the start of every iteration.}$$</div>
+<p><em>Proof:</em></p>
+<ol><li><p><em>Base case.</em> At initialization, <span class="inline-math">$w = 2 = r$</span>. So <span class="inline-math">$w \le r$</span>.</p></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$w \le r$</span> at the start of iteration <span class="inline-math">$r$</span>.</p>
+<p><em>Case 1 — gate fails (skip):</em> <span class="inline-math">$w$</span> is unchanged; <span class="inline-math">$r$</span> advances to <span class="inline-math">$r + 1$</span>.</p>
+<div class="equation">$$w \le r &lt; r + 1$$</div>
+<p><em>Case 2 — gate passes (write):</em> <span class="inline-math">$w$</span> advances to <span class="inline-math">$w + 1$</span>; <span class="inline-math">$r$</span> advances to <span class="inline-math">$r + 1$</span>.</p>
+<div class="equation">$$w + 1 \le r + 1$$</div></li><li><p>By induction on <span class="inline-math">$r$</span>, <span class="inline-math">$w \le r$</span> holds at every iteration. <span class="inline-math">$\blacksquare$</span></p></li></ol>
+<p><strong>Corollary 1.1: Every read returns the original value.</strong></p>
+<p>Since <span class="inline-math">$w \le r$</span>, positions <span class="inline-math">$r, r + 1, \ldots, n - 1$</span> have not been written to when the algorithm reads position <span class="inline-math">$r$</span>. Therefore <span class="inline-math">$A^{(t)}[r] = A^{(0)}[r]$</span> for every read.</p>
+<h2>3. Algorithm Mapping: The Lookback-Two Gate</h2>
+<p>The gate condition governing write-or-skip is:</p>
+<div class="equation">$$A^{(t)}[r] \ne A^{(t)}[w - 2]$$</div>
+<p>This is a <em>self-referential gate</em>: the comparison target <span class="inline-math">$A^{(t)}[w - 2]$</span> is in the written region — a position the algorithm may have overwritten.</p>
+<p><strong>Lemma 1: The lookback pair identity.</strong></p>
+<p>At the start of every iteration with read pointer <span class="inline-math">$r$</span> and write pointer <span class="inline-math">$w$</span>:</p>
+<p>(a) <span class="inline-math">$A^{(t)}[w - 2] = A^{(0)}[r - 2]$</span></p>
+<p>(b) <span class="inline-math">$A^{(t)}[w - 1] = A^{(0)}[r - 1]$</span></p>
+<p><em>Proof:</em></p>
+<p>By joint induction on <span class="inline-math">$r$</span>.</p>
+<ol><li><p><em>Base case (<span class="inline-math">$r = 2$</span>).</em> <span class="inline-math">$w = 2$</span>. Positions 0 and 1 have not been written, so <span class="inline-math">$A^{(0)}[0] = A^{(0)}[0]$</span> and <span class="inline-math">$A^{(0)}[1] = A^{(0)}[1]$</span>. Both (a) and (b) hold.</p></li><li><p><em>Inductive step.</em> Assume (a) and (b) hold at the start of iteration <span class="inline-math">$r$</span>.</p>
+<p><em>Case 1 — gate fails:</em> By Corollary 1.1 and (a): <span class="inline-math">$A^{(0)}[r] = A^{(t)}[w - 2] = A^{(0)}[r - 2]$</span>. By sortedness, <span class="inline-math">$A^{(0)}[r - 2] \le A^{(0)}[r - 1] \le A^{(0)}[r] = A^{(0)}[r - 2]$</span>, so:</p>
+<div class="equation">$$A^{(0)}[r - 2] = A^{(0)}[r - 1] = A^{(0)}[r]$$</div>
+<p>After the step, <span class="inline-math">$w$</span> is unchanged and <span class="inline-math">$r$</span> advances to <span class="inline-math">$r + 1$</span>. For (a): <span class="inline-math">$A^{(t)}[w - 2] = A^{(0)}[r - 2] = A^{(0)}[r - 1] = A^{(0)}[(r + 1) - 2]$</span>. For (b): <span class="inline-math">$A^{(t)}[w - 1] = A^{(0)}[r - 1] = A^{(0)}[r] = A^{(0)}[(r + 1) - 1]$</span>. Both hold.</p>
+<p><em>Case 2 — gate passes:</em> The algorithm writes <span class="inline-math">$A^{(t+1)}[w] \gets A^{(0)}[r]$</span> (by Corollary 1.1) and advances <span class="inline-math">$w$</span> to <span class="inline-math">$w + 1$</span>, <span class="inline-math">$r$</span> to <span class="inline-math">$r + 1$</span>. Position <span class="inline-math">$w - 1$</span> is untouched by this write.</p>
+<p>For (a): <span class="inline-math">$A^{(t+1)}[(w+1) - 2] = A^{(t+1)}[w - 1] = A^{(t)}[w - 1] = A^{(0)}[r - 1] = A^{(0)}[(r+1) - 2]$</span>, using (b).</p>
+<p>For (b): <span class="inline-math">$A^{(t+1)}[(w+1) - 1] = A^{(t+1)}[w] = A^{(0)}[r] = A^{(0)}[(r+1) - 1]$</span>, by the write.</p>
+<p>Both hold.</p></li><li><p>By joint induction, (a) and (b) hold at every iteration. <span class="inline-math">$\blacksquare$</span></p></li></ol>
+<p><strong>Consequence.</strong> By Corollary 1.1 and Lemma 1(a), the gate <span class="inline-math">$A^{(t)}[r] \ne A^{(t)}[w - 2]$</span> reduces to:</p>
+<div class="equation">$$A^{(0)}[r] \ne A^{(0)}[r - 2]$$</div>
+<p>Combined with sortedness (<span class="inline-math">$a_{r-2} \le a_{r-1} \le a_r$</span>), the gate passes if and only if <span class="inline-math">$a_r &gt; a_{r-2}$</span>. This occurs in exactly two situations:</p>
+<ul><li><p><em>New value:</em> <span class="inline-math">$a_r &gt; a_{r-1}$</span> — position <span class="inline-math">$r$</span> introduces a distinct value not yet at its copy limit.</p></li><li><p><em>Second copy:</em> <span class="inline-math">$a_r = a_{r-1} &gt; a_{r-2}$</span> — position <span class="inline-math">$r$</span> is the second occurrence of its value.</p></li></ul>
+<p>The gate fails when <span class="inline-math">$a_r = a_{r-1} = a_{r-2}$</span> — position <span class="inline-math">$r$</span> is a third-or-beyond consecutive occurrence.</p>
+<h2>4. Proof of Correctness: The At-Most-Two Compaction Invariant</h2>
+<p><strong>Theorem 2: Upon termination, <span class="inline-math">$A^{(f)}[0..w-1] = T$</span> and <span class="inline-math">$w = k$</span>.</strong></p>
+<p><em>Proof:</em></p>
+<p>For any prefix <span class="inline-math">$A^{(0)}[0..j-1]$</span>, let <span class="inline-math">$T_j$</span> denote its at-most-two compaction. Define the loop invariant at the start of iteration <span class="inline-math">$r$</span>:</p>
+<div class="equation">$$\text{INV}(r): \quad A^{(t)}[0..w-1] = T_r$$</div>
+<ol><li><p><em>Base case (<span class="inline-math">$r = 2$</span>).</em> <span class="inline-math">$w = 2$</span>. The written region is <span class="inline-math">$(a_0, a_1)$</span>. A two-element sorted sequence has each value appearing at most twice, so <span class="inline-math">$T_2 = (a_0, a_1)$</span>. <span class="inline-math">$\text{INV}(2)$</span> holds.</p></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$\text{INV}(r)$</span> holds.</p>
+<p><em>Case 1 — gate fails:</em> By the consequence, <span class="inline-math">$a_r = a_{r-1} = a_{r-2}$</span>. The value <span class="inline-math">$a_r$</span> appears at positions <span class="inline-math">$r - 2$</span>, <span class="inline-math">$r - 1$</span>, and <span class="inline-math">$r$</span> — a third-or-beyond consecutive occurrence. The at-most-two compaction already includes two copies of this value, so <span class="inline-math">$T_{r+1} = T_r$</span>. Since <span class="inline-math">$w$</span> is unchanged, <span class="inline-math">$\text{INV}(r + 1)$</span> holds.</p>
+<p><em>Case 2 — gate passes:</em> <span class="inline-math">$a_r &gt; a_{r-2}$</span>. By sortedness, <span class="inline-math">$a_r \ge a_{r-1} \ge a_{r-2}$</span>. Since <span class="inline-math">$a_r &gt; a_{r-2}$</span>, the contiguous block of value <span class="inline-math">$a_r$</span> in <span class="inline-math">$A^{(0)}[0..r]$</span> can extend back at most to position <span class="inline-math">$r - 1$</span> (because <span class="inline-math">$a_{r-2} &lt; a_r$</span>). The value <span class="inline-math">$a_r$</span> therefore appears at most twice in <span class="inline-math">$A^{(0)}[0..r]$</span>: once if <span class="inline-math">$a_r &gt; a_{r-1}$</span>, or twice if <span class="inline-math">$a_r = a_{r-1}$</span>. In both cases, this copy belongs in the compaction:</p>
+<div class="equation">$$T_{r+1} = T_r \| (a_r)$$</div>
+<p>The algorithm writes <span class="inline-math">$A^{(0)}[r]$</span> at position <span class="inline-math">$w$</span> (by Corollary 1.1):</p>
+<div class="equation">$$A^{(t+1)}[0..w] = (T_r, a_r) = T_{r+1}$$</div>
+<p>After <span class="inline-math">$w$</span> increments, <span class="inline-math">$\text{INV}(r + 1)$</span> holds.</p></li><li><p><em>Termination.</em> The loop ends when <span class="inline-math">$r = n$</span>. By <span class="inline-math">$\text{INV}(n)$</span>, <span class="inline-math">$A^{(f)}[0..w-1] = T_n = T$</span> and <span class="inline-math">$w = |T| = k$</span>. <span class="inline-math">$\blacksquare$</span></p></li></ol>
+<p><strong>Corollary 2.1:</strong> If all elements are identical (<span class="inline-math">$\mu(v) = n$</span> for one value <span class="inline-math">$v$</span>), the gate fails at every iteration. <span class="inline-math">$w = 2$</span>, retaining exactly two copies.</p>
+<p><strong>Corollary 2.2:</strong> If no value appears more than twice, the gate passes at every iteration. <span class="inline-math">$w = n$</span>, the entire array is retained.</p>
+<p><strong>Corollary 2.3:</strong> For <span class="inline-math">$n \le 2$</span>, the early return gives <span class="inline-math">$w = n = k$</span> — the array is already at most two copies of each value.</p>
+<hr />
+<h2>5. Mechanical Execution (System Trace)</h2>
+<p><strong>Input System.</strong> <span class="inline-math">$A^{(0)} = (1, 1, 1, 2, 2, 3)$</span>, <span class="inline-math">$n = 6$</span>. Target: <span class="inline-math">$T = (1, 1, 2, 2, 3)$</span>, <span class="inline-math">$k = 5$</span>.</p>
+<p>Initialization: <span class="inline-math">$w = 2$</span>, <span class="inline-math">$r = 2$</span>. Positions 0 and 1 retained unconditionally: <span class="inline-math">$(1, 1)$</span>.</p>
+<div class="table-wrap"><table><thead><tr><th>Step</th><th><span class="inline-math">$r$</span></th><th><span class="inline-math">$A^{(0)}[r]$</span></th><th><span class="inline-math">$A^{(t)}[w-2]$</span></th><th><span class="inline-math">$A^{(0)}[r-2]$</span></th><th>Gate</th><th>Action</th><th><span class="inline-math">$w$</span></th></tr></thead><tbody><tr><td><strong>1</strong></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1 = 1$</span> — fail</td><td>skip</td><td><span class="inline-math">$2$</span></td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$2 \ne 1$</span> — pass</td><td>write <span class="inline-math">$A[2] \gets 2$</span></td><td><span class="inline-math">$3$</span></td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$4$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$2 \ne 1$</span> — pass</td><td>write <span class="inline-math">$A[3] \gets 2$</span></td><td><span class="inline-math">$4$</span></td></tr><tr><td><strong>4</strong></td><td><span class="inline-math">$5$</span></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$3 \ne 2$</span> — pass</td><td>write <span class="inline-math">$A[4] \gets 3$</span></td><td><span class="inline-math">$5$</span></td></tr></tbody></table></div>
+<p><strong>Result:</strong> <span class="inline-math">$w = 5 = k$</span>, <span class="inline-math">$A^{(f)}[0..4] = (1, 1, 2, 2, 3) = T$</span>.</p>
+<p><em>Note on Step 4: The gate reads <span class="inline-math">$A^{(t)}[w - 2] = A^{(t)}[2] = 2$</span>, but position 2 originally held <span class="inline-math">$A^{(0)}[2] = 1$</span> — the algorithm overwrote it from <span class="inline-math">$1$</span> to <span class="inline-math">$2$</span> in Step 2. Despite this mutation, Lemma 1(a) guarantees the lookback value equals <span class="inline-math">$A^{(0)}[r - 2] = A^{(0)}[3] = 2$</span>. The joint induction is the reason this works: identity (a) for Step 4 depended on identity (b) from Step 3's gate-pass — each half of the lookback pair supports the other through the interlocking induction. This mutual dependence is what distinguishes #80 from #26, where a single self-sustaining identity sufficed.</em></p>
+<p>The theoretical guarantees translate into the mechanical result: Theorem 1 ensured every write landed in already-scanned territory, Lemma 1 confirmed the lookback pair tracked original values through two interlocking identities, and Theorem 2's invariant accumulated exactly the five elements of the at-most-two compaction.</p></article>
+  </main>
+</body>
+</html>
