@@ -1,10 +1,12 @@
-class HtmlEscaper {
-  escape(value) {
+class HtmlEscaper 
+{
+  escape(value) 
+  {
     return value
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+      .replace(/>/g, '&gt;')
   }
 }
 
-module.exports = HtmlEscaper;
+module.exports = HtmlEscaper

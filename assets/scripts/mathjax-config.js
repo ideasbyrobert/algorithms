@@ -5,6 +5,14 @@ window.MathJax = {
     processEscapes: true
   },
   options: {
-    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'code', 'annotation', 'annotation-xml']
+    skipHtmlTags: [
+      'script',
+      'noscript',
+      'style',
+      'textarea',
+      'code',
+      'annotation',
+      'annotation-xml'
+    ]
   }
-};
+}
