@@ -87,6 +87,16 @@ em {
   font-style: italic;
 }
 
+.inline-math {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.inline-math mjx-container {
+  max-width: 100%;
+}
+
 .equation {
   margin: 20px 0 28px;
   padding: clamp(16px, 4vw, 24px);
@@ -163,9 +173,40 @@ mjx-container[display='true'] {
 }
 
 @media (max-width: 720px) {
+  body {
+    padding: 0;
+    background: #ffffff;
+  }
+
+  main {
+    width: 100%;
+    padding: 24px 20px 40px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
   ul,
   ol {
     margin-left: 1rem;
+  }
+
+  .equation {
+    padding: 16px 14px;
+    overflow-x: visible;
+  }
+
+  mjx-container[display='true'] {
+    overflow-x: visible;
+    overflow-y: visible;
+    white-space: normal !important;
+  }
+
+  mjx-container[display='true'] mjx-math,
+  .inline-math mjx-container,
+  .inline-math mjx-container mjx-math {
+    white-space: normal !important;
   }
 
   th,
