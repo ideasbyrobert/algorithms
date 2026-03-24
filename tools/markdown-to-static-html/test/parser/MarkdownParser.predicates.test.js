@@ -17,7 +17,7 @@ describe('MarkdownLineClassifier helper rules', () =>
     expect(lineClassifier.isEquation(' $$x$$ ')).toBe(true)
     expect(lineClassifier.isEquation('$$x')).toBe(false)
     expect(lineClassifier.isUnorderedItem('  * bullet')).toBe(true)
-    expect(lineClassifier.isUnorderedItem('- bullet')).toBe(false)
+    expect(lineClassifier.isUnorderedItem('- bullet')).toBe(true)
     expect(lineClassifier.isOrderedItem('12. item')).toBe(true)
     expect(lineClassifier.isOrderedItem('12)item')).toBe(false)
   })

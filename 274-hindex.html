@@ -10,143 +10,74 @@
 </head>
 <body>
   <main>
-    <article>
-      <h1>Formal Proof of the H-Index Algorithm</h1>
-      <p>To establish the correctness of the H-Index algorithm, we must rigorously prove three properties: that citation counts above <span class="inline-math">$n$</span> can be capped without altering the h-index, that the bucket array faithfully encodes the support counting function, and that the descending threshold scan identifies the maximum qualifying threshold. We will dismantle the problem into a capping identity (§2), a bucket-to-support mapping (§3), and a descending scan invariant (§4).</p>
-
-      <h2>1. First Principles &amp; System Definitions</h2>
-      <p><strong>Problem objects.</strong> Let <span class="inline-math">$C = (c_0, c_1, \ldots, c_{n-1})$</span> be a finite sequence of non-negative integers, where <span class="inline-math">$c_i$</span> is the citation count of paper <span class="inline-math">$i$</span>. Define the <em>support counting function</em>:</p>
-      <div class="equation">$$S(h) = |\{i \in \{0, 1, \ldots, n-1\} : c_i \ge h\}|$$</div>
-      <p><span class="inline-math">$S(h)$</span> counts how many papers have at least <span class="inline-math">$h$</span> citations. Define the <em>h-index</em>:</p>
-      <div class="equation">$$H = \max\{h \in \{0, 1, \ldots, n\} : S(h) \ge h\}$$</div>
-      <p>This set is non-empty because <span class="inline-math">$S(0) = n \ge 0$</span>, so <span class="inline-math">$h = 0$</span> always qualifies.</p>
-      <p><strong>Preconditions and contract assumptions.</strong></p>
-      <ul>
-        <li><p><span class="inline-math">$c_i \in \mathbb{Z}_{\ge 0}$</span> for all <span class="inline-math">$0 \le i &lt; n$</span>.</p></li>
-        <li><p><span class="inline-math">$n \ge 1$</span>.</p></li>
-      </ul>
-      <p><strong>Postcondition.</strong></p>
-      <div class="equation">$$\text{The algorithm returns } H.$$</div>
-      <p><strong>State variables.</strong></p>
-      <ul>
-        <li><p><span class="inline-math">$B[j] \in \mathbb{Z}_{\ge 0}$</span> for <span class="inline-math">$j \in \{0, 1, \ldots, n\}$</span> — bucket array; <span class="inline-math">$B[j]$</span> counts papers whose capped citation count equals <span class="inline-math">$j$</span>.</p></li>
-        <li><p><span class="inline-math">$h \in \{0, 1, \ldots, n\}$</span> — candidate threshold, scanned from <span class="inline-math">$n$</span> down to <span class="inline-math">$0$</span>.</p></li>
-        <li><p><span class="inline-math">$\sigma \in \{0, 1, \ldots, n\}$</span> — running support count; accumulates papers with capped citations <span class="inline-math">$\ge h$</span>.</p></li>
-      </ul>
-      <p><strong>Initialization.</strong></p>
-      <p>Bucket construction:</p>
-      <div class="equation">$$B[j] = |\{i : \min(c_i, n) = j\}| \quad \text{for each } 0 \le j \le n$$</div>
-      <p>Scan initialization:</p>
-      <div class="equation">$$h = n, \quad \sigma = 0$$</div>
-      <p>No mutation model is needed — the algorithm constructs a separate bucket array and does not modify <span class="inline-math">$C$</span>.</p>
-
-      <h2>2. Bounding and Capping</h2>
-      <p><strong>Theorem 1: Capping citations at <span class="inline-math">$n$</span> preserves the support counting function.</strong></p>
-      <p>Define <span class="inline-math">$\hat{c}_i = \min(c_i, n)$</span> and <span class="inline-math">$\hat{S}(h) = |\{i : \hat{c}_i \ge h\}|$</span>. Then:</p>
-      <div class="equation">$$\hat{S}(h) = S(h) \quad \text{for all } h \in \{0, 1, \ldots, n\}$$</div>
-      <p><em>Proof:</em></p>
-      <p>Fix any <span class="inline-math">$h \le n$</span> and any paper <span class="inline-math">$i$</span>.</p>
-      <ol>
-        <li><p>If <span class="inline-math">$c_i \ge h$</span>: either <span class="inline-math">$c_i \le n$</span>, so <span class="inline-math">$\hat{c}_i = c_i \ge h$</span>; or <span class="inline-math">$c_i &gt; n$</span>, so <span class="inline-math">$\hat{c}_i = n \ge h$</span>. In both cases, <span class="inline-math">$\hat{c}_i \ge h$</span>.</p></li>
-        <li><p>If <span class="inline-math">$c_i &lt; h$</span>: then <span class="inline-math">$c_i &lt; h \le n$</span>, so <span class="inline-math">$\hat{c}_i = c_i &lt; h$</span>.</p></li>
-      </ol>
-      <p>Therefore <span class="inline-math">$c_i \ge h \iff \hat{c}_i \ge h$</span> for every paper <span class="inline-math">$i$</span> and every threshold <span class="inline-math">$h \le n$</span>. Summing over all papers, <span class="inline-math">$\hat{S}(h) = S(h)$</span>. <span class="inline-math">$\blacksquare$</span></p>
-      <p><strong>Corollary 1.1: The h-index lies in <span class="inline-math">$\{0, 1, \ldots, n\}$</span>.</strong></p>
-      <p>Since there are only <span class="inline-math">$n$</span> papers, <span class="inline-math">$S(h) \le n$</span> for all <span class="inline-math">$h$</span>. Any <span class="inline-math">$h &gt; n$</span> would require <span class="inline-math">$S(h) \ge h &gt; n$</span>, which is impossible. And <span class="inline-math">$S(0) = n \ge 0$</span>, so <span class="inline-math">$h = 0$</span> always qualifies. Therefore <span class="inline-math">$H \in \{0, 1, \ldots, n\}$</span>, and the search space for <span class="inline-math">$H$</span> is exactly the domain of <span class="inline-math">$B$</span>.</p>
-
-      <h2>3. Algorithm Mapping: The Bucket Array</h2>
-      <p>The bucket array <span class="inline-math">$B$</span> encodes the support counting function via a right-to-left prefix sum.</p>
-      <p><strong>Lemma 1: The right-to-left prefix sum of <span class="inline-math">$B$</span> equals <span class="inline-math">$S$</span>.</strong></p>
-      <div class="equation">$$\sum_{j=h}^{n} B[j] = S(h) \quad \text{for all } h \in \{0, 1, \ldots, n\}$$</div>
-      <p><em>Proof:</em></p>
-      <p>By definition of <span class="inline-math">$B$</span>:</p>
-      <div class="equation">$$\sum_{j=h}^{n} B[j] = \sum_{j=h}^{n} |\{i : \min(c_i, n) = j\}|$$</div>
-      <p>Since each paper maps to exactly one bucket (the sets <span class="inline-math">$\{i : \min(c_i, n) = j\}$</span> are pairwise disjoint for distinct <span class="inline-math">$j$</span>):</p>
-      <div class="equation">$$= |\{i : \min(c_i, n) \ge h\}| = \hat{S}(h)$$</div>
-      <p>By Theorem 1, <span class="inline-math">$\hat{S}(h) = S(h)$</span>. <span class="inline-math">$\blacksquare$</span></p>
-      <p><strong>Consequence.</strong> The running sum <span class="inline-math">$\sigma$</span>, after adding <span class="inline-math">$B[h]$</span> at threshold <span class="inline-math">$h$</span>, satisfies:</p>
-      <div class="equation">$$\sigma = \sum_{j=h}^{n} B[j] = S(h)$$</div>
-      <p>The bucket array converts the support function — which would otherwise require a full pass over <span class="inline-math">$C$</span> for each threshold — into an incremental right-to-left accumulation with <span class="inline-math">$O(1)$</span> work per threshold.</p>
-
-      <h2>4. Proof of Correctness: The Descending Threshold Scan</h2>
-      <p><strong>Theorem 2: The descending scan returns <span class="inline-math">$H$</span>.</strong></p>
-      <p><em>Proof:</em></p>
-      <p>Define the loop invariant at the start of the iteration with candidate <span class="inline-math">$h$</span>:</p>
-      <div class="equation">$$\text{INV}(h): \quad \sigma = \sum_{j=h+1}^{n} B[j] = S(h + 1), \quad \text{and } S(h') &lt; h' \text{ for all } h' &gt; h$$</div>
-      <ol>
-        <li><p><em>Base case (<span class="inline-math">$h = n$</span>).</em> Before the first iteration, <span class="inline-math">$\sigma = 0$</span>. The empty sum <span class="inline-math">$\sum_{j=n+1}^{n} B[j] = 0 = S(n + 1)$</span> holds, and no <span class="inline-math">$h' &gt; n$</span> exists, so the second clause is vacuously true. <span class="inline-math">$\text{INV}(n)$</span> holds.</p></li>
-        <li>
-          <p><em>Inductive step.</em> Assume <span class="inline-math">$\text{INV}(h)$</span> holds. The iteration adds <span class="inline-math">$B[h]$</span> to <span class="inline-math">$\sigma$</span>:</p>
-          <div class="equation">$$\sigma' = \sigma + B[h] = \sum_{j=h+1}^{n} B[j] + B[h] = \sum_{j=h}^{n} B[j] = S(h) \quad \text{(by Lemma 1)}$$</div>
-          <p><em>Case 1 — <span class="inline-math">$\sigma' \ge h$</span> (support sufficient):</em> The scan returns <span class="inline-math">$h$</span>. By hypothesis, <span class="inline-math">$S(h') &lt; h'$</span> for all <span class="inline-math">$h' &gt; h$</span>, so no larger threshold qualifies. Since <span class="inline-math">$S(h) \ge h$</span>, we have <span class="inline-math">$h \in \{h : S(h) \ge h\}$</span> and no element of that set exceeds <span class="inline-math">$h$</span>. Therefore <span class="inline-math">$h = H$</span>.</p>
-          <p><em>Case 2 — <span class="inline-math">$\sigma' &lt; h$</span> (support insufficient):</em> <span class="inline-math">$S(h) &lt; h$</span>, so <span class="inline-math">$h$</span> is not a valid candidate. The scan continues to <span class="inline-math">$h - 1$</span>. Now <span class="inline-math">$\sigma = S(h)$</span> and <span class="inline-math">$S(h') &lt; h'$</span> for all <span class="inline-math">$h' \ge h$</span>, so <span class="inline-math">$\text{INV}(h - 1)$</span> holds.</p>
-        </li>
-        <li>
-          <p><em>Termination.</em> If no positive threshold passes, the scan reaches <span class="inline-math">$h = 0$</span>. At this point:</p>
-          <div class="equation">$$\sigma' = \sum_{j=0}^{n} B[j] = S(0) = n \ge 0 = h$$</div>
-          <p>The check passes and the scan returns <span class="inline-math">$0$</span>. By Corollary 1.1, when no positive threshold is supported, <span class="inline-math">$H = 0$</span>.</p>
-        </li>
-      </ol>
-      <p>In all cases, the returned value equals <span class="inline-math">$H$</span>. <span class="inline-math">$\blacksquare$</span></p>
-      <p><strong>Corollary 2.1:</strong> If every paper has zero citations (<span class="inline-math">$c_i = 0$</span> for all <span class="inline-math">$i$</span>), then <span class="inline-math">$S(h) = 0$</span> for all <span class="inline-math">$h \ge 1$</span>, and <span class="inline-math">$H = 0$</span>.</p>
-      <p><strong>Corollary 2.2:</strong> If every paper has at least <span class="inline-math">$n$</span> citations (<span class="inline-math">$c_i \ge n$</span> for all <span class="inline-math">$i$</span>), then <span class="inline-math">$S(n) = n \ge n$</span>, and <span class="inline-math">$H = n$</span>.</p>
-      <p><strong>Corollary 2.3:</strong> For a single paper (<span class="inline-math">$n = 1$</span>), <span class="inline-math">$H = 1$</span> if <span class="inline-math">$c_0 \ge 1$</span>; otherwise <span class="inline-math">$H = 0$</span>.</p>
-
-      <hr />
-
-      <h2>5. Mechanical Execution (System Trace)</h2>
-      <p><strong>Input System.</strong> <span class="inline-math">$C = (3, 0, 6, 1, 5)$</span>, <span class="inline-math">$n = 5$</span>.</p>
-      <p><strong>Bucket construction.</strong> Capping: <span class="inline-math">$\min(3, 5) = 3$</span>, <span class="inline-math">$\min(0, 5) = 0$</span>, <span class="inline-math">$\min(6, 5) = 5$</span>, <span class="inline-math">$\min(1, 5) = 1$</span>, <span class="inline-math">$\min(5, 5) = 5$</span>.</p>
-      <div class="equation">$$B = (1, 1, 0, 1, 0, 2)$$</div>
-      <p><strong>Descending scan.</strong></p>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Step</th>
-              <th><span class="inline-math">$h$</span></th>
-              <th><span class="inline-math">$B[h]$</span></th>
-              <th><span class="inline-math">$\sigma$</span> after</th>
-              <th><span class="inline-math">$S(h) = \sigma$</span></th>
-              <th><span class="inline-math">$\sigma \ge h$</span>?</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>1</strong></td>
-              <td><span class="inline-math">$5$</span></td>
-              <td><span class="inline-math">$2$</span></td>
-              <td><span class="inline-math">$2$</span></td>
-              <td><span class="inline-math">$S(5) = 2$</span></td>
-              <td><span class="inline-math">$2 &lt; 5$</span> — no</td>
-              <td>continue</td>
-            </tr>
-            <tr>
-              <td><strong>2</strong></td>
-              <td><span class="inline-math">$4$</span></td>
-              <td><span class="inline-math">$0$</span></td>
-              <td><span class="inline-math">$2$</span></td>
-              <td><span class="inline-math">$S(4) = 2$</span></td>
-              <td><span class="inline-math">$2 &lt; 4$</span> — no</td>
-              <td>continue</td>
-            </tr>
-            <tr>
-              <td><strong>3</strong></td>
-              <td><span class="inline-math">$3$</span></td>
-              <td><span class="inline-math">$1$</span></td>
-              <td><span class="inline-math">$3$</span></td>
-              <td><span class="inline-math">$S(3) = 3$</span></td>
-              <td><span class="inline-math">$3 \ge 3$</span> — yes</td>
-              <td>return <span class="inline-math">$3$</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p><strong>Result:</strong> <span class="inline-math">$H = 3$</span>.</p>
-      <p><em>Note on Step 3: The running support count <span class="inline-math">$\sigma$</span> reaches exactly 3 at threshold <span class="inline-math">$h = 3$</span> — the tightest possible match where <span class="inline-math">$S(h) = h$</span>. The two papers with citations <span class="inline-math">$\ge 5$</span> (values 6 and 5, both capped into bucket 5 by Theorem 1) were counted in Step 1, and the paper with exactly 3 citations was added in Step 3. Lemma 1's prefix sum correctly computes <span class="inline-math">$S(3) = 3$</span> despite the capping — citation count 6 was compressed to bucket 5 alongside citation count 5, yet both still register as supporters of every threshold <span class="inline-math">$\le 5$</span>.</em></p>
-      <p>The theoretical guarantees translate into the mechanical result: Theorem 1 justified compressing citations into <span class="inline-math">$n + 1$</span> buckets without altering the support counts, Lemma 1 confirmed that each accumulation step computed the true value of <span class="inline-math">$S(h)$</span>, and Theorem 2's invariant delivered the h-index at the first qualifying threshold.</p>
-    </article>
+    <article><h1>Formal Proof of the H-Index Algorithm</h1>
+<p>To establish the correctness of the H-Index algorithm, we must rigorously prove three properties: that citation counts above <span class="inline-math">$n$</span> can be capped without altering the h-index, that the bucket array faithfully encodes the support counting function, and that the descending threshold scan identifies the maximum qualifying threshold. We will dismantle the problem into a capping identity (§2), a bucket-to-support mapping (§3), and a descending scan invariant (§4).</p>
+<h2>1. First Principles &amp; System Definitions</h2>
+<p><strong>Problem objects.</strong> Let <span class="inline-math">$C = (c_0, c_1, \ldots, c_{n-1})$</span> be a finite sequence of non-negative integers, where <span class="inline-math">$c_i$</span> is the citation count of paper <span class="inline-math">$i$</span>. Define the <em>support counting function</em>:</p>
+<div class="equation">$$S(h) = |\{i \in \{0, 1, \ldots, n-1\} : c_i \ge h\}|$$</div>
+<p><span class="inline-math">$S(h)$</span> counts how many papers have at least <span class="inline-math">$h$</span> citations. Define the <em>h-index</em>:</p>
+<div class="equation">$$H = \max\{h \in \{0, 1, \ldots, n\} : S(h) \ge h\}$$</div>
+<p>This set is non-empty because <span class="inline-math">$S(0) = n \ge 0$</span>, so <span class="inline-math">$h = 0$</span> always qualifies.</p>
+<p><strong>Preconditions and contract assumptions.</strong></p>
+<ul><li><p><span class="inline-math">$c_i \in \mathbb{Z}_{\ge 0}$</span> for all <span class="inline-math">$0 \le i &lt; n$</span>.</p></li><li><p><span class="inline-math">$n \ge 1$</span>.</p></li></ul>
+<p><strong>Postcondition.</strong></p>
+<div class="equation">$$\text{The algorithm returns } H.$$</div>
+<p><strong>State variables.</strong></p>
+<ul><li><p><span class="inline-math">$B[j] \in \mathbb{Z}_{\ge 0}$</span> for <span class="inline-math">$j \in \{0, 1, \ldots, n\}$</span> — bucket array; <span class="inline-math">$B[j]$</span> counts papers whose capped citation count equals <span class="inline-math">$j$</span>.</p></li><li><p><span class="inline-math">$h \in \{0, 1, \ldots, n\}$</span> — candidate threshold, scanned from <span class="inline-math">$n$</span> down to <span class="inline-math">$0$</span>.</p></li><li><p><span class="inline-math">$\sigma \in \{0, 1, \ldots, n\}$</span> — running support count; accumulates papers with capped citations <span class="inline-math">$\ge h$</span>.</p></li></ul>
+<p><strong>Initialization.</strong></p>
+<p>Bucket construction:</p>
+<div class="equation">$$B[j] = |\{i : \min(c_i, n) = j\}| \quad \text{for each } 0 \le j \le n$$</div>
+<p>Scan initialization:</p>
+<div class="equation">$$h = n, \quad \sigma = 0$$</div>
+<p>No mutation model is needed — the algorithm constructs a separate bucket array and does not modify <span class="inline-math">$C$</span>.</p>
+<h2>2. Bounding and Capping</h2>
+<p><strong>Theorem 1: Capping citations at <span class="inline-math">$n$</span> preserves the support counting function.</strong></p>
+<p>Define <span class="inline-math">$\hat{c}_i = \min(c_i, n)$</span> and <span class="inline-math">$\hat{S}(h) = |\{i : \hat{c}_i \ge h\}|$</span>. Then:</p>
+<div class="equation">$$\hat{S}(h) = S(h) \quad \text{for all } h \in \{0, 1, \ldots, n\}$$</div>
+<p><em>Proof:</em></p>
+<p>Fix any <span class="inline-math">$h \le n$</span> and any paper <span class="inline-math">$i$</span>.</p>
+<ol><li><p>If <span class="inline-math">$c_i \ge h$</span>: either <span class="inline-math">$c_i \le n$</span>, so <span class="inline-math">$\hat{c}_i = c_i \ge h$</span>; or <span class="inline-math">$c_i &gt; n$</span>, so <span class="inline-math">$\hat{c}_i = n \ge h$</span>. In both cases, <span class="inline-math">$\hat{c}_i \ge h$</span>.</p></li><li><p>If <span class="inline-math">$c_i &lt; h$</span>: then <span class="inline-math">$c_i &lt; h \le n$</span>, so <span class="inline-math">$\hat{c}_i = c_i &lt; h$</span>.</p></li></ol>
+<p>Therefore <span class="inline-math">$c_i \ge h \iff \hat{c}_i \ge h$</span> for every paper <span class="inline-math">$i$</span> and every threshold <span class="inline-math">$h \le n$</span>. Summing over all papers, <span class="inline-math">$\hat{S}(h) = S(h)$</span>. <span class="inline-math">$\blacksquare$</span></p>
+<p><strong>Corollary 1.1: The h-index lies in <span class="inline-math">$\{0, 1, \ldots, n\}$</span>.</strong></p>
+<p>Since there are only <span class="inline-math">$n$</span> papers, <span class="inline-math">$S(h) \le n$</span> for all <span class="inline-math">$h$</span>. Any <span class="inline-math">$h &gt; n$</span> would require <span class="inline-math">$S(h) \ge h &gt; n$</span>, which is impossible. And <span class="inline-math">$S(0) = n \ge 0$</span>, so <span class="inline-math">$h = 0$</span> always qualifies. Therefore <span class="inline-math">$H \in \{0, 1, \ldots, n\}$</span>, and the search space for <span class="inline-math">$H$</span> is exactly the domain of <span class="inline-math">$B$</span>.</p>
+<h2>3. Algorithm Mapping: The Bucket Array</h2>
+<p>The bucket array <span class="inline-math">$B$</span> encodes the support counting function via a right-to-left prefix sum.</p>
+<p><strong>Lemma 1: The right-to-left prefix sum of <span class="inline-math">$B$</span> equals <span class="inline-math">$S$</span>.</strong></p>
+<div class="equation">$$\sum_{j=h}^{n} B[j] = S(h) \quad \text{for all } h \in \{0, 1, \ldots, n\}$$</div>
+<p><em>Proof:</em></p>
+<p>By definition of <span class="inline-math">$B$</span>:</p>
+<div class="equation">$$\sum_{j=h}^{n} B[j] = \sum_{j=h}^{n} |\{i : \min(c_i, n) = j\}|$$</div>
+<p>Since each paper maps to exactly one bucket (the sets <span class="inline-math">$\{i : \min(c_i, n) = j\}$</span> are pairwise disjoint for distinct <span class="inline-math">$j$</span>):</p>
+<div class="equation">$$= |\{i : \min(c_i, n) \ge h\}| = \hat{S}(h)$$</div>
+<p>By Theorem 1, <span class="inline-math">$\hat{S}(h) = S(h)$</span>. <span class="inline-math">$\blacksquare$</span></p>
+<p><strong>Consequence.</strong> The running sum <span class="inline-math">$\sigma$</span>, after adding <span class="inline-math">$B[h]$</span> at threshold <span class="inline-math">$h$</span>, satisfies:</p>
+<div class="equation">$$\sigma = \sum_{j=h}^{n} B[j] = S(h)$$</div>
+<p>The bucket array converts the support function — which would otherwise require a full pass over <span class="inline-math">$C$</span> for each threshold — into an incremental right-to-left accumulation with <span class="inline-math">$O(1)$</span> work per threshold.</p>
+<h2>4. Proof of Correctness: The Descending Threshold Scan</h2>
+<p><strong>Theorem 2: The descending scan returns <span class="inline-math">$H$</span>.</strong></p>
+<p><em>Proof:</em></p>
+<p>Define the loop invariant at the start of the iteration with candidate <span class="inline-math">$h$</span>:</p>
+<div class="equation">$$\text{INV}(h): \quad \sigma = \sum_{j=h+1}^{n} B[j] = S(h + 1), \quad \text{and } S(h') &lt; h' \text{ for all } h' &gt; h$$</div>
+<ol><li><p><em>Base case (<span class="inline-math">$h = n$</span>).</em> Before the first iteration, <span class="inline-math">$\sigma = 0$</span>. The empty sum <span class="inline-math">$\sum_{j=n+1}^{n} B[j] = 0 = S(n + 1)$</span> holds, and no <span class="inline-math">$h' &gt; n$</span> exists, so the second clause is vacuously true. <span class="inline-math">$\text{INV}(n)$</span> holds.</p></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$\text{INV}(h)$</span> holds. The iteration adds <span class="inline-math">$B[h]$</span> to <span class="inline-math">$\sigma$</span>:</p>
+<div class="equation">$$\sigma' = \sigma + B[h] = \sum_{j=h+1}^{n} B[j] + B[h] = \sum_{j=h}^{n} B[j] = S(h) \quad \text{(by Lemma 1)}$$</div>
+<p><em>Case 1 — <span class="inline-math">$\sigma' \ge h$</span> (support sufficient):</em> The scan returns <span class="inline-math">$h$</span>. By hypothesis, <span class="inline-math">$S(h') &lt; h'$</span> for all <span class="inline-math">$h' &gt; h$</span>, so no larger threshold qualifies. Since <span class="inline-math">$S(h) \ge h$</span>, we have <span class="inline-math">$h \in \{h : S(h) \ge h\}$</span> and no element of that set exceeds <span class="inline-math">$h$</span>. Therefore <span class="inline-math">$h = H$</span>.</p>
+<p><em>Case 2 — <span class="inline-math">$\sigma' &lt; h$</span> (support insufficient):</em> <span class="inline-math">$S(h) &lt; h$</span>, so <span class="inline-math">$h$</span> is not a valid candidate. The scan continues to <span class="inline-math">$h - 1$</span>. Now <span class="inline-math">$\sigma = S(h)$</span> and <span class="inline-math">$S(h') &lt; h'$</span> for all <span class="inline-math">$h' \ge h$</span>, so <span class="inline-math">$\text{INV}(h - 1)$</span> holds.</p></li><li><p><em>Termination.</em> If no positive threshold passes, the scan reaches <span class="inline-math">$h = 0$</span>. At this point:</p>
+<div class="equation">$$\sigma' = \sum_{j=0}^{n} B[j] = S(0) = n \ge 0 = h$$</div>
+<p>The check passes and the scan returns <span class="inline-math">$0$</span>. By Corollary 1.1, when no positive threshold is supported, <span class="inline-math">$H = 0$</span>.</p></li></ol>
+<p>In all cases, the returned value equals <span class="inline-math">$H$</span>. <span class="inline-math">$\blacksquare$</span></p>
+<p><strong>Corollary 2.1:</strong> If every paper has zero citations (<span class="inline-math">$c_i = 0$</span> for all <span class="inline-math">$i$</span>), then <span class="inline-math">$S(h) = 0$</span> for all <span class="inline-math">$h \ge 1$</span>, and <span class="inline-math">$H = 0$</span>.</p>
+<p><strong>Corollary 2.2:</strong> If every paper has at least <span class="inline-math">$n$</span> citations (<span class="inline-math">$c_i \ge n$</span> for all <span class="inline-math">$i$</span>), then <span class="inline-math">$S(n) = n \ge n$</span>, and <span class="inline-math">$H = n$</span>.</p>
+<p><strong>Corollary 2.3:</strong> For a single paper (<span class="inline-math">$n = 1$</span>), <span class="inline-math">$H = 1$</span> if <span class="inline-math">$c_0 \ge 1$</span>; otherwise <span class="inline-math">$H = 0$</span>.</p>
+<hr />
+<h2>5. Mechanical Execution (System Trace)</h2>
+<p><strong>Input System.</strong> <span class="inline-math">$C = (3, 0, 6, 1, 5)$</span>, <span class="inline-math">$n = 5$</span>.</p>
+<p><strong>Bucket construction.</strong> Capping: <span class="inline-math">$\min(3, 5) = 3$</span>, <span class="inline-math">$\min(0, 5) = 0$</span>, <span class="inline-math">$\min(6, 5) = 5$</span>, <span class="inline-math">$\min(1, 5) = 1$</span>, <span class="inline-math">$\min(5, 5) = 5$</span>.</p>
+<div class="equation">$$B = (1, 1, 0, 1, 0, 2)$$</div>
+<p><strong>Descending scan.</strong></p>
+<div class="table-wrap"><table><thead><tr><th>Step</th><th><span class="inline-math">$h$</span></th><th><span class="inline-math">$B[h]$</span></th><th><span class="inline-math">$\sigma$</span> after</th><th><span class="inline-math">$S(h) = \sigma$</span></th><th><span class="inline-math">$\sigma \ge h$</span>?</th><th>Action</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><span class="inline-math">$5$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$S(5) = 2$</span></td><td><span class="inline-math">$2 &lt; 5$</span> — no</td><td>continue</td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$4$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$S(4) = 2$</span></td><td><span class="inline-math">$2 &lt; 4$</span> — no</td><td>continue</td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$S(3) = 3$</span></td><td><span class="inline-math">$3 \ge 3$</span> — yes</td><td>return <span class="inline-math">$3$</span></td></tr></tbody></table></div>
+<p><strong>Result:</strong> <span class="inline-math">$H = 3$</span>.</p>
+<p><em>Note on Step 3: The running support count <span class="inline-math">$\sigma$</span> reaches exactly 3 at threshold <span class="inline-math">$h = 3$</span> — the tightest possible match where <span class="inline-math">$S(h) = h$</span>. The two papers with citations <span class="inline-math">$\ge 5$</span> (values 6 and 5, both capped into bucket 5 by Theorem 1) were counted in Step 1, and the paper with exactly 3 citations was added in Step 3. Lemma 1's prefix sum correctly computes <span class="inline-math">$S(3) = 3$</span> despite the capping — citation count 6 was compressed to bucket 5 alongside citation count 5, yet both still register as supporters of every threshold <span class="inline-math">$\le 5$</span>.</em></p>
+<p>The theoretical guarantees translate into the mechanical result: Theorem 1 justified compressing citations into <span class="inline-math">$n + 1$</span> buckets without altering the support counts, Lemma 1 confirmed that each accumulation step computed the true value of <span class="inline-math">$S(h)$</span>, and Theorem 2's invariant delivered the h-index at the first qualifying threshold.</p></article>
   </main>
 </body>
 </html>

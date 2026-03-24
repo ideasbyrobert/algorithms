@@ -51,7 +51,7 @@ class MarkdownLineClassifier
 
   isUnorderedItem(line) 
   {
-    return line.trim().startsWith('* ')
+    return /^[-*]\s/.test(line.trim())
   }
 
   isOrderedItem(line) 
