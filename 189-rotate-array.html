@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Formal Proof of the Three-Reversal Rotation Algorithm</title>
+  <link rel="stylesheet" href="assets/styles/document-page.css" />
+  <script src="assets/scripts/mathjax-config.js"></script>
+  <script src="assets/scripts/load-mathjax.js" data-cdn-source="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" data-local-source="assets/vendor/mathjax/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <main>
+    <article><h1>Formal Proof of the Three-Reversal Rotation Algorithm</h1>
+<p>To establish the correctness of the Three-Reversal Rotation algorithm, we must rigorously prove three properties: that reversing a concatenation reverses the block order while internally reversing each block, that a two-pointer swap loop correctly reverses any contiguous segment in place, and that composing three specific reversals produces exactly the right rotation. We will dismantle the problem into a reversal-concatenation identity (§2), an in-place reversal primitive (§3), and a three-phase composition theorem (§4).</p>
+<h2>1. First Principles &amp; System Definitions</h2>
+<p><strong>Problem objects.</strong> Let <span class="inline-math">$A = (a_0, a_1, \ldots, a_{n-1})$</span> be a finite sequence of integers. For any rotation amount <span class="inline-math">$k \ge 0$</span>, define the <em>effective rotation</em>:</p>
+<div class="equation">$$k' = k \bmod n$$</div>
+<p>Partition <span class="inline-math">$A$</span> into two contiguous <em>blocks</em> determined by <span class="inline-math">$k'$</span>:</p>
+<div class="equation">$$F = (a_0, a_1, \ldots, a_{n-k'-1}) \quad \text{(front block, length } n - k'\text{)}$$</div>
+<div class="equation">$$T = (a_{n-k'}, a_{n-k'+1}, \ldots, a_{n-1}) \quad \text{(tail block, length } k'\text{)}$$</div>
+<p>so that <span class="inline-math">$A = F \| T$</span>, where <span class="inline-math">$\|$</span> denotes concatenation.</p>
+<p>For any finite sequence <span class="inline-math">$X = (x_0, x_1, \ldots, x_{d-1})$</span>, define the <em>reversal</em>:</p>
+<div class="equation">$$\text{Rev}(X) = (x_{d-1}, x_{d-2}, \ldots, x_0)$$</div>
+<p>The <em>right rotation by <span class="inline-math">$k$</span></em> produces:</p>
+<div class="equation">$$\text{Rot}_k(A) = T \| F = (a_{n-k'}, \ldots, a_{n-1}, a_0, \ldots, a_{n-k'-1})$$</div>
+<p><strong>Preconditions and contract assumptions.</strong></p>
+<ul><li><p><span class="inline-math">$n \ge 1$</span>, <span class="inline-math">$k \ge 0$</span>.</p></li><li><p>In-place mutation of <span class="inline-math">$A$</span> is permitted.</p></li></ul>
+<p><strong>Postcondition.</strong></p>
+<div class="equation">$$A^{(f)} = T \| F$$</div>
+<p>Equivalently: <span class="inline-math">$A^{(f)}[j] = A^{(0)}[(j - k') \bmod n]$</span> for all <span class="inline-math">$0 \le j &lt; n$</span>.</p>
+<p><strong>State variables.</strong> The algorithm applies three segment-reversal operations in sequence. Within each reversal:</p>
+<ul><li><p><span class="inline-math">$l, r \in \{0, 1, \ldots, n-1\}$</span> — left and right swap pointers, converging toward each other.</p></li></ul>
+<p><strong>Initialization.</strong></p>
+<div class="equation">$$\text{Phase 1: } l = 0, \; r = n - 1$$</div>
+<div class="equation">$$\text{Phase 2: } l = 0, \; r = k' - 1$$</div>
+<div class="equation">$$\text{Phase 3: } l = k', \; r = n - 1$$</div>
+<p><strong>Mutation model.</strong> <span class="inline-math">$A^{(0)}$</span> is the input. <span class="inline-math">$A^{(1)}$</span> is the state after Phase 1 (whole-array reversal). <span class="inline-math">$A^{(2)}$</span> after Phase 2 (front-block reversal). <span class="inline-math">$A^{(f)}$</span> after Phase 3 (back-block reversal).</p>
+<h2>2. The Reversal-Concatenation Identity</h2>
+<p><strong>Theorem 1: Reversing a concatenation reverses the block order with each block internally reversed.</strong></p>
+<p>For any finite sequences <span class="inline-math">$X = (x_0, \ldots, x_{p-1})$</span> and <span class="inline-math">$Y = (y_0, \ldots, y_{q-1})$</span>:</p>
+<div class="equation">$$\text{Rev}(X \| Y) = \text{Rev}(Y) \| \text{Rev}(X)$$</div>
+<p><em>Proof:</em></p>
+<p>The concatenation <span class="inline-math">$X \| Y = (x_0, \ldots, x_{p-1}, y_0, \ldots, y_{q-1})$</span> has length <span class="inline-math">$p + q$</span>. Its reversal reads right-to-left:</p>
+<div class="equation">$$\text{Rev}(X \| Y) = (y_{q-1}, \ldots, y_0, x_{p-1}, \ldots, x_0)$$</div>
+<p>The first <span class="inline-math">$q$</span> elements are <span class="inline-math">$(y_{q-1}, \ldots, y_0) = \text{Rev}(Y)$</span>. The remaining <span class="inline-math">$p$</span> elements are <span class="inline-math">$(x_{p-1}, \ldots, x_0) = \text{Rev}(X)$</span>. Therefore:</p>
+<div class="equation">$$\text{Rev}(X \| Y) = \text{Rev}(Y) \| \text{Rev}(X) \quad \blacksquare$$</div>
+<p><strong>Corollary 1.1: Reversal is an involution.</strong></p>
+<div class="equation">$$\text{Rev}(\text{Rev}(X)) = X$$</div>
+<p>For <span class="inline-math">$X = (x_0, \ldots, x_{p-1})$</span>: <span class="inline-math">$\text{Rev}(X) = (x_{p-1}, \ldots, x_0)$</span>, and reversing again restores the original left-to-right order.</p>
+<h2>3. Algorithm Mapping: The In-Place Reversal Primitive</h2>
+<p>Each of the three phases reverses a contiguous segment <span class="inline-math">$A[l..r]$</span> using a two-pointer swap loop: <span class="inline-math">$l$</span> starts at the left boundary, <span class="inline-math">$r$</span> at the right boundary, and on each step they swap <span class="inline-math">$A[l] \leftrightarrow A[r]$</span> and converge (<span class="inline-math">$l \gets l + 1$</span>, <span class="inline-math">$r \gets r - 1$</span>) until <span class="inline-math">$l \ge r$</span>.</p>
+<p><strong>Lemma 1: The two-pointer swap loop correctly reverses <span class="inline-math">$A[l..r]$</span> in place.</strong></p>
+<p><em>Proof:</em></p>
+<p>Define the loop invariant: after <span class="inline-math">$t$</span> iterations, the outermost <span class="inline-math">$t$</span> pairs have been swapped — positions <span class="inline-math">$l, \ldots, l + t - 1$</span> and <span class="inline-math">$r - t + 1, \ldots, r$</span> hold their reversed values, and the unprocessed interior <span class="inline-math">$A[l + t .. r - t]$</span> retains its original content.</p>
+<ol><li><p><em>Base case (<span class="inline-math">$t = 0$</span>).</em> No swaps have occurred. The entire segment is unprocessed. The invariant holds vacuously.</p></li><li><p><em>Inductive step.</em> The swap <span class="inline-math">$A[l + t] \leftrightarrow A[r - t]$</span> places position <span class="inline-math">$l + t$</span> and <span class="inline-math">$r - t$</span> into their reversed positions, extending the processed boundary inward by one on each side.</p></li><li><p><em>Termination.</em> The loop exits when <span class="inline-math">$l + t \ge r - t$</span>, i.e., <span class="inline-math">$t \ge \lfloor d / 2 \rfloor$</span> where <span class="inline-math">$d = r - l + 1$</span>. At this point, all <span class="inline-math">$\lfloor d / 2 \rfloor$</span> pairs have been swapped. If <span class="inline-math">$d$</span> is odd, the center element remains in place — which is its correct reversed position. The segment is fully reversed. <span class="inline-math">$\blacksquare$</span></p></li></ol>
+<p>Phases 2 and 3 operate on disjoint segments (<span class="inline-math">$[0, k'-1]$</span> and <span class="inline-math">$[k', n-1]$</span>), so they cannot interfere with each other. Every element participates in exactly one swap during Phase 1 and at most one swap during Phases 2–3.</p>
+<h2>4. Proof of Correctness: The Three-Phase Rotation</h2>
+<p><strong>Theorem 2: The three-phase algorithm produces <span class="inline-math">$A^{(f)} = T \| F$</span>.</strong></p>
+<p><em>Proof:</em></p>
+<p>By the block decomposition from §1, <span class="inline-math">$A^{(0)} = F \| T$</span>.</p>
+<p><strong>Phase 1</strong> — Reverse the whole array (<span class="inline-math">$[0, n-1]$</span>):</p>
+<div class="equation">$$A^{(1)} = \text{Rev}(A^{(0)}) = \text{Rev}(F \| T) = \text{Rev}(T) \| \text{Rev}(F) \quad \text{(by Theorem 1)}$$</div>
+<p>The front <span class="inline-math">$k'$</span> positions now hold <span class="inline-math">$\text{Rev}(T)$</span> and the back <span class="inline-math">$n - k'$</span> positions hold <span class="inline-math">$\text{Rev}(F)$</span>.</p>
+<p><strong>Phase 2</strong> — Reverse the front block (<span class="inline-math">$[0, k'-1]$</span>):</p>
+<div class="equation">$$A^{(2)}[0..k'-1] = \text{Rev}(\text{Rev}(T)) = T \quad \text{(by Corollary 1.1)}$$</div>
+<p>The back block is untouched: <span class="inline-math">$A^{(2)}[k'..n-1] = \text{Rev}(F)$</span>.</p>
+<p><strong>Phase 3</strong> — Reverse the back block (<span class="inline-math">$[k', n-1]$</span>):</p>
+<div class="equation">$$A^{(f)}[k'..n-1] = \text{Rev}(\text{Rev}(F)) = F \quad \text{(by Corollary 1.1)}$$</div>
+<p>The front block is untouched: <span class="inline-math">$A^{(f)}[0..k'-1] = T$</span>.</p>
+<p>Therefore:</p>
+<div class="equation">$$A^{(f)} = T \| F = \text{Rot}_k(A^{(0)}) \quad \blacksquare$$</div>
+<p><strong>Corollary 2.1:</strong> If <span class="inline-math">$k' = 0$</span> (rotation is a multiple of <span class="inline-math">$n$</span>), <span class="inline-math">$T$</span> is empty, <span class="inline-math">$F = A$</span>, and <span class="inline-math">$A^{(f)} = A^{(0)}$</span>. The algorithm short-circuits before any reversal is performed.</p>
+<p><strong>Corollary 2.2:</strong> If <span class="inline-math">$n = 1$</span>, then <span class="inline-math">$k' = 0$</span> for any <span class="inline-math">$k$</span>, so the single-element array is unchanged.</p>
+<p><strong>Corollary 2.3:</strong> If <span class="inline-math">$k' = n - 1$</span>, <span class="inline-math">$F$</span> is a single element and <span class="inline-math">$T$</span> has <span class="inline-math">$n - 1$</span> elements. The result moves the first element to the last position — equivalent to a left rotation by 1.</p>
+<hr />
+<h2>5. Mechanical Execution (System Trace)</h2>
+<p><strong>Input System.</strong> <span class="inline-math">$A^{(0)} = (1, 2, 3, 4, 5, 6, 7)$</span>, <span class="inline-math">$n = 7$</span>, <span class="inline-math">$k = 3$</span>, <span class="inline-math">$k' = 3$</span>.</p>
+<p>Block decomposition: <span class="inline-math">$F = (1, 2, 3, 4)$</span>, <span class="inline-math">$T = (5, 6, 7)$</span>. Target: <span class="inline-math">$T \| F = (5, 6, 7, 1, 2, 3, 4)$</span>.</p>
+<div class="table-wrap"><table><thead><tr><th>Phase</th><th>Operation</th><th>Segment</th><th>Array state</th></tr></thead><tbody><tr><td><strong>0</strong></td><td>initial</td><td>—</td><td><span class="inline-math">$(1, 2, 3, 4, 5, 6, 7)$</span></td></tr><tr><td><strong>1</strong></td><td><span class="inline-math">$\text{Rev}(0, 6)$</span></td><td>whole array</td><td><span class="inline-math">$(7, 6, 5, 4, 3, 2, 1)$</span></td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$\text{Rev}(0, 2)$</span></td><td>front <span class="inline-math">$k' = 3$</span></td><td><span class="inline-math">$(5, 6, 7, 4, 3, 2, 1)$</span></td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$\text{Rev}(3, 6)$</span></td><td>back <span class="inline-math">$n - k' = 4$</span></td><td><span class="inline-math">$(5, 6, 7, 1, 2, 3, 4)$</span></td></tr></tbody></table></div>
+<p><strong>Detail of Phase 1 swaps:</strong></p>
+<div class="table-wrap"><table><thead><tr><th>Swap</th><th><span class="inline-math">$l$</span></th><th><span class="inline-math">$r$</span></th><th>Before</th><th>After</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$6$</span></td><td><span class="inline-math">$A[0] = 1,\; A[6] = 7$</span></td><td><span class="inline-math">$A[0] = 7,\; A[6] = 1$</span></td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$5$</span></td><td><span class="inline-math">$A[1] = 2,\; A[5] = 6$</span></td><td><span class="inline-math">$A[1] = 6,\; A[5] = 2$</span></td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$4$</span></td><td><span class="inline-math">$A[2] = 3,\; A[4] = 5$</span></td><td><span class="inline-math">$A[2] = 5,\; A[4] = 3$</span></td></tr></tbody></table></div>
+<p>Position 3 (<span class="inline-math">$A[3] = 4$</span>) is the midpoint — it stays in place.</p>
+<p><em>Note on Phase 1: After the whole-array reversal, the front three positions hold <span class="inline-math">$(7, 6, 5) = \text{Rev}(T)$</span> — the tail block has arrived in the correct region but in reversed internal order. By Theorem 1, the reversal of the concatenation <span class="inline-math">$F \| T$</span> necessarily delivered <span class="inline-math">$\text{Rev}(T)$</span> to the front and <span class="inline-math">$\text{Rev}(F)$</span> to the back. This is the moment where the reversal-concatenation identity manifests most visibly: the two blocks have swapped positions, but each block's internal order has been inverted. Phases 2 and 3 each apply Corollary 1.1 to undo the internal reversal within each block, restoring the original left-to-right order without disturbing each other's region.</em></p>
+<p><strong>Result:</strong> <span class="inline-math">$A^{(f)} = (5, 6, 7, 1, 2, 3, 4) = T \| F$</span>.</p>
+<p>The theoretical guarantees translate into the mechanical result: Theorem 1 predicted the whole-array reversal would swap the block positions while internally reversing each block, Corollary 1.1 ensured each subsequent phase-reversal restored the original internal order, and Theorem 2 composed the three phases into the target rotation <span class="inline-math">$T \| F = (5, 6, 7, 1, 2, 3, 4)$</span>.</p></article>
+  </main>
+</body>
+</html>
