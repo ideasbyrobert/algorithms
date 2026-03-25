@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Formal Proof of the Right-to-Left Binary Addition Algorithm</title>
+  <link rel="stylesheet" href="assets/styles/document-page.css" />
+  <script src="assets/scripts/mathjax-config.js"></script>
+  <script src="assets/scripts/load-mathjax.js" data-cdn-source="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" data-local-source="assets/vendor/mathjax/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <main>
+    <article><h1>Formal Proof of the Right-to-Left Binary Addition Algorithm</h1>
+<p>To establish the correctness of the Right-to-Left Binary Addition algorithm, we must rigorously prove three properties: that the carry never exceeds a single bit, that each column's modular arithmetic faithfully implements a binary full-adder, and that the accumulated result bits compose the binary representation of the input sum. We will dismantle the problem into a carry-bound theorem (§2), a full-adder identity (§3), and a column-value invariant (§4).</p>
+<h2>1. First Principles &amp; System Definitions</h2>
+<p><strong>Problem objects.</strong> Let <span class="inline-math">$A$</span> and <span class="inline-math">$B$</span> be finite binary strings of lengths <span class="inline-math">$m$</span> and <span class="inline-math">$n$</span> respectively. Define bit positions by their power of 2: <span class="inline-math">$a_k \in \{0, 1\}$</span> is the bit at position <span class="inline-math">$k$</span> of <span class="inline-math">$A$</span> (weight <span class="inline-math">$2^k$</span>), with position <span class="inline-math">$0$</span> being the least significant bit. Extend both strings with zeros beyond their length:</p>
+<div class="equation">$$a_k = 0 \;\text{ for }\; k \ge m, \qquad b_k = 0 \;\text{ for }\; k \ge n$$</div>
+<p>The <em>numeric values</em> are:</p>
+<div class="equation">$$\text{val}(A) = \sum_{i=0}^{m-1} a_i \cdot 2^i, \qquad \text{val}(B) = \sum_{j=0}^{n-1} b_j \cdot 2^j$$</div>
+<p>The <em>binary sum</em> is the unique binary string <span class="inline-math">$R = (r_{K-1}, \ldots, r_1, r_0)$</span> satisfying <span class="inline-math">$r_i \in \{0, 1\}$</span> for all <span class="inline-math">$i$</span>, <span class="inline-math">$\text{val}(R) = \text{val}(A) + \text{val}(B)$</span>, and either <span class="inline-math">$K = 1$</span> (the sum is zero) or <span class="inline-math">$r_{K-1} = 1$</span> (no leading zeros).</p>
+<p><strong>Preconditions and contract assumptions.</strong></p>
+<ul><li><p><em>Binary validity:</em> <span class="inline-math">$a_k, b_j \in \{0, 1\}$</span> for all relevant positions.</p></li><li><p><em>Non-empty:</em> <span class="inline-math">$m \ge 1$</span> and <span class="inline-math">$n \ge 1$</span>.</p></li><li><p><em>No leading zeros:</em> <span class="inline-math">$a_{m-1} = 1$</span> unless <span class="inline-math">$m = 1$</span> and <span class="inline-math">$a_0 = 0$</span>; likewise for <span class="inline-math">$B$</span>.</p></li><li><p><em>Unbounded length:</em> The algorithm operates digit-by-digit without converting to fixed-width integers.</p></li></ul>
+<p><strong>Postcondition.</strong></p>
+<div class="equation">$$\text{val}(R) = \text{val}(A) + \text{val}(B)$$</div>
+<p><strong>State variables.</strong></p>
+<ul><li><p><span class="inline-math">$k \in \{0, 1, \ldots\}$</span> — current bit position, advancing from LSB toward MSB.</p></li><li><p><span class="inline-math">$c_k \in \mathbb{Z}_{\ge 0}$</span> — carry into position <span class="inline-math">$k$</span>.</p></li><li><p><span class="inline-math">$r_k \in \{0, 1\}$</span> — result bit at position <span class="inline-math">$k$</span>.</p></li><li><p><span class="inline-math">$\sigma_k \in \mathbb{Z}_{\ge 0}$</span> — column sum at position <span class="inline-math">$k$</span>.</p></li></ul>
+<p><strong>Initialization.</strong></p>
+<div class="equation">$$k = 0, \quad c_0 = 0$$</div>
+<p><strong>Iteration.</strong> At each position <span class="inline-math">$k$</span>, the algorithm computes:</p>
+<div class="equation">$$\sigma_k = a_k + b_k + c_k, \qquad r_k = \sigma_k \bmod 2, \qquad c_{k+1} = \lfloor \sigma_k / 2 \rfloor$$</div>
+<p>Then <span class="inline-math">$k$</span> advances to <span class="inline-math">$k + 1$</span>.</p>
+<p><strong>Termination.</strong> The loop runs while <span class="inline-math">$k &lt; m$</span> or <span class="inline-math">$k &lt; n$</span> or <span class="inline-math">$c_k \neq 0$</span>. It exits at the first position <span class="inline-math">$K$</span> where all three conditions fail simultaneously.</p>
+<h2>2. The Carry Bound (Safety)</h2>
+<p><strong>Theorem 1: The carry satisfies <span class="inline-math">$c_k \in \{0, 1\}$</span> at every position <span class="inline-math">$k \ge 0$</span>.</strong></p>
+<p><em>Proof:</em></p>
+<ol><li><p><em>Base case.</em> <span class="inline-math">$c_0 = 0 \in \{0, 1\}$</span>.</p></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$c_k \in \{0, 1\}$</span>. The column sum is:</p>
+<div class="equation">$$\sigma_k = a_k + b_k + c_k$$</div>
+<p>Since <span class="inline-math">$a_k \in \{0, 1\}$</span>, <span class="inline-math">$b_k \in \{0, 1\}$</span>, and <span class="inline-math">$c_k \in \{0, 1\}$</span>:</p>
+<div class="equation">$$\sigma_k \in \{0, 1, 2, 3\}$$</div>
+<p>Therefore:</p>
+<div class="equation">$$c_{k+1} = \lfloor \sigma_k / 2 \rfloor \in \{0, 1\}$$</div></li><li><p>By induction, <span class="inline-math">$c_k \in \{0, 1\}$</span> for all <span class="inline-math">$k \ge 0$</span>. <span class="inline-math">$\blacksquare$</span></p></li></ol>
+<p><strong>Corollary 1.1: The result bit <span class="inline-math">$r_k \in \{0, 1\}$</span>.</strong> Since <span class="inline-math">$\sigma_k \in \{0, 1, 2, 3\}$</span>, <span class="inline-math">$r_k = \sigma_k \bmod 2 \in \{0, 1\}$</span>. Every result bit is a valid binary digit.</p>
+<p><strong>Corollary 1.2: The loop terminates.</strong> Let <span class="inline-math">$L = \max(m, n)$</span>. For all <span class="inline-math">$k \ge L$</span>, <span class="inline-math">$a_k = b_k = 0$</span>, so <span class="inline-math">$\sigma_k = c_k \in \{0, 1\}$</span>. If <span class="inline-math">$c_L = 0$</span>, the loop exits at <span class="inline-math">$K = L$</span>. If <span class="inline-math">$c_L = 1$</span>, then <span class="inline-math">$\sigma_L = 1$</span>, <span class="inline-math">$r_L = 1$</span>, <span class="inline-math">$c_{L+1} = 0$</span>, and the loop exits at <span class="inline-math">$K = L + 1$</span>. The result has at most <span class="inline-math">$\max(m, n) + 1$</span> bits.</p>
+<h2>3. Algorithm Mapping: The Binary Full-Adder</h2>
+<p>At each position <span class="inline-math">$k$</span>, the algorithm performs integer division of the column sum <span class="inline-math">$\sigma_k$</span> by 2, extracting a remainder (the result bit) and a quotient (the outgoing carry). This is the classical binary full-adder operation.</p>
+<p><strong>Lemma 1: The full-adder identity holds at every position.</strong></p>
+<div class="equation">$$r_k + 2 \cdot c_{k+1} = a_k + b_k + c_k \quad \text{for all } k \ge 0$$</div>
+<p><em>Proof:</em></p>
+<p>By the division algorithm applied to <span class="inline-math">$\sigma_k$</span> with divisor 2:</p>
+<div class="equation">$$\sigma_k = 2 \cdot \lfloor \sigma_k / 2 \rfloor + (\sigma_k \bmod 2) = 2 \cdot c_{k+1} + r_k$$</div>
+<p>Rearranging: <span class="inline-math">$r_k + 2 \cdot c_{k+1} = \sigma_k = a_k + b_k + c_k$</span>. <span class="inline-math">$\blacksquare$</span></p>
+<p>The full-adder decomposes the column sum into its "stays here" component (<span class="inline-math">$r_k$</span>, the bit written at position <span class="inline-math">$k$</span>) and its "moves left" component (<span class="inline-math">$c_{k+1}$</span>, the carry into the next higher position). The identity ensures no information is created or destroyed — the column sum is perfectly partitioned between the result bit and the carry.</p>
+<h2>4. Proof of Correctness: The Column-Value Invariant</h2>
+<p><strong>Theorem 2: Upon termination, <span class="inline-math">$\text{val}(R) = \text{val}(A) + \text{val}(B)$</span>.</strong></p>
+<p><em>Proof:</em></p>
+<p>Define the loop invariant at the start of iteration <span class="inline-math">$k$</span>:</p>
+<div class="equation">$$\text{INV}(k): \quad \sum_{i=0}^{k-1} r_i \cdot 2^i \;+\; c_k \cdot 2^k \;=\; \sum_{i=0}^{k-1} (a_i + b_i) \cdot 2^i$$</div>
+<p>The invariant states that the numeric value of the result bits computed so far, augmented by the carry at its positional weight, equals the column-by-column sum of the inputs processed so far.</p>
+<ol><li><p><em>Base case (<span class="inline-math">$k = 0$</span>).</em> No result bits have been computed. The sums on both sides are empty, and <span class="inline-math">$c_0 = 0$</span>:</p>
+<div class="equation">$$0 + 0 \cdot 2^0 = 0$$</div>
+<p><span class="inline-math">$\text{INV}(0)$</span> holds vacuously.</p></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$\text{INV}(k)$</span> holds. After processing position <span class="inline-math">$k$</span>:</p>
+<div class="equation">$$\begin{aligned}
+\sum_{i=0}^{k} r_i \cdot 2^i + c_{k+1} \cdot 2^{k+1}
+&amp;= \sum_{i=0}^{k-1} r_i \cdot 2^i + r_k \cdot 2^k + c_{k+1} \cdot 2^{k+1} \\
+&amp;= \sum_{i=0}^{k-1} r_i \cdot 2^i + (r_k + 2 \cdot c_{k+1}) \cdot 2^k
+\end{aligned}$$</div>
+<p>By Lemma 1, <span class="inline-math">$r_k + 2 \cdot c_{k+1} = a_k + b_k + c_k$</span>. Substituting:</p>
+<div class="equation">$$\begin{aligned}
+&amp;= \sum_{i=0}^{k-1} r_i \cdot 2^i + (a_k + b_k + c_k) \cdot 2^k \\
+&amp;= \underbrace{\sum_{i=0}^{k-1} r_i \cdot 2^i + c_k \cdot 2^k}_{\text{INV}(k)} + (a_k + b_k) \cdot 2^k \\
+&amp;= \sum_{i=0}^{k-1} (a_i + b_i) \cdot 2^i + (a_k + b_k) \cdot 2^k \\
+&amp;= \sum_{i=0}^{k} (a_i + b_i) \cdot 2^i
+\end{aligned}$$</div>
+<p>This is <span class="inline-math">$\text{INV}(k+1)$</span>.</p></li><li><p><em>Termination.</em> The loop exits at position <span class="inline-math">$K$</span> with <span class="inline-math">$c_K = 0$</span> and <span class="inline-math">$K \ge \max(m, n)$</span>. By <span class="inline-math">$\text{INV}(K)$</span>:</p>
+<div class="equation">$$\sum_{i=0}^{K-1} r_i \cdot 2^i + \underbrace{c_K}_{0} \cdot 2^K = \sum_{i=0}^{K-1} (a_i + b_i) \cdot 2^i$$</div>
+<p>Since <span class="inline-math">$a_i = 0$</span> for <span class="inline-math">$i \ge m$</span> and <span class="inline-math">$b_i = 0$</span> for <span class="inline-math">$i \ge n$</span>:</p>
+<div class="equation">$$\text{val}(R) = \sum_{i=0}^{K-1} r_i \cdot 2^i = \sum_{i=0}^{m-1} a_i \cdot 2^i + \sum_{i=0}^{n-1} b_i \cdot 2^i = \text{val}(A) + \text{val}(B)$$</div>
+<p>By Corollary 1.1, every <span class="inline-math">$r_i \in \{0, 1\}$</span>, so <span class="inline-math">$R$</span> is a valid binary string. <span class="inline-math">$\blacksquare$</span></p></li></ol>
+<p><strong>Corollary 2.1:</strong> If <span class="inline-math">$\text{val}(A) = \text{val}(B) = 0$</span>, the loop processes one position (<span class="inline-math">$\sigma_0 = 0$</span>, <span class="inline-math">$r_0 = 0$</span>, <span class="inline-math">$c_1 = 0$</span>) and the result is <span class="inline-math">$R = \text{``0"}$</span>.</p>
+<p><strong>Corollary 2.2:</strong> If one input is "0", then <span class="inline-math">$c_k = 0$</span> for all <span class="inline-math">$k$</span> (since the column sum never exceeds 1), and <span class="inline-math">$r_k$</span> equals the corresponding bit of the non-zero input. The result is the other input unchanged.</p>
+<p><strong>Corollary 2.3:</strong> The result has at most <span class="inline-math">$\max(m, n) + 1$</span> bits. The extra bit appears if and only if <span class="inline-math">$c_{\max(m,n)} = 1$</span> — that is, the carry survives past both input strings. This occurs precisely when the sum overflows the wider operand's bit width.</p>
+<hr />
+<h2>5. Mechanical Execution (System Trace)</h2>
+<p><strong>Input System.</strong> <span class="inline-math">$A = \text{``1010"}$</span>, <span class="inline-math">$B = \text{``1011"}$</span>. Bit positions: <span class="inline-math">$a_3 = 1, a_2 = 0, a_1 = 1, a_0 = 0$</span>; <span class="inline-math">$b_3 = 1, b_2 = 0, b_1 = 1, b_0 = 1$</span>. <span class="inline-math">$m = n = 4$</span>, <span class="inline-math">$L = 4$</span>.</p>
+<div class="table-wrap"><table><thead><tr><th>Step</th><th><span class="inline-math">$k$</span></th><th><span class="inline-math">$a_k$</span></th><th><span class="inline-math">$b_k$</span></th><th><span class="inline-math">$c_k$</span></th><th><span class="inline-math">$\sigma_k$</span></th><th><span class="inline-math">$r_k$</span></th><th><span class="inline-math">$c_{k+1}$</span></th><th><span class="inline-math">$R$</span> (MSB first)</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$\text{1}$</span></td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$\text{01}$</span></td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$\text{101}$</span></td></tr><tr><td><strong>4</strong></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$\text{0101}$</span></td></tr><tr><td><strong>5</strong></td><td><span class="inline-math">$4$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$\text{10101}$</span></td></tr></tbody></table></div>
+<p><strong>Result:</strong> <span class="inline-math">$c_5 = 0$</span>, both strings exhausted. <span class="inline-math">$R = \text{"10101"}$</span>, <span class="inline-math">$\text{val}(R) = 16 + 4 + 1 = 21 = 10 + 11 = \text{val}(A) + \text{val}(B)$</span>.</p>
+<p><em>Note on Step 5: Both input strings are exhausted (<span class="inline-math">$k = 4 \ge m = n = 4$</span>, so <span class="inline-math">$a_4 = b_4 = 0$</span>), but the carry <span class="inline-math">$c_4 = 1$</span> from Step 4 forces one additional iteration. This is the only step where the carry alone sustains the loop — the three-way termination condition (<span class="inline-math">$k &lt; m$</span> or <span class="inline-math">$k &lt; n$</span> or <span class="inline-math">$c_k \neq 0$</span>) is essential here. Without the carry check, the algorithm would stop after Step 4 and output <span class="inline-math">$\text{"0101"} = 5$</span>, losing the most significant bit. Theorem 1's carry bound guarantees this extra step produces exactly one additional bit (<span class="inline-math">$c_4 = 1$</span> yields <span class="inline-math">$r_4 = 1, c_5 = 0$</span>), so the loop cannot extend beyond a single overflow position.</em></p>
+<p>The theoretical guarantees translate into the mechanical result: Theorem 1 ensured the carry never exceeded a single bit, Lemma 1 confirmed each step faithfully partitioned the column sum into a result bit and a carry, and Theorem 2's invariant accumulated the five result bits into the binary sum <span class="inline-math">$\text{``10101"}$</span>.</p></article>
+  </main>
+</body>
+</html>
