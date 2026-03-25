@@ -39,6 +39,32 @@ describe('MarkdownParser basic block parsing', () =>
     ])
   })
 
+  test('parses multi-line display equations as a single equation block', () =>
+  {
+    const markdown =
+      'Intro line\n' +
+      '\n' +
+      '$$\\rho(d) = \\begin{cases}\n' +
+      '\\varepsilon & \\text{if } d = 0 \\\\n' +
+      '1 & \\text{otherwise}\n' +
+      '\\end{cases}$$\n' +
+      '\n' +
+      'Trailing line'
+
+    expect(parseMarkdown(markdown)).toEqual([
+      { type: 'paragraph', text: 'Intro line' },
+      {
+        type: 'equation',
+        text:
+          '$$\\rho(d) = \\begin{cases}\n' +
+          '\\varepsilon & \\text{if } d = 0 \\\\n' +
+          '1 & \\text{otherwise}\n' +
+          '\\end{cases}$$'
+      },
+      { type: 'paragraph', text: 'Trailing line' }
+    ])
+  })
+
   test('stops a paragraph when a special block begins', () =>
   {
     const markdown =

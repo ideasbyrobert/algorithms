@@ -25,10 +25,19 @@ class MarkdownLineClassifier
     return line.trim() === '***'
   }
 
+  startsEquation(line) 
+  {
+    return line.trim().startsWith('$$')
+  }
+
+  endsEquation(line) 
+  {
+    return line.trim().endsWith('$$')
+  }
+
   isEquation(line) 
   {
-    const trimmed = line.trim()
-    return trimmed.startsWith('$$') && trimmed.endsWith('$$')
+    return this.startsEquation(line) && this.endsEquation(line)
   }
 
   startsTableRow(line) 
@@ -72,7 +81,7 @@ class MarkdownLineClassifier
       this.isHeading1(line) ||
       this.isHeading2(line) ||
       this.isRule(line) ||
-      this.isEquation(line) ||
+      this.startsEquation(line) ||
       this.isTable(lines, index) ||
       this.isUnorderedItem(line) ||
       this.isOrderedItem(line)

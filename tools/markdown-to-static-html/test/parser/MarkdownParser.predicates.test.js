@@ -14,6 +14,8 @@ describe('MarkdownLineClassifier helper rules', () =>
     expect(lineClassifier.isHeading2('# Section')).toBe(false)
     expect(lineClassifier.isRule('***')).toBe(true)
     expect(lineClassifier.isRule('---')).toBe(false)
+    expect(lineClassifier.startsEquation(' $$x')).toBe(true)
+    expect(lineClassifier.endsEquation('x$$ ')).toBe(true)
     expect(lineClassifier.isEquation(' $$x$$ ')).toBe(true)
     expect(lineClassifier.isEquation('$$x')).toBe(false)
     expect(lineClassifier.isUnorderedItem('  * bullet')).toBe(true)
@@ -48,6 +50,7 @@ describe('MarkdownLineClassifier helper rules', () =>
       'Plain paragraph',
       '## Heading',
       '* bullet',
+      '$$x',
       '$$x$$'
     ]
 
@@ -55,6 +58,7 @@ describe('MarkdownLineClassifier helper rules', () =>
     expect(lineClassifier.isSpecialBlock(lines, 1)).toBe(true)
     expect(lineClassifier.isSpecialBlock(lines, 2)).toBe(true)
     expect(lineClassifier.isSpecialBlock(lines, 3)).toBe(true)
-    expect(lineClassifier.isSpecialBlock(lines, 4)).toBe(false)
+    expect(lineClassifier.isSpecialBlock(lines, 4)).toBe(true)
+    expect(lineClassifier.isSpecialBlock(lines, 5)).toBe(false)
   })
 })

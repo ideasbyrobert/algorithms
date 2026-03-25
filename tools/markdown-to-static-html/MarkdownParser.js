@@ -68,7 +68,7 @@ class MarkdownParser
     return this.parseHeading1Block(line, index) ||
       this.parseHeading2Block(line, index) ||
       this.parseRuleBlock(line, index) ||
-      this.parseEquationBlock(line, index) ||
+      this.parseEquationBlock(lines, index) ||
       this.tableParser.parse(lines, index) ||
       this.listParser.parseUnorderedList(lines, index) ||
       this.listParser.parseOrderedList(lines, index)
@@ -110,16 +110,30 @@ class MarkdownParser
     return this.blockResult({ type: 'rule' }, index + 1)
   }
 
-  parseEquationBlock(line, index) 
+  parseEquationBlock(lines, index) 
   {
-    if (!this.lineClassifier.isEquation(line)) 
+    const line = lines[index]
+
+    if (!this.lineClassifier.startsEquation(line)) 
     {
       return null
     }
 
+    const equationLines = [line.trim()]
+    let nextIndex = index + 1
+
+    while (
+      !this.lineClassifier.endsEquation(equationLines[equationLines.length - 1]) &&
+      nextIndex < lines.length
+    )
+    {
+      equationLines.push(lines[nextIndex].trim())
+      nextIndex += 1
+    }
+
     return this.blockResult(
-      { type: 'equation', text: line.trim() },
-      index + 1
+      { type: 'equation', text: equationLines.join('\n') },
+      nextIndex
     )
   }
 

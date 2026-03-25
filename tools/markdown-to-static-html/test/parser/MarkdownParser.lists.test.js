@@ -102,6 +102,41 @@ describe('MarkdownParser list parsing', () =>
     ])
   })
 
+  test('parses ordered items with nested multi-line equations', () =>
+  {
+    const markdown =
+      '1. Encode the digit\n' +
+      '\n' +
+      '  $$\\rho(d) = \\begin{cases}\n' +
+      '  \\varepsilon & \\text{if } d = 0 \\\\n' +
+      '  1 & \\text{otherwise}\n' +
+      '  \\end{cases}$$\n' +
+      '\n' +
+      '  Continue the proof\n' +
+      '2. Finish the proof'
+
+    expect(parseMarkdown(markdown)).toEqual([
+      {
+        type: 'ordered-list',
+        items: [
+          [
+            { type: 'paragraph', text: 'Encode the digit' },
+            {
+              type: 'equation',
+              text:
+                '$$\\rho(d) = \\begin{cases}\n' +
+                '\\varepsilon & \\text{if } d = 0 \\\\n' +
+                '  1 & \\text{otherwise}\n' +
+                '\\end{cases}$$'
+            },
+            { type: 'paragraph', text: 'Continue the proof' }
+          ],
+          [{ type: 'paragraph', text: 'Finish the proof' }]
+        ]
+      }
+    ])
+  })
+
   test('stops an ordered list when following text is not indented', () =>
   {
     const markdown =
