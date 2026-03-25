@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://ideasbyrobert.github.io/algorithms/</loc>
+  </url>
+  <url>
+    <loc>https://ideasbyrobert.github.io/algorithms/12-integer-to-roman.html</loc>
+  </url>
+  <url>
+    <loc>https://ideasbyrobert.github.io/algorithms/67-add-binary.html</loc>
+  </url>
+  <url>
+    <loc>https://ideasbyrobert.github.io/algorithms/80-remove-duplicates-II.html</loc>
+  </url>
+  <url>
+    <loc>https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html</loc>
+  </url>
+  <url>
+    <loc>https://ideasbyrobert.github.io/algorithms/169-majority-element.html</loc>
+  </url>
+  <url>
+    <loc>https://ideasbyrobert.github.io/algorithms/189-rotate-array.html</loc>
+  </url>
+  <url>
+    <loc>https://ideasbyrobert.github.io/algorithms/274-hindex.html</loc>
+  </url>
+  <url>
+    <loc>https://ideasbyrobert.github.io/algorithms/334-increasing-triplet-subsequence.html</loc>
+  </url>
+</urlset>

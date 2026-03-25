@@ -34,6 +34,8 @@ jobs:
       - name: Validate static site
         run: |
           find . -maxdepth 1 -name '*.html' -print -quit | grep -q .
+          test -f robots.txt
+          test -f sitemap.xml
           test -f assets/styles/document-page.css
           test -f assets/scripts/mathjax-config.js
           test -f assets/scripts/load-mathjax.js

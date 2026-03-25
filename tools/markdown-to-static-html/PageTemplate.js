@@ -1,13 +1,15 @@
 class PageTemplate 
 {
-  constructor(htmlEscaper) 
+  constructor(htmlEscaper, seoHeadRenderer = null) 
   {
     this.htmlEscaper = htmlEscaper
+    this.seoHeadRenderer = seoHeadRenderer
   }
 
-  render(title, content, assets) 
+  render(title, content, assets, pageMetadata = null) 
   {
     const escapedTitle = this.htmlEscaper.escape(title)
+    const seoHead = this.seoHeadRenderer ? this.seoHeadRenderer.render(pageMetadata) : ''
     const viewportMeta =
       '  <meta name="viewport" content="' +
       'width=device-width, initial-scale=1.0, viewport-fit=cover" />'
@@ -27,6 +29,7 @@ class PageTemplate
       '  <meta charset="UTF-8" />',
       viewportMeta,
       '  <title>' + escapedTitle + '</title>',
+      seoHead,
       '  <link rel="stylesheet" href="' + assets.stylesheetPath + '" />',
       '  <script src="' + assets.mathJaxConfigPath + '"></script>',
       mathJaxLoaderScript,

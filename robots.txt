@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ideasbyrobert.github.io/algorithms/sitemap.xml

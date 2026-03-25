@@ -7,6 +7,8 @@ const HtmlRenderer = require('./HtmlRenderer')
 const AssetPathResolver = require('./AssetPathResolver')
 const PageTemplate = require('./PageTemplate')
 const StaticPageGenerator = require('./StaticPageGenerator')
+const DocumentPageMetadataFactory = require('./seo/DocumentPageMetadataFactory')
+const SeoHeadRenderer = require('./seo/SeoHeadRenderer')
 
 const markdownPath = process.argv[2]
 const outputPathArgument = process.argv[3]
@@ -25,12 +27,15 @@ const inlineFormatter = new InlineFormatter(htmlEscaper)
 const markdownParser = new MarkdownParser()
 const htmlRenderer = new HtmlRenderer(htmlEscaper, inlineFormatter)
 const assetPathResolver = new AssetPathResolver(projectRoot)
-const pageTemplate = new PageTemplate(htmlEscaper)
+const pageMetadataFactory = new DocumentPageMetadataFactory(projectRoot)
+const seoHeadRenderer = new SeoHeadRenderer(htmlEscaper)
+const pageTemplate = new PageTemplate(htmlEscaper, seoHeadRenderer)
 const staticPageGenerator = new StaticPageGenerator(
   markdownParser,
   htmlRenderer,
   pageTemplate,
-  assetPathResolver
+  assetPathResolver,
+  pageMetadataFactory
 )
 
 process.stdout.write(staticPageGenerator.generate(markdown, absoluteOutputPath))
