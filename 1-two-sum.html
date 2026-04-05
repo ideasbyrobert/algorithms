@@ -19,13 +19,9 @@
         <h1>Trading memory for answers.</h1>
         <p class="hero-text">
             A warehouse receives a shipment of parts with known weights. Quality control needs to
-            find exactly two parts whose combined weight matches a calibration standard. Scanning
-            every possible pair takes quadratic time — far too slow for thousands of parts. Given
-            an array of integers and a target sum, return the indices of the two numbers that add up to it.
-        </p>
-        <p class="hero-text">
-            For each number, calculate its complement — the value that would complete the pair.
-            If the complement already exists in a hash map, you have the answer. One pass.
+            find exactly two parts whose combined weight matches a calibration standard — but scanning
+            every possible pair takes quadratic time. The insight: for each number, calculate its
+            complement, and check a hash map. If the complement exists, you have the answer. One pass.
             <code>O(n)</code> time. <code>O(n)</code> space.
         </p>
     </section>

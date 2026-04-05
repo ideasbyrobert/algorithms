@@ -19,14 +19,10 @@
         <h1>Halving the search space, one comparison at a time.</h1>
         <p class="hero-text">
             A library's digital catalog holds 200,000 titles sorted alphabetically. Rather than
-            scanning from A to Z, you open to the middle, decide whether your title falls before
-            or after, and repeat — each decision eliminates half the remaining candidates.
-            Given a sorted array and a target value, find its index or confirm its absence.
-        </p>
-        <p class="hero-text">
-            Two pointers — <code>low</code> and <code>high</code> — define the interval that
-            could still contain the answer. Each iteration computes the midpoint, compares, and
-            discards an entire half. The answer arrives in <code>O(log n)</code> comparisons.
+            scanning from A to Z, you open to the middle and discard half — repeating until the
+            answer emerges. Two pointers, <code>low</code> and <code>high</code>, define the
+            surviving interval; each comparison shrinks it by half. The answer arrives in
+            <code>O(log n)</code> comparisons.
         </p>
     </section>
 
