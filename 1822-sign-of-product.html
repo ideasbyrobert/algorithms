@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Sign of the Product — Running Sign Flip · Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of Sign of the Product of an Array. Watch a running sign flip on negatives and bail on zero — no multiplication needed. O(n) single pass.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="sign of product, LeetCode 1822, running sign, negative parity, zero short-circuit, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1822-sign-of-product.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Sign of the Product — Running Sign Flip · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Sign of the Product of an Array. Watch a running sign flip on negatives and bail on zero.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1822-sign-of-product.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sign of the Product — Running Sign Flip · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Sign of the Product of an Array. Watch a running sign flip on negatives and bail on zero.">
+<meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Sign of the Product — Running Sign Flip","description":"Interactive step-by-step visualization of Sign of the Product of an Array. Watch a running sign flip on negatives and bail on zero — no multiplication needed.","url":"https://ideasbyrobert.github.io/algorithms/1822-sign-of-product.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/1822-sign-of-product.html","inLanguage":"en","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"sign of product, LeetCode 1822, running sign, negative parity, zero short-circuit, algorithm visualization"}</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+</head>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Sign of the Product of an Array · Optimal Solution</span>
+        <h1>Flip the sign. Never multiply.</h1>
+        <p class="hero-text">
+            A financial ledger records daily gain/loss multipliers for a portfolio — positive
+            for gains, negative for losses, zero if the account was frozen. Before rendering the
+            balance indicator, the system must determine whether the cumulative effect is positive,
+            negative, or zero — without computing the potentially enormous product itself.
+            One scan, flipping a running sign on each negative and bailing at the first zero,
+            answers the question in <code>O(n)</code> time and <code>O(1)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the sign oscillate</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Three rules, no arithmetic</h2>
+        <p class="section-intro">
+            The product's sign depends only on how many negatives appear and whether any
+            zero is present. Magnitudes are irrelevant — <code>-100</code> flips the sign
+            exactly like <code>-1</code>.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>zero dominates</h3>
+                <p>If any element is zero, the entire product is zero. The scan terminates immediately — no subsequent value can change the outcome.</p>
+            </article>
+            <article class="concept-card">
+                <h3>negative flips</h3>
+                <p>Each negative value flips the running sign. Positive values leave it unchanged. The magnitude of each factor is never used.</p>
+            </article>
+            <article class="concept-card">
+                <h3>parity decides</h3>
+                <p>Even number of flips returns the sign to positive. Odd number leaves it negative. That is the entire logic.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Scan, flip, or bail</h2>
+        <p class="section-intro">
+            A single pass through the array with a running sign variable that starts at +1.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize running sign as +1</h4>
+                    <p>The identity element for multiplication. No factors examined yet — the sign is positive by default.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>For each element</h4>
+                    <p>If the value is <code>0</code>, return <code>0</code> immediately. If the value is negative, flip the running sign: <code>sign = −sign</code>. If positive, do nothing.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Return the running sign</h4>
+                    <p>After all elements: the running sign is the answer. <code>+1</code> for positive product, <code>−1</code> for negative. No overflow. No multiplication.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where the sign tells the story</h2>
+        <p class="section-intro">
+            The running sign's final state encodes everything the problem asks for.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>All positive — no flips</h3>
+                <p>
+                    When every element is positive, the sign never flips. The scan is
+                    effectively a zero-check — confirming no zero exists. The result is +1.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Zero terminates early</h3>
+                <p>
+                    The moment a zero is encountered, the product is zero regardless of
+                    remaining elements. The scan halts — values after the zero are never examined.
+                    This is the only early termination case.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Overflow avoidance</h3>
+                <p>
+                    The naive approach of multiplying all values overflows even 64-bit integers
+                    for large arrays. Tracking only the sign — a single bit of information — makes
+                    overflow impossible and the solution trivially correct.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current element" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "index",  label: "Index (i)" },
+        { id: "value",  label: "Value" },
+        { id: "action", label: "Action" },
+        { id: "verdict", label: "Verdict" }
+    ],
+    values: [
+        { id: "sign",  label: "Running Sign" },
+        { id: "flips", label: "Flip Count" }
+    ],
+    orderTitle: "Sign Progression"
+});
+
+const ptrElements = VizArray.createPointers(refs.container, [
+    { id: "i", label: "i", position: "above" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "8 elements \u2014 mixed signs, even negatives",
+        array: [-2, 3, -4, 5, -1, 7, -6, 2],
+        desc: "Four negatives among eight values. The running sign flips four times \u2014 even count returns to positive."
+    },
+    {
+        name: "6 elements \u2014 mixed signs, odd negatives",
+        array: [-3, 2, -5, 4, -1, 7],
+        desc: "Three negatives among six values. The sign flips three times \u2014 odd count leaves the result negative.",
+        mobileDefault: true
+    },
+    {
+        name: "8 elements \u2014 zero terminates early",
+        array: [3, -2, 5, -1, 0, -4, 7, 2],
+        desc: "A zero at index 4 halts the scan. Three elements never get examined \u2014 their values cannot rescue a zero product."
+    },
+    {
+        name: "6 elements \u2014 all positive",
+        array: [2, 5, 3, 1, 8, 4],
+        desc: "Every element is positive. The sign never flips \u2014 it stays at +1 from start to finish."
+    },
+    {
+        name: "6 elements \u2014 all negative, even count",
+        array: [-1, -3, -2, -4, -5, -6],
+        desc: "Six negatives. Every element flips the sign. Even count means the final result is positive."
+    },
+    {
+        name: "5 elements \u2014 all negative, odd count",
+        array: [-1, -3, -2, -4, -5],
+        desc: "Five negatives. Each one flips the sign. Odd count leaves the result negative."
+    },
+    {
+        name: "8 elements \u2014 alternating positive and negative",
+        array: [-1, 2, -3, 4, -5, 6, -7, 8],
+        desc: "Negatives and positives alternate. The sign oscillates on every other step \u2014 four flips total, returning to positive."
+    },
+    {
+        name: "1 element \u2014 single negative",
+        array: [-7],
+        desc: "One negative value. A single flip takes the sign from +1 to \u22121."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const nums = preset.array;
+    const steps = [];
+    let sign = 1;
+
+    for (let i = 0; i < nums.length; i++) {
+        const value = nums[i];
+        const signBefore = sign;
+
+        if (value === 0) {
+            steps.push({
+                index: i, value, signBefore, signAfter: 0,
+                action: "return-zero", earlyBail: true
+            });
+            break;
+        }
+
+        if (value < 0) {
+            sign = -sign;
+            steps.push({
+                index: i, value, signBefore, signAfter: sign,
+                action: "flip"
+            });
+        } else {
+            steps.push({
+                index: i, value, signBefore, signAfter: sign,
+                action: "keep"
+            });
+        }
+    }
+
+    const last = steps[steps.length - 1];
+    const finalSign = last && last.action === "return-zero" ? 0 : sign;
+    const order = steps.map(s =>
+        s.signAfter === 1 ? "+1" : s.signAfter === -1 ? "\u22121" : "0"
+    );
+
+    return { steps, order, array: nums, desc: preset.desc, finalSign };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+
+    VizArray.renderCells(refs.grid, {
+        array: trace.array,
+        current: step ? step.index : undefined
+    });
+
+    if (step) {
+        refs.status.index.textContent = String(step.index);
+        refs.status.value.textContent = String(step.value);
+
+        if (step.action === "flip")
+            refs.status.action.textContent = "Flip (negative)";
+        else if (step.action === "keep")
+            refs.status.action.textContent = "Keep (positive)";
+        else
+            refs.status.action.textContent = "Zero \u2014 halt";
+
+        if (step.earlyBail)
+            refs.status.verdict.textContent = "Sign = 0";
+        else if (engine.position === trace.steps.length - 1)
+            refs.status.verdict.textContent = trace.finalSign === 1
+                ? "Sign = +1" : "Sign = \u22121";
+        else
+            refs.status.verdict.textContent = "Scanning\u2026";
+
+        refs.values.sign.textContent = step.signAfter === 1
+            ? "+1" : step.signAfter === -1 ? "\u22121" : "0";
+
+        let flips = 0;
+        for (let j = 0; j <= engine.position; j++)
+            if (trace.steps[j].action === "flip") flips++;
+        refs.values.flips.textContent = String(flips);
+    } else {
+        refs.status.index.textContent = "\u2014";
+        refs.status.value.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+        refs.status.verdict.textContent = "\u2014";
+        refs.values.sign.textContent = "+1";
+        refs.values.flips.textContent = "0";
+    }
+
+    refs.note.textContent = describeStep(engine);
+
+    requestAnimationFrame(() => {
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: { i: { index: step ? step.index : 0 } },
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const step = engine.currentStep();
+    const trace = engine.trace;
+
+    if (!step) return `${trace.desc} Press Play or Next to begin.`;
+
+    const fmt = v => v === 1 ? "+1" : v === -1 ? "\u22121" : "0";
+
+    if (step.action === "return-zero")
+        return `Index ${step.index}: value is 0. The product is immediately zero \u2014 scan terminates. Remaining elements are irrelevant.`;
+
+    let desc;
+    if (step.action === "flip")
+        desc = `Index ${step.index}: value ${step.value} is negative. Flip the running sign from ${fmt(step.signBefore)} to ${fmt(step.signAfter)}.`;
+    else
+        desc = `Index ${step.index}: value ${step.value} is positive. Running sign stays at ${fmt(step.signAfter)}.`;
+
+    if (engine.position === trace.steps.length - 1)
+        desc += ` Scan complete \u2014 the product sign is ${trace.finalSign === 1 ? "positive (+1)" : "negative (\u22121)"}.`;
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 800
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
