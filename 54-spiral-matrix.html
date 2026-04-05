@@ -15,10 +15,25 @@
         <span class="label">Spiral Matrix · Optimal Solution</span>
         <h1>The shrinking rectangle, made visible.</h1>
         <p class="hero-text">
-            Four boundary pointers — <code>top</code>, <code>right</code>, <code>bottom</code>,
-            and <code>left</code> — define a rectangle within the matrix. Walk its perimeter,
-            shrink it inward, and repeat until nothing remains. That is the entire algorithm.
+            A weather-monitoring station deploys sensors across an m × n grid. To run diagnostics,
+            the system must ping each sensor exactly once — spiraling inward from the perimeter,
+            outer ring first. The underlying question: given an m × n matrix, return every element
+            in spiral order.
         </p>
+        <p class="hero-text">
+            Four boundary pointers — <code>top</code>, <code>right</code>, <code>bottom</code>,
+            and <code>left</code> — define a rectangle. Walk its perimeter, shrink inward, repeat.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
     </section>
 
     <hr class="divider">
@@ -123,17 +138,6 @@
 
     <hr class="divider">
 
-    <!-- ── Interactive Visualization ── -->
-
-    <section>
-        <span class="label">Interactive</span>
-        <h2>Watch the algorithm run</h2>
-
-        <div id="interactiveMount"></div>
-    </section>
-
-    <hr class="divider">
-
     <!-- ── Guard Cases ── -->
 
     <section>
@@ -203,6 +207,10 @@
         </div>
     </section>
 
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
 </main>
 
 <script src="shared/viz/viz-engine.js"></script>
@@ -239,14 +247,9 @@ const refs = VizPage.createInteractive(document.getElementById("interactiveMount
 
 const PRESETS = [
     {
-        name: "3 × 3 — canonical spiral",
-        matrix: [[1,2,3],[4,5,6],[7,8,9]],
-        desc: "The simplest complete cycle: top → right → bottom → left, then a single centre cell."
-    },
-    {
-        name: "4 × 4 — two full layers",
-        matrix: [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16]],
-        desc: "Two complete layers. The inner 2×2 square is walked as its own mini-spiral."
+        name: "4 × 5 — two complete layers",
+        matrix: [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20]],
+        desc: "Twenty elements across two concentric layers. The outer ring visits 14 cells, then the inner 2 × 3 rectangle completes the remaining 6."
     },
     {
         name: "5 × 5 — three layers deep",
@@ -256,27 +259,32 @@ const PRESETS = [
     {
         name: "6 × 6 — three full layers",
         matrix: [[1,2,3,4,5,6],[7,8,9,10,11,12],[13,14,15,16,17,18],[19,20,21,22,23,24],[25,26,27,28,29,30],[31,32,33,34,35,36]],
-        desc: "Three complete rectangular layers — outer, middle, and an inner 2×2 core. Watch boundaries shrink three times."
+        desc: "Thirty-six elements across three complete rectangular layers — outer, middle, and an inner 2 × 2 core."
     },
     {
-        name: "3 × 4 — single-inner-row guard",
-        matrix: [[1,2,3,4],[5,6,7,8],[9,10,11,12]],
-        desc: "After layer 0, the inner rectangle is a single row. The bottom sweep must be skipped."
+        name: "5 × 4 — tall rectangle, two layers",
+        matrix: [[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16],[17,18,19,20]],
+        desc: "More rows than columns. The inner 3 × 2 rectangle produces a layer where the left sweep has zero iterations due to loop bounds."
     },
     {
-        name: "5 × 3 — single-inner-column guard",
-        matrix: [[1,2,3],[4,5,6],[7,8,9],[10,11,12],[13,14,15]],
-        desc: "After layer 0, the inner rectangle is a single column. The left sweep must be skipped."
+        name: "3 × 6 — wide, inner single row (bottom guard)",
+        matrix: [[1,2,3,4,5,6],[7,8,9,10,11,12],[13,14,15,16,17,18]],
+        desc: "Wide and shallow. After layer 0, only a single inner row remains — the bottom sweep must be skipped."
     },
     {
-        name: "1 × 4 — single row",
-        matrix: [[1,2,3,4]],
+        name: "6 × 3 — tall, inner single column (left guard)",
+        matrix: [[1,2,3],[4,5,6],[7,8,9],[10,11,12],[13,14,15],[16,17,18]],
+        desc: "Tall and narrow. After layer 0, only a single inner column remains — the left sweep must be skipped."
+    },
+    {
+        name: "1 × 6 — single row",
+        matrix: [[1,2,3,4,5,6]],
         desc: "Only the top sweep executes. Both bottom and left guards activate immediately."
     },
     {
-        name: "4 × 1 — single column",
-        matrix: [[1],[2],[3],[4]],
-        desc: "The top sweep visits one cell, then the right sweep walks the rest downward. Left guard activates."
+        name: "6 × 1 — single column",
+        matrix: [[1],[2],[3],[4],[5],[6]],
+        desc: "The top sweep visits one cell, then the right sweep walks downward. Left guard activates."
     }
 ];
 

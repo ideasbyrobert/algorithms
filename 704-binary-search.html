@@ -18,11 +18,26 @@
         <span class="label">Binary Search · Optimal Solution</span>
         <h1>Halving the search space, one comparison at a time.</h1>
         <p class="hero-text">
-            A sorted array of <em>n</em> elements. Two pointers — <code>low</code> and
-            <code>high</code> — define the interval that could still contain the target.
-            Each iteration computes the midpoint, compares, and discards an entire half.
-            The answer arrives in <code>O(log n)</code> comparisons.
+            A library's digital catalog holds 200,000 titles sorted alphabetically. Rather than
+            scanning from A to Z, you open to the middle, decide whether your title falls before
+            or after, and repeat — each decision eliminates half the remaining candidates.
+            Given a sorted array and a target value, find its index or confirm its absence.
         </p>
+        <p class="hero-text">
+            Two pointers — <code>low</code> and <code>high</code> — define the interval that
+            could still contain the answer. Each iteration computes the midpoint, compares, and
+            discards an entire half. The answer arrives in <code>O(log n)</code> comparisons.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the interval shrink</h2>
+        <div id="interactiveMount"></div>
     </section>
 
     <hr class="divider">
@@ -106,17 +121,6 @@
 
     <hr class="divider">
 
-    <!-- ── Interactive Visualization ── -->
-
-    <section>
-        <span class="label">Interactive</span>
-        <h2>Watch the interval shrink</h2>
-
-        <div id="interactiveMount"></div>
-    </section>
-
-    <hr class="divider">
-
     <!-- ── Edge Cases ── -->
 
     <section>
@@ -146,6 +150,10 @@
             </article>
         </div>
     </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
 
 </main>
 
@@ -192,13 +200,13 @@ const PRESETS = [
         name: "20 elements — find 93 (5 comparisons, max depth)",
         array: [3, 7, 12, 18, 24, 29, 35, 41, 48, 53, 59, 64, 70, 76, 82, 88, 93, 97, 104, 110],
         target: 93,
-        desc: "20 elements, 5 comparisons — the theoretical maximum for this array size. Watch how each halving narrows the interval until only one candidate remains."
+        desc: "Twenty elements, 5 comparisons — the theoretical maximum for this array size. Watch how each halving narrows the interval until only one candidate remains."
     },
     {
         name: "Perfect squares — find 64 (3 comparisons)",
         array: [1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169],
         target: 64,
-        desc: "13 perfect squares from 1² to 13². Binary search finds 64 = 8² in just 3 comparisons."
+        desc: "Thirteen perfect squares from 1² to 13². Binary search finds 64 = 8² in just 3 comparisons."
     },
     {
         name: "With negatives — find 7 (3 comparisons)",
@@ -219,16 +227,16 @@ const PRESETS = [
         desc: "The target is the very first element. The midpoint is always too large, so the algorithm repeatedly discards the right half."
     },
     {
-        name: "Classic: [-1, 0, 3, 5, 9, 12] target = 9",
-        array: [-1, 0, 3, 5, 9, 12],
-        target: 9,
-        desc: "The textbook example. A 6-element sorted array — the target 9 is found at index 4 after 2 comparisons."
+        name: "12 sorted integers — find last element 99 (always right)",
+        array: [3, 11, 18, 25, 33, 40, 52, 67, 74, 81, 88, 99],
+        target: 99,
+        desc: "The target is the last element. Every comparison goes right, pushing low upward repeatedly until the final candidate is the answer."
     },
     {
-        name: "Single element: [42] target = 42",
-        array: [42],
-        target: 42,
-        desc: "A single-element array. low = high = 0, mid = 0. One comparison resolves the answer immediately."
+        name: "18 elements — find 55 (zigzag path, 4 comparisons)",
+        array: [2, 7, 13, 19, 24, 30, 36, 41, 48, 55, 61, 67, 73, 79, 85, 91, 97, 103],
+        target: 55,
+        desc: "An 18-element array. The algorithm goes right, then left, then left again, then right — a zigzag path that narrows to the answer in 4 comparisons."
     }
 ];
 

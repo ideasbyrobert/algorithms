@@ -18,11 +18,27 @@
         <span class="label">Two Sum · Optimal Solution</span>
         <h1>Trading memory for answers.</h1>
         <p class="hero-text">
-            For each number, calculate its complement — the value that would complete the pair.
-            If the complement already exists in a hash map, you have the answer.
-            If not, store the current number and move on.
-            One pass. <code>O(n)</code> time. <code>O(n)</code> space.
+            A warehouse receives a shipment of parts with known weights. Quality control needs to
+            find exactly two parts whose combined weight matches a calibration standard. Scanning
+            every possible pair takes quadratic time — far too slow for thousands of parts. Given
+            an array of integers and a target sum, return the indices of the two numbers that add up to it.
         </p>
+        <p class="hero-text">
+            For each number, calculate its complement — the value that would complete the pair.
+            If the complement already exists in a hash map, you have the answer. One pass.
+            <code>O(n)</code> time. <code>O(n)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the map grow</h2>
+        <div id="interactiveMount"></div>
+        <div id="hashSection"></div>
     </section>
 
     <hr class="divider">
@@ -93,18 +109,6 @@
 
     <hr class="divider">
 
-    <!-- ── Interactive Visualization ── -->
-
-    <section>
-        <span class="label">Interactive</span>
-        <h2>Watch the map grow</h2>
-
-        <div id="interactiveMount"></div>
-        <div id="hashSection"></div>
-    </section>
-
-    <hr class="divider">
-
     <!-- ── Edge Cases ── -->
 
     <section>
@@ -133,6 +137,10 @@
             </article>
         </div>
     </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
 
 </main>
 
@@ -193,40 +201,40 @@ const PRESETS = [
         desc: "A 15-element array. The map accumulates 8 entries before finding complement 12 at index 4. The pair [12, 15] sums to 27."
     },
     {
-        name: "10 elements with negatives — target 5",
+        name: "10 elements — target 5 (mixed positive and negative)",
         array: [-5, 0, 3, -8, 12, 7, -2, 15, 9, -4],
         target: 5,
         desc: "Negative numbers work identically. The complement of -2 is 7, found at index 5. The map handles negative keys without issue."
     },
     {
-        name: "8 elements — target 101 (large values)",
-        array: [100, 4, 23, 67, 89, 12, 45, 1],
+        name: "12 elements — target 101 (large values)",
+        array: [100, 4, 23, 67, 250, 175, 89, 12, 45, 1, 78, 56],
         target: 101,
-        desc: "Large values. Multiple pairs could theoretically sum to 101, but the first discovered match is [89, 12] at indices 4 and 5."
+        desc: "Large values with multiple pairs that could sum to 101. The first discovered match is [89, 12] at indices 6 and 7."
     },
     {
-        name: "Classic: [2, 7, 11, 15] target = 9",
-        array: [2, 7, 11, 15],
-        target: 9,
-        desc: "The canonical Two Sum. The complement of 7 is 2, which was stored at index 0. Answer found in just 2 steps."
+        name: "10 elements — target 40 (immediate match at start)",
+        array: [15, 25, 8, 3, 19, 42, 7, 31, 11, 6],
+        target: 40,
+        desc: "The pair [15, 25] sits at the very start. The algorithm stores 15 at step 1, then finds complement 15 for value 25 at step 2 — early termination with the map nearly empty."
     },
     {
-        name: "Duplicate values: [4, 4, 2, 7, 8, 11] target = 8",
-        array: [4, 4, 2, 7, 8, 11],
-        target: 8,
-        desc: "Two copies of 4 sum to 8. The first 4 is stored at index 0. The second 4 finds its complement immediately. The check-before-store order prevents self-pairing."
+        name: "12 elements — target 50 (late match at the end)",
+        array: [5, 17, 3, 28, 9, 14, 2, 7, 21, 44, 11, 39],
+        target: 50,
+        desc: "The answer pair [11, 39] sits at indices 10 and 11 — the very last two elements. The map fills almost completely before the match is discovered."
     },
     {
-        name: "Negatives: [-3, 4, 3, 90] target = 0",
-        array: [-3, 4, 3, 90],
+        name: "11 elements — target 14 (duplicate values provide the answer)",
+        array: [22, 9, 31, 18, 6, 27, 4, 33, 7, 19, 7],
+        target: 14,
+        desc: "The array has two 7s at indices 8 and 10. The first is stored in the map; the second finds its complement immediately. Check-before-store prevents self-pairing."
+    },
+    {
+        name: "11 elements — target 0 (negatives with deep scan)",
+        array: [-8, 12, -5, 17, 3, -15, 9, 22, 8, -3, 14],
         target: 0,
-        desc: "Target zero with negative numbers. The complement of 3 is -3, stored at index 0. The formula target − nums[i] works regardless of sign."
-    },
-    {
-        name: "Minimal pair: [3, 3] target = 6",
-        array: [3, 3],
-        target: 6,
-        desc: "The smallest possible input. Store 3 at index 0, then immediately find complement 3 in the map. Two steps, one match."
+        desc: "Target zero with negative numbers. The complement of 8 is -8, stored 9 steps earlier at index 0. The formula works regardless of sign."
     }
 ];
 

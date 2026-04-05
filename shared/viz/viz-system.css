@@ -1186,3 +1186,31 @@ input[type="range"]::-webkit-slider-thumb {
         border-left: none;
     }
 }
+
+/* ── Footer ─────────────────────────────────────────────── */
+
+.page-footer {
+    margin-top: 80px;
+    padding-top: 20px;
+    border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.page-footer p {
+    font-family: var(--font-sf);
+    font-size: 0.7rem;
+    color: var(--ink-secondary);
+    letter-spacing: 0.02em;
+    line-height: 1.6;
+}
+
+.page-footer a {
+    color: var(--ink-secondary);
+    text-decoration: none;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.12);
+    transition: border-color 200ms ease;
+}
+
+.page-footer a:hover {
+    border-color: var(--ink-tertiary);
+}
