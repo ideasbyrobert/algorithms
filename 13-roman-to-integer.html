@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roman to Integer — Lookahead Subtraction | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of the Roman to Integer algorithm (LeetCode 13). Watch the lookahead subtraction rule resolve each symbol left to right in real time.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="Roman to Integer, LeetCode 13, algorithm visualization, lookahead subtraction, Roman numeral conversion, interactive walkthrough">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/13-roman-to-integer.html">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Roman to Integer — Lookahead Subtraction | Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of the Roman to Integer algorithm. Watch the lookahead subtraction rule resolve each symbol in real time.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/13-roman-to-integer.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Roman to Integer — Lookahead Subtraction | Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of the Roman to Integer algorithm. Lookahead subtraction in real time.">
+<meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Roman to Integer — Lookahead Subtraction","description":"Interactive step-by-step visualization of the Roman to Integer algorithm (LeetCode 13). Watch the lookahead subtraction rule resolve each symbol left to right.","url":"https://ideasbyrobert.github.io/algorithms/13-roman-to-integer.html","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Ideas by Robert | Algorithms","url":"https://ideasbyrobert.github.io/algorithms/"},"about":[{"@type":"Thing","name":"Roman to Integer"},{"@type":"Thing","name":"Lookahead subtraction"},{"@type":"Thing","name":"String scanning"}]}</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Roman to Integer · Optimal Solution</span>
+        <h1>Peek ahead. Add or subtract.</h1>
+        <p class="hero-text">
+            Ancient Roman inscriptions carved dates and quantities using seven symbols — I, V, X,
+            L, C, D, M — with a subtractive twist: a smaller symbol placed before a larger one
+            means "subtract me." Converting a Roman string to an integer requires nothing more than
+            a left-to-right scan with a one-symbol lookahead: if the current value is less than the
+            next, subtract it; otherwise, add it. <code>O(n)</code> time. <code>O(1)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the total accumulate</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>One rule decides every symbol</h2>
+        <p class="section-intro">
+            Each Roman symbol is either additive or subtractive. The decision depends entirely
+            on whether the next symbol represents a larger value.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>lookahead comparison</h3>
+                <p>For each symbol, peek at the next one. If the current value is strictly less than the next value, the current symbol is subtractive. Otherwise, it adds normally.</p>
+            </article>
+            <article class="concept-card">
+                <h3>six subtractive pairs</h3>
+                <p>Only six combinations trigger subtraction: IV (4), IX (9), XL (40), XC (90), CD (400), CM (900). All follow the same lookahead rule — no special-casing needed.</p>
+            </article>
+            <article class="concept-card">
+                <h3>last symbol always adds</h3>
+                <p>The final symbol has no successor to compare against. Without a larger value on its right, it can never participate in a subtractive pair — so it always contributes positively.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Scan, compare, accumulate</h2>
+        <p class="section-intro">
+            A single pass resolves every symbol. No backtracking, no grouping, no pattern matching.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize total to zero</h4>
+                    <p>The running total starts at 0. Each symbol will either increase or decrease it.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>For each symbol, get current and next values</h4>
+                    <p>Map the current character to its integer value. If a next character exists, map it too; otherwise treat the next value as 0.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Compare: subtract or add</h4>
+                    <p>If <code>current &lt; next</code>, subtract the current value from the total. Otherwise, add it. This single comparison handles all six subtractive pairs.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Return the total</h4>
+                    <p>After processing every symbol left to right, the total holds the integer equivalent of the Roman numeral.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where subtraction never fires</h2>
+        <p class="section-intro">
+            Some inputs have no subtractive pairs at all, while others are composed entirely of them.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Single symbol</h3>
+                <p>
+                    A one-character string like <code>V</code> has no next symbol. The lookahead
+                    comparison never triggers subtraction — the symbol's value is the answer.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>All identical symbols</h3>
+                <p>
+                    Strings like <code>III</code> or <code>XXX</code> have every symbol equal to its
+                    successor. Equal values never trigger subtraction — every symbol adds.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>All subtractive pairs</h3>
+                <p>
+                    A numeral like <code>CMXCIX</code> (999) is composed entirely of subtractive pairs.
+                    Every odd-indexed symbol is larger than the one before it, creating an alternating
+                    subtract-add pattern throughout.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current symbol" },
+        { dot: true, label: "lookahead (next)" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "index",  label: "Index" },
+        { id: "symbol", label: "Symbol" },
+        { id: "next",   label: "Next" },
+        { id: "action", label: "Action" }
+    ],
+    values: [
+        { id: "total",        label: "Running Total" },
+        { id: "contribution", label: "Contribution" }
+    ],
+    orderTitle: "Contribution Sequence"
+});
+
+const ptrElements = VizArray.createPointers(refs.container, [
+    { id: "i", label: "i", position: "above" }
+]);
+
+/* ── Roman value map ───────────────────────────────────── */
+
+const ROMAN = { I: 1, V: 5, X: 10, L: 50, C: 100, D: 500, M: 1000 };
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "MCMXCIV \u2014 three subtractive pairs (1994)",
+        roman: "MCMXCIV",
+        desc: "The year 1994. Three subtractive pairs \u2014 CM (900), XC (90), IV (4) \u2014 interspersed with additive symbols."
+    },
+    {
+        name: "XLVII \u2014 one subtractive pair (47)",
+        roman: "XLVII",
+        desc: "One subtractive pair XL (40), then three additive symbols V, I, I.",
+        mobileDefault: true
+    },
+    {
+        name: "MMXXVI \u2014 all additive (2026)",
+        roman: "MMXXVI",
+        desc: "Every symbol is larger than or equal to its successor \u2014 no subtraction at all."
+    },
+    {
+        name: "CDXLIV \u2014 consecutive subtractive pairs (444)",
+        roman: "CDXLIV",
+        desc: "Three consecutive subtractive pairs: CD (400), XL (40), IV (4). Every pair subtracts."
+    },
+    {
+        name: "IX \u2014 minimal subtractive pair (9)",
+        roman: "IX",
+        desc: "I before X means \u22121 + 10 = 9. The smallest non-trivial subtractive pair."
+    },
+    {
+        name: "III \u2014 identical symbols (3)",
+        roman: "III",
+        desc: "Three identical symbols. Equal values never trigger subtraction \u2014 all add."
+    },
+    {
+        name: "CMXCIX \u2014 dense subtraction (999)",
+        roman: "CMXCIX",
+        desc: "Almost every symbol triggers subtraction: CM (900) + XC (90) + IX (9)."
+    },
+    {
+        name: "MMMCMXCIX \u2014 maximum value (3999)",
+        roman: "MMMCMXCIX",
+        desc: "The largest valid Roman numeral. Nine symbols with both additive Ms and all three subtractive pairs."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const chars = preset.roman.split("");
+    const steps = [];
+    let total = 0;
+
+    for (let i = 0; i < chars.length; i++) {
+        const currentValue = ROMAN[chars[i]];
+        const nextValue = i < chars.length - 1 ? ROMAN[chars[i + 1]] : 0;
+        const action = currentValue < nextValue ? "subtract" : "add";
+        const contribution = action === "subtract" ? -currentValue : currentValue;
+        total += contribution;
+
+        steps.push({
+            index: i,
+            symbol: chars[i],
+            currentValue,
+            nextSymbol: i < chars.length - 1 ? chars[i + 1] : null,
+            nextValue,
+            action,
+            contribution,
+            total
+        });
+    }
+
+    const order = steps.map(s =>
+        (s.contribution >= 0 ? "+" : "\u2212") + Math.abs(s.contribution)
+    );
+
+    return { steps, order, chars, desc: preset.desc, total };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+
+    let currentIdx, highlights;
+    if (step) {
+        currentIdx = step.index;
+        highlights = new Map();
+        if (step.nextSymbol !== null) {
+            highlights.set(step.index + 1, "sweep");
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: trace.chars,
+        current: currentIdx,
+        highlights
+    });
+
+    if (step) {
+        refs.status.index.textContent = String(step.index);
+        refs.status.symbol.textContent = step.symbol + " = " + step.currentValue;
+        refs.status.next.textContent = step.nextSymbol
+            ? step.nextSymbol + " = " + step.nextValue
+            : "none";
+        refs.status.action.textContent = step.action === "subtract"
+            ? "Subtract (" + step.currentValue + " < " + step.nextValue + ")"
+            : step.nextSymbol
+                ? "Add (" + step.currentValue + " \u2265 " + step.nextValue + ")"
+                : "Add (last symbol)";
+    } else {
+        refs.status.index.textContent = "\u2014";
+        refs.status.symbol.textContent = "\u2014";
+        refs.status.next.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+    }
+
+    refs.values.total.textContent = step ? String(step.total) : "0";
+    refs.values.contribution.textContent = step
+        ? (step.contribution >= 0 ? "+" : "\u2212") + Math.abs(step.contribution)
+        : "\u2014";
+
+    refs.note.textContent = describeStep(engine);
+
+    requestAnimationFrame(() => {
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: { i: { index: step ? step.index : 0 } },
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const step = engine.currentStep();
+    const trace = engine.trace;
+
+    if (!step) {
+        return "Roman numeral: " + trace.chars.join("") + ". " + trace.desc + " Press Play or Next to begin the left-to-right scan.";
+    }
+
+    const sym = step.symbol + " (" + step.currentValue + ")";
+    let desc;
+
+    if (step.action === "subtract") {
+        desc = "Symbol " + sym + ". Next symbol " + step.nextSymbol + " (" + step.nextValue + ") is larger \u2014 subtract " + step.currentValue + ". ";
+    } else if (step.nextSymbol) {
+        desc = "Symbol " + sym + ". Next symbol " + step.nextSymbol + " (" + step.nextValue + ") is not larger \u2014 add " + step.currentValue + ". ";
+    } else {
+        desc = "Symbol " + sym + ". Last symbol \u2014 no lookahead needed. Add " + step.currentValue + ". ";
+    }
+
+    desc += "Running total: " + step.total + ".";
+
+    if (engine.position === trace.steps.length - 1) {
+        desc += " Complete \u2014 " + trace.chars.join("") + " = " + step.total + ".";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 800
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
