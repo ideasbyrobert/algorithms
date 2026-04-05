@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Can Make Arithmetic Progression — Sort and Gap Check · Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of Can Make Arithmetic Progression. Sort the array, establish an expected difference, then verify every adjacent gap matches. O(n log n).">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="arithmetic progression, LeetCode 1502, sort and check, adjacent gaps, constant difference, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1502-arithmetic-progression.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Can Make Arithmetic Progression — Sort and Gap Check · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Can Make Arithmetic Progression. Sort, establish a difference, verify every gap.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1502-arithmetic-progression.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Can Make Arithmetic Progression — Sort and Gap Check · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Can Make Arithmetic Progression. Sort, establish a difference, verify every gap.">
+<meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Can Make Arithmetic Progression — Sort and Gap Check","description":"Interactive step-by-step visualization of Can Make Arithmetic Progression. Sort the array, establish an expected difference, then verify every adjacent gap matches.","url":"https://ideasbyrobert.github.io/algorithms/1502-arithmetic-progression.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/1502-arithmetic-progression.html","inLanguage":"en","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"arithmetic progression, LeetCode 1502, sort and check, adjacent gaps, constant difference, algorithm visualization"}</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+</head>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Can Make Arithmetic Progression · Optimal Solution</span>
+        <h1>Sort once. Check every gap.</h1>
+        <p class="hero-text">
+            A calibration system expects sensor readings at evenly spaced intervals — 10, 20, 30,
+            40 — but network latency scrambles the arrival order. Can these values be rearranged
+            into a sequence with a constant step? Sort them to expose the only candidate order, then
+            verify that every adjacent gap matches the first. If any gap deviates, no rearrangement
+            can help. <code>O(n log n)</code> time for the sort. <code>O(1)</code> extra space if sorted in place.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the gaps align — or break</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>One sort, one contract, one scan</h2>
+        <p class="section-intro">
+            An arithmetic progression has exactly one correct order. Sorting reveals it.
+            The first adjacent gap becomes a contract that every subsequent gap must honor.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>sort reveals order</h3>
+                <p>If any permutation of the values forms an arithmetic progression, the sorted order must be that progression. No other arrangement needs checking.</p>
+            </article>
+            <article class="concept-card">
+                <h3>first gap defines the contract</h3>
+                <p>The difference between the first two sorted values sets the expected step. Every subsequent pair must produce exactly this difference.</p>
+            </article>
+            <article class="concept-card">
+                <h3>one mismatch suffices</h3>
+                <p>A single pair with a different gap proves impossibility. The scan can terminate early — no later pair can repair the broken contract.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Sort, establish, verify</h2>
+        <p class="section-intro">
+            The algorithm sorts once, locks in a difference, and verifies it across all adjacent pairs.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Sort the array</h4>
+                    <p>Sort the values in ascending order. This is the only candidate arrangement for an arithmetic progression.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Establish the expected difference</h4>
+                    <p>Compute <code>d = sorted[1] − sorted[0]</code>. This is the gap every adjacent pair must replicate.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Verify remaining pairs</h4>
+                    <p>For each pair <code>(sorted[i−1], sorted[i])</code> starting at <code>i = 2</code>: if the gap differs from <code>d</code>, return <code>false</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>All gaps matched</h4>
+                    <p>If the scan completes without a mismatch, return <code>true</code> — the values form an arithmetic progression.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where the gap check is trivial</h2>
+        <p class="section-intro">
+            Some inputs resolve immediately, exposing the boundaries of the algorithm.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>All equal values</h3>
+                <p>
+                    When every element is the same, the expected difference is zero. Every gap
+                    is zero. The sequence is a valid arithmetic progression with step 0.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Two elements</h3>
+                <p>
+                    With only two values, there is exactly one gap — and it defines the difference.
+                    No further pairs to check. Every two-element array is trivially arithmetic.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Scrambled input</h3>
+                <p>
+                    The input order is irrelevant. The algorithm sorts first, so <code>[16, 4, 10, 7, 1]</code>
+                    and <code>[1, 4, 7, 10, 16]</code> produce the same sorted sequence and the same answer.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current pair" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "index",   label: "Index (i)" },
+        { id: "pair",    label: "Pair" },
+        { id: "gap",     label: "This Gap" },
+        { id: "verdict", label: "Verdict" }
+    ],
+    values: [
+        { id: "diff",    label: "Expected Diff (d)" },
+        { id: "checked", label: "Pairs Checked" }
+    ],
+    orderTitle: "Gap Sequence"
+});
+
+const ptrElements = VizArray.createPointers(refs.container, [
+    { id: "i", label: "i", position: "above" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "8 elements \u2014 scrambled valid progression",
+        array: [16, 4, 22, 10, 1, 19, 7, 13],
+        desc: "Eight scrambled values that sort into [1, 4, 7, 10, 13, 16, 19, 22] with a constant difference of 3."
+    },
+    {
+        name: "6 elements \u2014 scrambled valid progression",
+        array: [9, 3, 11, 1, 7, 5],
+        desc: "Six values that sort into [1, 3, 5, 7, 9, 11] with a constant difference of 2.",
+        mobileDefault: true
+    },
+    {
+        name: "6 elements \u2014 mismatch at the end",
+        array: [1, 3, 5, 7, 10, 12],
+        desc: "Sorted [1, 3, 5, 7, 10, 12] starts with gaps of 2, but the jump from 7 to 10 breaks the contract."
+    },
+    {
+        name: "5 elements \u2014 early mismatch",
+        array: [1, 3, 8, 10, 13],
+        desc: "Sorted [1, 3, 8, 10, 13] has first gap 2, but the second gap is 5 \u2014 fails at just the second comparison."
+    },
+    {
+        name: "5 elements \u2014 all equal (zero difference)",
+        array: [5, 5, 5, 5, 5],
+        desc: "All equal values form a valid progression with difference 0. Every gap is zero \u2014 constant by definition."
+    },
+    {
+        name: "6 elements \u2014 negative values",
+        array: [7, -1, 3, -5, 11, 15],
+        desc: "Negative and positive values sort to [\u22125, \u22121, 3, 7, 11, 15] with a constant difference of 4."
+    },
+    {
+        name: "5 elements \u2014 descending input",
+        array: [20, 15, 10, 5, 0],
+        desc: "Descending input sorts to [0, 5, 10, 15, 20]. The sort reveals the hidden arithmetic structure with d = 5."
+    },
+    {
+        name: "2 elements \u2014 trivially valid",
+        array: [42, 17],
+        desc: "Two elements always form an arithmetic progression \u2014 there is only one gap, and it defines the difference."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const original = [...preset.array];
+    const sorted = [...original].sort((a, b) => a - b);
+    const steps = [];
+
+    if (sorted.length < 2)
+        return { steps: [], order: [], original, sorted, desc: preset.desc, isArithmetic: true, expectedDiff: 0 };
+
+    const expectedDiff = sorted[1] - sorted[0];
+
+    // Step 0: Establish expected difference from first pair
+    steps.push({
+        phase: "establish",
+        index: 1,
+        leftIndex: 0,
+        leftValue: sorted[0],
+        rightValue: sorted[1],
+        gap: expectedDiff,
+        expectedDiff,
+        matches: true
+    });
+
+    // Steps 1+: Verify remaining pairs
+    let isArithmetic = true;
+    for (let i = 2; i < sorted.length; i++) {
+        const gap = sorted[i] - sorted[i - 1];
+        const matches = gap === expectedDiff;
+
+        steps.push({
+            phase: "check",
+            index: i,
+            leftIndex: i - 1,
+            leftValue: sorted[i - 1],
+            rightValue: sorted[i],
+            gap,
+            expectedDiff,
+            matches,
+            earlyBail: !matches
+        });
+
+        if (!matches) { isArithmetic = false; break; }
+    }
+
+    const order = steps.map(s => String(s.gap));
+    return { steps, order, original, sorted, desc: preset.desc, isArithmetic, expectedDiff };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+
+    // Before stepping: show original array. During stepping: sorted array.
+    const displayArray = step ? trace.sorted : trace.original;
+
+    let currentIdx, highlights;
+    if (step) {
+        currentIdx = step.index;
+        highlights = new Map();
+        highlights.set(step.leftIndex, "sweep");
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: displayArray,
+        current: currentIdx,
+        highlights
+    });
+
+    // Status bar
+    if (step) {
+        refs.status.index.textContent = String(step.index);
+        refs.status.pair.textContent = `${step.leftValue} \u2192 ${step.rightValue}`;
+        refs.status.gap.textContent = String(step.gap);
+
+        if (step.phase === "establish")
+            refs.status.verdict.textContent = `d = ${step.expectedDiff} established`;
+        else if (step.earlyBail)
+            refs.status.verdict.textContent = "Not arithmetic \u2717";
+        else if (engine.position === trace.steps.length - 1)
+            refs.status.verdict.textContent = trace.isArithmetic ? "Arithmetic \u2713" : "Not arithmetic \u2717";
+        else
+            refs.status.verdict.textContent = step.matches ? "Match \u2713" : "Mismatch \u2717";
+    } else {
+        refs.status.index.textContent = "\u2014";
+        refs.status.pair.textContent = "\u2014";
+        refs.status.gap.textContent = "\u2014";
+        refs.status.verdict.textContent = "\u2014";
+    }
+
+    // Values bar
+    refs.values.diff.textContent = step ? String(step.expectedDiff) : "\u2014";
+
+    let checked = 0;
+    if (step) {
+        for (let j = 0; j <= engine.position; j++)
+            if (trace.steps[j].phase === "check") checked++;
+    }
+    refs.values.checked.textContent = String(checked);
+
+    refs.note.textContent = describeStep(engine);
+
+    // Pointer
+    requestAnimationFrame(() => {
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: { i: { index: step ? step.index : (trace.sorted.length > 1 ? 1 : 0) } },
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const step = engine.currentStep();
+    const trace = engine.trace;
+
+    if (!step) {
+        if (trace.steps.length === 0) return "Single element \u2014 trivially arithmetic.";
+        return `Original array: [${trace.original.join(", ")}]. ${trace.desc} Press Play or Next to sort and begin.`;
+    }
+
+    if (step.phase === "establish") {
+        return `Sorted: [${trace.sorted.join(", ")}]. First pair (${step.leftValue}, ${step.rightValue}) establishes the expected difference: d = ${step.expectedDiff}. Every subsequent gap must equal ${step.expectedDiff}.`;
+    }
+
+    let desc = `Pair (${step.leftValue}, ${step.rightValue}): gap = ${step.gap}. `;
+
+    if (step.matches)
+        desc += `Matches expected difference d = ${step.expectedDiff}. \u2713`;
+    else
+        desc += `Does NOT match expected difference d = ${step.expectedDiff}. The sequence is not arithmetic.`;
+
+    if (!step.earlyBail && engine.position === trace.steps.length - 1 && trace.isArithmetic)
+        desc += ` All gaps match d = ${trace.expectedDiff} \u2014 the array can form an arithmetic progression.`;
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 800
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
