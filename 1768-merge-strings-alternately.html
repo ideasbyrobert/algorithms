@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merge Strings Alternately — Interleave and Append | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 1768 Merge Strings Alternately. Watch the interleave build character by character with source tracking.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1768-merge-strings-alternately.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="merge strings alternately, leetcode 1768, interleave strings, algorithm visualization, two pointer, string merge">
+<meta property="og:title" content="Merge Strings Alternately — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 1768. Watch the interleave build character by character.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1768-merge-strings-alternately.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Merge Strings Alternately — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 1768. Watch the interleave build character by character.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Merge Strings Alternately — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 1768 Merge Strings Alternately.","url":"https://ideasbyrobert.github.io/algorithms/1768-merge-strings-alternately.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.merge-sources {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 0 0 20px;
+}
+.source-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.source-label {
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: #636366;
+    min-width: 46px;
+    text-align: right;
+    flex-shrink: 0;
+}
+.source-chars {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+.source-char {
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 15px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    border: 1.5px solid #C7C7CC;
+    color: #1D1D1F;
+    transition: all 0.25s ease;
+}
+.source-char.consumed {
+    opacity: 0.22;
+    border-color: transparent;
+}
+.source-char.active-source {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border-color: #1D1D1F;
+    font-weight: 600;
+}
+@media (max-width: 600px) {
+    .source-char {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+    .source-label {
+        font-size: 11px;
+        min-width: 38px;
+    }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Merge Strings Alternately · Optimal Solution</span>
+        <h1>Interleave one from each, then append the rest.</h1>
+        <p class="hero-text">
+            A messaging platform combines status updates from two partner feeds into a single
+            blended stream — one from each, alternating. This problem works the same way at the
+            character level: given two strings, interleave their characters one at a time, and
+            when the shorter string runs out, append whatever remains from the longer one.
+            <code>O(n + m)</code> time. <code>O(n + m)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the merge build character by character</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Alternate pairs, then tail</h2>
+        <p class="section-intro">
+            The merge has at most two phases: an interleave while both words have characters
+            at the same index, then a tail append from whichever word is longer.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>shared-index interleave</h3>
+                <p>While both strings have a character at the current index, take one from word1 then one from word2. Each shared index produces exactly two result characters.</p>
+            </article>
+            <article class="concept-card">
+                <h3>append the remaining tail</h3>
+                <p>Once the shorter string is exhausted, every remaining character from the longer string is appended in order. No further alternation — just a straight copy.</p>
+            </article>
+            <article class="concept-card">
+                <h3>stable ordering</h3>
+                <p>Characters from each word maintain their original relative order. The merge interleaves positions but never rearranges characters within either source.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Two loops, one result</h2>
+        <p class="section-intro">
+            One loop handles the shared-index pairs. A second handles the leftover tail.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Calculate the shared length</h4>
+                    <p>Set <code>shared = min(word1.length, word2.length)</code>. This is how many indices both words cover.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Interleave shared indices</h4>
+                    <p>For each index <code>i</code> from <code>0</code> to <code>shared − 1</code>, append <code>word1[i]</code> then <code>word2[i]</code> to the result.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Identify the longer word</h4>
+                    <p>If <code>word1.length > shared</code>, word1 has leftover characters. Otherwise word2 does. If equal, there is no tail.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Append the tail</h4>
+                    <p>Copy the remaining characters from index <code>shared</code> to the end of the longer word. The result is complete.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where one phase vanishes</h2>
+        <p class="section-intro">
+            Some inputs make the merge trivially short by eliminating an entire phase.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Equal lengths</h3>
+                <p>
+                    When both words have the same length, every character participates in a shared
+                    pair. The tail phase is empty — the interleave alone produces the full result.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>One character each</h3>
+                <p>
+                    A single shared pair with no tail. The result is simply <code>word1[0]</code>
+                    followed by <code>word2[0]</code> — two characters, one pair, done.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Vastly unequal lengths</h3>
+                <p>
+                    When one word is much shorter, most of the result comes from the tail.
+                    After one or two shared pairs, the longer word's suffix dominates the output.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current placement" },
+        { dot: true, label: "previously placed" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "phase",    label: "Phase" },
+        { id: "source",   label: "Source" },
+        { id: "sourceIdx", label: "Index" },
+        { id: "char",     label: "Character" }
+    ],
+    values: [
+        { id: "word1",  label: "Word 1" },
+        { id: "word2",  label: "Word 2" },
+        { id: "merged", label: "Merged" }
+    ],
+    orderTitle: "Merge Sequence"
+});
+
+/* ── Source display (injected above viz-array) ─────────── */
+
+const sourceDisplay = document.createElement("div");
+sourceDisplay.className = "merge-sources";
+sourceDisplay.innerHTML = [
+    '<div class="source-row">',
+    '<span class="source-label">word\u2081</span>',
+    '<div class="source-chars" id="w1Chars"></div>',
+    '</div>',
+    '<div class="source-row">',
+    '<span class="source-label">word\u2082</span>',
+    '<div class="source-chars" id="w2Chars"></div>',
+    '</div>'
+].join("");
+
+refs.container.parentNode.insertBefore(sourceDisplay, refs.container);
+
+const w1CharsEl = document.getElementById("w1Chars");
+const w2CharsEl = document.getElementById("w2Chars");
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "\"abcdef\" + \"pqr\" \u2014 three pairs, then word1 tail",
+        word1: "abcdef", word2: "pqr",
+        desc: "Three shared pairs interleave six characters, then word1\u2019s remaining \"def\" appends as the tail."
+    },
+    {
+        name: "\"ab\" + \"xyz\" \u2014 two pairs, then word2 tail",
+        word1: "ab", word2: "xyz",
+        desc: "Two shared pairs, then word2\u2019s remaining \"z\" appends. Short enough to see both phases clearly.",
+        mobileDefault: true
+    },
+    {
+        name: "\"ace\" + \"bdf\" \u2014 equal length, perfect interleave",
+        word1: "ace", word2: "bdf",
+        desc: "Equal lengths mean no tail phase. All six characters come from shared-index pairs, producing \"abcdef\"."
+    },
+    {
+        name: "\"hello\" + \"world\" \u2014 equal length, real words",
+        word1: "hello", word2: "world",
+        desc: "Five shared pairs, no tail. The interleave of two familiar words produces an unfamiliar but correctly merged result."
+    },
+    {
+        name: "\"wxyz\" + \"ab\" \u2014 two pairs, then word1 tail",
+        word1: "wxyz", word2: "ab",
+        desc: "Two shared pairs consume both of word2, then word1\u2019s \"yz\" suffix appends."
+    },
+    {
+        name: "\"k\" + \"lmno\" \u2014 one pair, long tail",
+        word1: "k", word2: "lmno",
+        desc: "Only one shared pair. The tail dominates \u2014 three of five result characters come from word2 alone."
+    },
+    {
+        name: "\"m\" + \"n\" \u2014 single pair, minimal",
+        word1: "m", word2: "n",
+        desc: "One character each. A single shared pair produces \"mn\" \u2014 the simplest possible merge."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const { word1, word2 } = preset;
+    const shared = Math.min(word1.length, word2.length);
+    const total = word1.length + word2.length;
+
+    const result = [];
+    for (let i = 0; i < shared; i++) {
+        result.push(word1[i]);
+        result.push(word2[i]);
+    }
+    const longer = word1.length > word2.length ? word1 : word2;
+    for (let i = shared; i < longer.length; i++) {
+        result.push(longer[i]);
+    }
+
+    const steps = [];
+    const order = [];
+    let w1c = 0, w2c = 0, ri = 0;
+
+    for (let i = 0; i < shared; i++) {
+        w1c = i + 1;
+        steps.push({ ri: ri++, src: "w1", si: i, ch: word1[i], phase: "interleave", w1c, w2c });
+        order.push(word1[i] + "\u2081");
+
+        w2c = i + 1;
+        steps.push({ ri: ri++, src: "w2", si: i, ch: word2[i], phase: "interleave", w1c, w2c });
+        order.push(word2[i] + "\u2082");
+    }
+
+    const tailSrc = word1.length > word2.length ? "w1" : "w2";
+    const tailWord = word1.length > word2.length ? word1 : word2;
+    const tailSub = tailSrc === "w1" ? "\u2081" : "\u2082";
+    for (let i = shared; i < tailWord.length; i++) {
+        if (tailSrc === "w1") w1c = i + 1; else w2c = i + 1;
+        steps.push({ ri: ri++, src: tailSrc, si: i, ch: tailWord[i], phase: "tail", w1c, w2c });
+        order.push(tailWord[i] + tailSub);
+    }
+
+    return {
+        word1, word2, result, steps, order, total, shared,
+        desc: preset.desc,
+        hasTail: word1.length !== word2.length
+    };
+}
+
+/* ── Source display updater ─────────────────────────────── */
+
+function updateSources(trace, step) {
+    let w1h = "";
+    for (let i = 0; i < trace.word1.length; i++) {
+        let cls = "source-char";
+        if (step) {
+            if (step.src === "w1" && i === step.si) cls += " active-source";
+            else if (i < step.w1c) cls += " consumed";
+        }
+        w1h += '<span class="' + cls + '">' + trace.word1[i] + "</span>";
+    }
+    w1CharsEl.innerHTML = w1h;
+
+    let w2h = "";
+    for (let i = 0; i < trace.word2.length; i++) {
+        let cls = "source-char";
+        if (step) {
+            if (step.src === "w2" && i === step.si) cls += " active-source";
+            else if (i < step.w2c) cls += " consumed";
+        }
+        w2h += '<span class="' + cls + '">' + trace.word2[i] + "</span>";
+    }
+    w2CharsEl.innerHTML = w2h;
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+    const pos = engine.position;
+
+    let current = null;
+    const highlights = new Map();
+    const active = new Set();
+
+    if (step) {
+        for (let j = 0; j <= step.ri; j++) active.add(j);
+        current = step.ri;
+        for (let j = 0; j < pos; j++) {
+            highlights.set(trace.steps[j].ri, "sweep");
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: trace.result,
+        current,
+        highlights,
+        active
+    });
+
+    updateSources(trace, step);
+
+    const isDone = step && pos === trace.steps.length - 1;
+
+    if (step) {
+        refs.status.phase.textContent = isDone ? "Done" : (step.phase === "interleave" ? "Interleave" : "Append Tail");
+        refs.status.source.textContent = step.src === "w1" ? "word1" : "word2";
+        refs.status.sourceIdx.textContent = String(step.si);
+        refs.status.char.textContent = step.ch;
+    } else {
+        refs.status.phase.textContent = "Ready";
+        refs.status.source.textContent = "\u2014";
+        refs.status.sourceIdx.textContent = "\u2014";
+        refs.status.char.textContent = "\u2014";
+    }
+
+    refs.values.word1.textContent = trace.word1;
+    refs.values.word2.textContent = trace.word2;
+    const filled = step ? step.ri + 1 : 0;
+    refs.values.merged.textContent = filled + " / " + trace.total;
+
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+    const pos = engine.position;
+
+    if (!step) {
+        return "\u201C" + trace.word1 + "\u201D (" + trace.word1.length + ") and \u201C" +
+            trace.word2 + "\u201D (" + trace.word2.length + "). " + trace.desc +
+            " Press Play or Next to begin.";
+    }
+
+    const srcLabel = step.src === "w1" ? "word1" : "word2";
+    let desc;
+
+    if (step.phase === "interleave") {
+        desc = "Take \u2018" + step.ch + "\u2019 from " + srcLabel + "[" + step.si +
+            "] \u2192 result[" + step.ri + "]. Shared index " + step.si + ".";
+    } else {
+        desc = "Append \u2018" + step.ch + "\u2019 from " + srcLabel + "[" + step.si +
+            "] \u2192 result[" + step.ri + "]. Tail character.";
+    }
+
+    if (pos === trace.steps.length - 1) {
+        desc += " Merge complete: \u201C" + trace.result.join("") + "\u201D (" + trace.total + " characters).";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 500
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
