@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Length of Last Word — Reverse Scan | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of the Length of Last Word algorithm (LeetCode 58). Watch the reverse scan skip trailing spaces and count the last word in real time.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="Length of Last Word, LeetCode 58, algorithm visualization, reverse scan, string processing, interactive walkthrough">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/58-length-of-last-word.html">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Length of Last Word — Reverse Scan | Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of the Length of Last Word algorithm. Watch the reverse scan find the word in real time.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/58-length-of-last-word.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Length of Last Word — Reverse Scan | Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of the Length of Last Word algorithm. Reverse scan in real time.">
+<meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Length of Last Word — Reverse Scan","description":"Interactive step-by-step visualization of the Length of Last Word algorithm (LeetCode 58). Watch the reverse scan skip trailing spaces and count the last word.","url":"https://ideasbyrobert.github.io/algorithms/58-length-of-last-word.html","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Ideas by Robert | Algorithms","url":"https://ideasbyrobert.github.io/algorithms/"},"about":[{"@type":"Thing","name":"Length of Last Word"},{"@type":"Thing","name":"Reverse scan"},{"@type":"Thing","name":"String processing"}]}</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Length of Last Word · Optimal Solution</span>
+        <h1>Scan from the end. Skip, count, stop.</h1>
+        <p class="hero-text">
+            A chat application displays conversation snippets, showing the last word of each message
+            as a preview tag — but messages can end with stray spaces from pasted text, auto-correct,
+            or speech-to-text. Finding the true last word means scanning from the end: skip any
+            trailing spaces, then count characters until you hit a space or the start of the string.
+            No splitting, no allocation. <code>O(n)</code> time. <code>O(1)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the reverse scan find the word</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Right to left, two phases, one pass</h2>
+        <p class="section-intro">
+            The last word lives at the right edge of the string. A reverse scan reaches it
+            immediately, avoiding irrelevant prefix characters entirely.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>scan from the end</h3>
+                <p>Starting at the last index means the first non-space character found is part of the answer. No need to process the entire string or split into tokens.</p>
+            </article>
+            <article class="concept-card">
+                <h3>two-phase transition</h3>
+                <p>Phase one: skip trailing spaces (length still zero). Phase two: count non-space characters (length grows). The transition happens naturally when the first letter appears.</p>
+            </article>
+            <article class="concept-card">
+                <h3>first space after counting stops</h3>
+                <p>Once counting has started, the next space marks the left boundary of the last word. Everything before it — leading spaces, earlier words — is irrelevant and never examined.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Skip, count, break</h2>
+        <p class="section-intro">
+            A single reverse loop with one counter and one branch handles all cases.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Start at the last index, length = 0</h4>
+                    <p>Begin at <code>i = s.length − 1</code>. The counter <code>length</code> starts at zero.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>If space and length is zero — skip</h4>
+                    <p>Trailing spaces are noise. While <code>s[i]</code> is a space and no letters have been counted yet, move left.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>If non-space — count</h4>
+                    <p>Every non-space character belongs to the last word. Increment <code>length</code> and continue left.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>If space and length > 0 — stop</h4>
+                    <p>A space after counting means the word's left boundary is found. Break and return <code>length</code>.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where the scan is trivial</h2>
+        <p class="section-intro">
+            Some inputs skip an entire phase, making the scan even shorter.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>No trailing spaces</h3>
+                <p>
+                    When the string ends with a letter, the skip phase is empty. Counting begins
+                    immediately at the last character — no wasted iterations.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Single word, no spaces</h3>
+                <p>
+                    With no spaces at all, the count phase runs to the start of the string.
+                    The boundary is the string's own left edge, and the length equals the string length.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>One-letter last word</h3>
+                <p>
+                    A single non-space character between two spaces means the count phase fires
+                    exactly once. The very next character is a space boundary — length is 1.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current character" },
+        { dot: true, label: "counted (last word)" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "index",  label: "Index (i)" },
+        { id: "char",   label: "Character" },
+        { id: "action", label: "Action" },
+        { id: "length", label: "Length" }
+    ],
+    values: [
+        { id: "wordLength", label: "Word Length" },
+        { id: "phase",      label: "Phase" }
+    ],
+    orderTitle: "Scan Sequence"
+});
+
+const ptrElements = VizArray.createPointers(refs.container, [
+    { id: "i", label: "i", position: "above" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "\"Hello World   \" \u2014 trailing spaces + boundary",
+        text: "Hello World   ",
+        desc: "Three trailing spaces to skip, then \"World\" (5 letters) to count, then a space boundary stops the scan."
+    },
+    {
+        name: "\"sky  \" \u2014 single word with trailing spaces",
+        text: "sky  ",
+        desc: "Two trailing spaces, then \"sky\" (3 letters). No boundary \u2014 scan reaches the start.",
+        mobileDefault: true
+    },
+    {
+        name: "\"the moon  \" \u2014 two words, trailing spaces",
+        text: "the moon  ",
+        desc: "Two trailing spaces, then \"moon\" (4 letters), then a boundary space."
+    },
+    {
+        name: "\"luffy\" \u2014 single word, no spaces",
+        text: "luffy",
+        desc: "No spaces at all. The skip phase is empty \u2014 every character counts. Length equals string length."
+    },
+    {
+        name: "\"a b\" \u2014 one-letter last word",
+        text: "a b",
+        desc: "Last word \"b\" is one letter. The boundary space is reached after a single count."
+    },
+    {
+        name: "\"   day\" \u2014 leading spaces only",
+        text: "   day",
+        desc: "No trailing spaces. Counting starts immediately. Leading spaces are never reached."
+    },
+    {
+        name: "\"go   far\" \u2014 multiple internal spaces",
+        text: "go   far",
+        desc: "No trailing spaces. Last word \"far\" (3 letters). The cluster of internal spaces is never reached."
+    },
+    {
+        name: "\"hi\" \u2014 minimal input",
+        text: "hi",
+        desc: "Two characters, no spaces. The entire string is the last word. Length is 2."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const text = preset.text;
+    const chars = text.split("");
+    const display = chars.map(c => c === " " ? "\u00B7" : c);
+    const steps = [];
+    let length = 0;
+
+    for (let i = text.length - 1; i >= 0; i--) {
+        const ch = text[i];
+
+        if (ch === " ") {
+            if (length > 0) {
+                steps.push({ index: i, char: ch, action: "stop", length });
+                break;
+            }
+            steps.push({ index: i, char: ch, action: "skip", length });
+            continue;
+        }
+
+        length++;
+        steps.push({ index: i, char: ch, action: "count", length });
+    }
+
+    const order = steps.map(s => {
+        if (s.action === "skip") return "\u00B7";
+        if (s.action === "stop") return "\u25AE";
+        return s.char;
+    });
+
+    return { steps, order, chars, display, text, desc: preset.desc, length };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+
+    let currentIdx, highlights;
+    if (step) {
+        currentIdx = step.index;
+        highlights = new Map();
+        for (let j = 0; j < engine.position; j++) {
+            if (trace.steps[j].action === "count") {
+                highlights.set(trace.steps[j].index, "sweep");
+            }
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: trace.display,
+        current: currentIdx,
+        highlights
+    });
+
+    if (step) {
+        refs.status.index.textContent = String(step.index);
+        refs.status.char.textContent = step.char === " " ? "\u00B7 (space)" : step.char;
+        refs.status.length.textContent = String(step.length);
+
+        if (step.action === "skip")
+            refs.status.action.textContent = "Skip trailing space";
+        else if (step.action === "count")
+            refs.status.action.textContent = "Count letter";
+        else
+            refs.status.action.textContent = "Stop at boundary";
+    } else {
+        refs.status.index.textContent = "\u2014";
+        refs.status.char.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+        refs.status.length.textContent = "\u2014";
+    }
+
+    refs.values.wordLength.textContent = step ? String(step.length) : "0";
+
+    if (!step)
+        refs.values.phase.textContent = "Ready";
+    else if (step.action === "skip")
+        refs.values.phase.textContent = "Skipping trailing";
+    else if (step.action === "count")
+        refs.values.phase.textContent = engine.position === trace.steps.length - 1 ? "Done" : "Counting word";
+    else
+        refs.values.phase.textContent = "Done";
+
+    refs.note.textContent = describeStep(engine);
+
+    requestAnimationFrame(() => {
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: { i: { index: step ? step.index : trace.chars.length - 1 } },
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const step = engine.currentStep();
+    const trace = engine.trace;
+
+    if (!step) {
+        return "String: \"" + trace.text + "\". " + trace.desc + " Press Play or Next to begin the reverse scan.";
+    }
+
+    const charLabel = step.char === " " ? "space" : "'" + step.char + "'";
+    let desc;
+
+    if (step.action === "skip") {
+        desc = "Index " + step.index + ": " + charLabel + ". No letters counted yet \u2014 skip this trailing space.";
+    } else if (step.action === "count") {
+        desc = "Index " + step.index + ": " + charLabel + ". Count this letter. Word length: " + step.length + ".";
+    } else {
+        desc = "Index " + step.index + ": " + charLabel + ". Already counting (length = " + step.length + ") \u2014 stop at this boundary.";
+    }
+
+    if (engine.position === trace.steps.length - 1) {
+        if (step.action === "count") {
+            desc += " Reached the start of the string. Last word length: " + trace.length + ".";
+        } else {
+            desc += " Last word length: " + trace.length + ".";
+        }
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
