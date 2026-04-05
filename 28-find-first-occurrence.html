@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find the Index of the First Occurrence — Window Scan | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of the Find First Occurrence algorithm (LeetCode 28). Watch the sliding window compare character-by-character against the needle in real time.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="Find First Occurrence, LeetCode 28, algorithm visualization, sliding window, substring search, interactive walkthrough">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/28-find-first-occurrence.html">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Find the Index of the First Occurrence — Window Scan | Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of the Find First Occurrence algorithm. Watch the sliding window scan in real time.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/28-find-first-occurrence.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Find the Index of the First Occurrence — Window Scan | Interactive Visualization">
+<meta name="twitter:description" content="Interactive visualization of the sliding window substring search algorithm.">
+<meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Find the Index of the First Occurrence — Window Scan","description":"Interactive step-by-step visualization of the Find First Occurrence algorithm (LeetCode 28). Watch the sliding window compare character-by-character against the needle.","url":"https://ideasbyrobert.github.io/algorithms/28-find-first-occurrence.html","inLanguage":"en","isPartOf":{"@type":"WebSite","name":"Ideas by Robert | Algorithms","url":"https://ideasbyrobert.github.io/algorithms/"},"about":[{"@type":"Thing","name":"Find First Occurrence"},{"@type":"Thing","name":"Sliding window"},{"@type":"Thing","name":"Substring search"}]}</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Find the Index of the First Occurrence · Optimal Solution</span>
+        <h1>Slide a window. Match or move on.</h1>
+        <p class="hero-text">
+            A search engine highlights query terms within documents by locating where each keyword
+            first appears — but raw text offers only characters, not an index. The approach slides
+            a window across the haystack, comparing it character-by-character against the needle.
+            For each candidate position, match as far as you can; if every character agrees, return
+            that position. If not, advance and try the next start. <code>O(n · m)</code> worst case
+            — simple, correct, and often fast in practice.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch each window succeed or fail</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Every start gets a fair trial</h2>
+        <p class="section-intro">
+            Each valid start index defines one candidate window with the same length as the needle.
+            The algorithm tries every window left to right, returning the first full match.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>candidate windows</h3>
+                <p>Start index 0 through <code>haystack.length − needle.length</code>. Each defines a window of <code>needle.length</code> characters. Any start beyond that would run past the end.</p>
+            </article>
+            <article class="concept-card">
+                <h3>character-by-character comparison</h3>
+                <p>Within each window, compare characters left to right against the needle. Stop at the first mismatch — no need to check the rest of that window.</p>
+            </article>
+            <article class="concept-card">
+                <h3>a partial match is still a failure</h3>
+                <p>A window that matches 4 out of 5 characters is not a partial success — it's a failed candidate. Only a full match counts. Keep scanning later windows.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Slide, compare, decide</h2>
+        <p class="section-intro">
+            A nested loop: the outer loop picks window starts, the inner loop compares characters.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Compute the last valid start</h4>
+                    <p>The last candidate window starts at <code>haystack.length − needle.length</code>. Any later start would run past the end of the haystack.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>For each start, compare character by character</h4>
+                    <p>At position <code>start</code>, compare <code>haystack[start + j]</code> with <code>needle[j]</code> for <code>j = 0, 1, …</code>. Stop at the first mismatch.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>If all characters match — return start</h4>
+                    <p>A window where every character agrees is the first occurrence. Return its start index immediately.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>If no window matches — return −1</h4>
+                    <p>After exhausting all candidate windows without a full match, the needle does not occur in the haystack.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where windows collapse</h2>
+        <p class="section-intro">
+            Some inputs have very few candidate windows, or none at all.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Needle longer than haystack</h3>
+                <p>
+                    When the needle is longer, no valid start index exists. The last valid start
+                    would be negative. The outer loop never runs — return −1 immediately.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Needle equals haystack</h3>
+                <p>
+                    Only one window exists (start = 0), and it spans the entire haystack. If every
+                    character matches, the answer is 0. If any character differs, the answer is −1.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Single-character needle</h3>
+                <p>
+                    Each window is one character wide. The comparison is a single equality check.
+                    The first matching character's index is the answer.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "comparison point" },
+        { dot: true, label: "matched prefix" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "start",  label: "Window Start" },
+        { id: "window", label: "Window" },
+        { id: "match",  label: "Prefix Match" },
+        { id: "result", label: "Result" }
+    ],
+    values: [
+        { id: "needle",  label: "Needle" },
+        { id: "checked", label: "Windows Checked" }
+    ],
+    orderTitle: "Window Results"
+});
+
+const ptrElements = VizArray.createPointers(refs.container, [
+    { id: "start", label: "start", position: "above" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "\"mississippi\" + \"issip\" \u2014 tricky near-matches",
+        haystack: "mississippi",
+        needle: "issip",
+        desc: "Multiple near-matches before the real match at index 4. Shows why you can\u2019t stop at the first promising start."
+    },
+    {
+        name: "\"hello\" + \"ll\" \u2014 match in the middle",
+        haystack: "hello",
+        needle: "ll",
+        desc: "Short string, match at index 2. Two failed windows before the match.",
+        mobileDefault: true
+    },
+    {
+        name: "\"sadbutsad\" + \"sad\" \u2014 match at the front",
+        haystack: "sadbutsad",
+        needle: "sad",
+        desc: "First window matches immediately. The algorithm returns 0 on the first try."
+    },
+    {
+        name: "\"leetcode\" + \"leeto\" \u2014 no match (long prefix)",
+        haystack: "leetcode",
+        needle: "leeto",
+        desc: "First window matches 4 of 5 characters but fails on the fifth. No later window matches either."
+    },
+    {
+        name: "\"aaa\" + \"aa\" \u2014 overlapping matches",
+        haystack: "aaa",
+        needle: "aa",
+        desc: "Both windows 0 and 1 would match, but the algorithm returns 0 \u2014 the first occurrence."
+    },
+    {
+        name: "\"abc\" + \"c\" \u2014 single-char needle at end",
+        haystack: "abc",
+        needle: "c",
+        desc: "Single-character needle. Each window is one character wide. Match found at index 2."
+    },
+    {
+        name: "\"abcdef\" + \"xyz\" \u2014 no match at all",
+        haystack: "abcdef",
+        needle: "xyz",
+        desc: "Every window fails at the very first character. No matching prefix anywhere."
+    },
+    {
+        name: "\"aab\" + \"aab\" \u2014 needle equals haystack",
+        haystack: "aab",
+        needle: "aab",
+        desc: "Only one candidate window (start = 0). It spans the entire string and matches fully."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const haystack = preset.haystack.split("");
+    const needle = preset.needle;
+    const steps = [];
+    const lastStart = haystack.length - needle.length;
+
+    for (let start = 0; start <= lastStart; start++) {
+        let matchLen = 0;
+        while (matchLen < needle.length &&
+               haystack[start + matchLen] === needle[matchLen]) {
+            matchLen++;
+        }
+
+        const isFullMatch = matchLen === needle.length;
+        const windowText = haystack.slice(start, start + needle.length).join("");
+
+        steps.push({
+            startIndex: start,
+            windowText,
+            matchingPrefixLength: matchLen,
+            isFullMatch
+        });
+
+        if (isFullMatch) break;
+    }
+
+    const matchIndex = steps.length > 0 && steps[steps.length - 1].isFullMatch
+        ? steps[steps.length - 1].startIndex
+        : -1;
+
+    const order = steps.map(s =>
+        String(s.startIndex) + (s.isFullMatch ? "\u2713" : "\u2717")
+    );
+
+    return { steps, order, haystack, needle, desc: preset.desc, matchIndex };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+
+    let currentIdx, highlights, active;
+    if (step) {
+        active = new Set();
+        highlights = new Map();
+
+        for (let j = 0; j < trace.needle.length; j++)
+            active.add(step.startIndex + j);
+
+        for (let j = 0; j < step.matchingPrefixLength; j++)
+            highlights.set(step.startIndex + j, "sweep");
+
+        if (step.isFullMatch) {
+            currentIdx = step.startIndex + step.matchingPrefixLength - 1;
+        } else {
+            currentIdx = step.startIndex + step.matchingPrefixLength;
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: trace.haystack,
+        current: currentIdx,
+        active,
+        highlights
+    });
+
+    if (step) {
+        refs.status.start.textContent = String(step.startIndex);
+        refs.status.window.textContent = "\"" + step.windowText + "\"";
+        refs.status.match.textContent = step.matchingPrefixLength + " / " + trace.needle.length;
+        refs.status.result.textContent = step.isFullMatch
+            ? "Full match \u2713"
+            : "Mismatch at pos " + step.matchingPrefixLength;
+    } else {
+        refs.status.start.textContent = "\u2014";
+        refs.status.window.textContent = "\u2014";
+        refs.status.match.textContent = "\u2014";
+        refs.status.result.textContent = "\u2014";
+    }
+
+    refs.values.needle.textContent = "\"" + trace.needle + "\"";
+
+    let checked = 0;
+    if (step) {
+        for (let j = 0; j <= engine.position; j++) checked++;
+    }
+    refs.values.checked.textContent = String(checked);
+
+    refs.note.textContent = describeStep(engine);
+
+    requestAnimationFrame(() => {
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: { start: { index: step ? step.startIndex : 0 } },
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const step = engine.currentStep();
+    const trace = engine.trace;
+
+    if (!step) {
+        return "Haystack: \"" + trace.haystack.join("") + "\". Needle: \"" + trace.needle + "\". " + trace.desc + " Press Play or Next to begin scanning windows.";
+    }
+
+    const winLabel = "Window at start " + step.startIndex + ": \"" + step.windowText + "\" vs \"" + trace.needle + "\". ";
+
+    if (step.isFullMatch) {
+        let desc = winLabel + "All " + trace.needle.length + " characters match \u2014 found at index " + step.startIndex + ".";
+        if (engine.position === trace.steps.length - 1 && trace.matchIndex >= 0) {
+            desc += " First occurrence is at index " + trace.matchIndex + ".";
+        }
+        return desc;
+    }
+
+    let desc = winLabel;
+    if (step.matchingPrefixLength === 0) {
+        desc += "First character differs \u2014 no matching prefix. Move to next window.";
+    } else {
+        desc += "First " + step.matchingPrefixLength + " character" + (step.matchingPrefixLength > 1 ? "s" : "") + " match, but position " + step.matchingPrefixLength + " differs. Move to next window.";
+    }
+
+    if (engine.position === trace.steps.length - 1 && trace.matchIndex === -1) {
+        desc += " No more windows \u2014 needle not found. Return \u22121.";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 900
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
