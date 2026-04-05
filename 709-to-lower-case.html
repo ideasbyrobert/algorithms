@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To Lower Case — ASCII Arithmetic | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 709 To Lower Case. Watch ASCII arithmetic convert uppercase letters character by character.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/709-to-lower-case.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="to lower case, leetcode 709, ASCII arithmetic, character conversion, algorithm visualization, string transformation">
+<meta property="og:title" content="To Lower Case — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 709. Watch ASCII arithmetic convert uppercase letters.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/709-to-lower-case.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="To Lower Case — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 709. Watch ASCII arithmetic convert uppercase letters.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"To Lower Case — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 709 To Lower Case.","url":"https://ideasbyrobert.github.io/algorithms/709-to-lower-case.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">To Lower Case · Optimal Solution</span>
+        <h1>Add 32 to every uppercase letter.</h1>
+        <p class="hero-text">
+            A search engine normalizes user queries before matching — converting "WiFi Router"
+            to "wifi router" ensures case-insensitive lookups without a translation table. In
+            ASCII, every uppercase letter sits exactly 32 positions before its lowercase partner.
+            One pass checks each character's code: if it falls between 65 and 90, add 32;
+            otherwise leave it alone. <code>O(n)</code> time. <code>O(n)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch each character convert in place</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>ASCII arithmetic, one rule</h2>
+        <p class="section-intro">
+            The conversion relies on a fixed numeric relationship between uppercase and
+            lowercase letters in the ASCII table.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>the +32 shift</h3>
+                <p>In ASCII, <code>'A'</code> is 65 and <code>'a'</code> is 97. The gap is exactly 32 for every letter pair. Adding 32 to any uppercase letter produces its lowercase partner — no lookup table needed.</p>
+            </article>
+            <article class="concept-card">
+                <h3>range guard</h3>
+                <p>Only characters with ASCII codes between 65 (<code>'A'</code>) and 90 (<code>'Z'</code>) should be shifted. Digits, punctuation, spaces, and already-lowercase letters must pass through unchanged.</p>
+            </article>
+            <article class="concept-card">
+                <h3>one pass, one decision</h3>
+                <p>Each character is examined exactly once. The convert-or-keep decision depends only on whether the character falls in the uppercase range — no state carried between iterations.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Check, shift, or keep</h2>
+        <p class="section-intro">
+            A single loop with one range check and one arithmetic operation.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Allocate the result</h4>
+                    <p>Create a character array of the same length as the input string.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Check the ASCII range</h4>
+                    <p>For each character, test whether its code is between 65 (<code>'A'</code>) and 90 (<code>'Z'</code>) inclusive.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Convert or keep</h4>
+                    <p>If uppercase, add 32 to produce the lowercase character. Otherwise copy the character unchanged.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Return the result</h4>
+                    <p>After all characters are processed, join and return the result string.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where nothing changes</h2>
+        <p class="section-intro">
+            Some inputs pass through the loop without a single conversion.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>All lowercase</h3>
+                <p>
+                    Every character's ASCII code is already above 90. The range check fails
+                    for all positions — the output is identical to the input.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Digits and punctuation</h3>
+                <p>
+                    Non-letter characters have codes outside [65, 90]. Without the range
+                    guard, adding 32 to <code>'1'</code> (49) would produce <code>'Q'</code> (81) —
+                    a silent corruption.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Boundary letters A and Z</h3>
+                <p>
+                    <code>'A'</code> (65) and <code>'Z'</code> (90) sit at the edges of the
+                    range. Both convert correctly: 65 + 32 = 97 (<code>'a'</code>),
+                    90 + 32 = 122 (<code>'z'</code>).
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current character" },
+        { dot: true, label: "already processed" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "index",  label: "Index" },
+        { id: "char",   label: "Character" },
+        { id: "ascii",  label: "ASCII" },
+        { id: "action", label: "Action" }
+    ],
+    values: [
+        { id: "original",  label: "Original" },
+        { id: "uppercase", label: "Converted" }
+    ],
+    orderTitle: "Result"
+});
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "\"Hello-123\" \u2014 mixed case, digits, punctuation",
+        text: "Hello-123",
+        desc: "Two uppercase letters, lowercase, a hyphen, and digits. Only 'H' converts \u2014 the rest keep."
+    },
+    {
+        name: "\"Hi!\" \u2014 short mixed input",
+        text: "Hi!",
+        desc: "One uppercase, one lowercase, one punctuation. Quick demonstration of convert vs keep.",
+        mobileDefault: true
+    },
+    {
+        name: "\"LOVELY\" \u2014 all uppercase",
+        text: "LOVELY",
+        desc: "Every character falls in the [65, 90] range. All six convert \u2014 +32 fires every time."
+    },
+    {
+        name: "\"already\" \u2014 all lowercase",
+        text: "already",
+        desc: "Every character is already lowercase. The range check fails at every position \u2014 nothing converts."
+    },
+    {
+        name: "\"MiXeD\" \u2014 alternating case",
+        text: "MiXeD",
+        desc: "Uppercase and lowercase alternate. Three convert, two keep \u2014 a clear pattern."
+    },
+    {
+        name: "\"[X]?9\" \u2014 punctuation around uppercase",
+        text: "[X]?9",
+        desc: "Brackets, question mark, and a digit surround a single uppercase letter. Only 'X' converts."
+    },
+    {
+        name: "\"AZ\" \u2014 boundary letters",
+        text: "AZ",
+        desc: "The first and last letters of the uppercase range. Both convert: 65\u219297, 90\u2192122."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const text = preset.text;
+    const n = text.length;
+    const steps = [];
+    const order = [];
+    let upperCount = 0;
+
+    for (let i = 0; i < n; i++) {
+        const ch = text[i];
+        const code = ch.charCodeAt(0);
+        const isUpper = code >= 65 && code <= 90;
+        const converted = isUpper ? String.fromCharCode(code + 32) : ch;
+        if (isUpper) upperCount++;
+
+        steps.push({ index: i, original: ch, converted, code, isUpper, upperCount });
+        order.push(converted);
+    }
+
+    return { text, n, steps, order, desc: preset.desc, totalUpper: upperCount };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+    const pos = engine.position;
+
+    const display = trace.text.split("");
+    if (pos >= 0) {
+        for (let i = 0; i <= pos; i++) display[i] = trace.steps[i].converted;
+    }
+
+    let current = null;
+    const highlights = new Map();
+
+    if (step) {
+        current = step.index;
+        for (let j = 0; j < pos; j++) highlights.set(j, "sweep");
+    }
+
+    VizArray.renderCells(refs.grid, { array: display, current, highlights });
+
+    if (step) {
+        refs.status.index.textContent = String(step.index);
+        refs.status.char.textContent = step.original + (step.isUpper ? " \u2192 " + step.converted : "");
+        refs.status.ascii.textContent = String(step.code) + (step.isUpper ? " + 32 = " + (step.code + 32) : "");
+        refs.status.action.textContent = step.isUpper ? "Convert" : "Keep";
+    } else {
+        refs.status.index.textContent = "\u2014";
+        refs.status.char.textContent = "\u2014";
+        refs.status.ascii.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+    }
+
+    refs.values.original.textContent = trace.text;
+    refs.values.uppercase.textContent = step ? String(step.upperCount) : "0";
+
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+    const pos = engine.position;
+
+    if (!step) {
+        return "\u201C" + trace.text + "\u201D (" + trace.n + " chars). " +
+            trace.desc + " Press Play or Next to begin.";
+    }
+
+    var desc;
+    if (step.isUpper) {
+        desc = "Index " + step.index + ": \u2018" + step.original +
+            "\u2019 (ASCII " + step.code + ") is uppercase. " +
+            step.code + " + 32 = " + (step.code + 32) + " \u2192 \u2018" +
+            step.converted + "\u2019. Convert.";
+    } else {
+        var reason = step.code >= 97 && step.code <= 122 ? "already lowercase"
+            : step.code >= 48 && step.code <= 57 ? "a digit"
+            : "not a letter";
+        desc = "Index " + step.index + ": \u2018" + step.original +
+            "\u2019 (ASCII " + step.code + ") \u2014 " + reason +
+            ". Not in [65, 90]. Keep unchanged.";
+    }
+
+    if (pos === trace.steps.length - 1) {
+        var result = trace.steps.map(function(s) { return s.converted; }).join("");
+        desc += " Done: \u201C" + result + "\u201D. " +
+            trace.totalUpper + " character" + (trace.totalUpper !== 1 ? "s" : "") + " converted.";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 500
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
