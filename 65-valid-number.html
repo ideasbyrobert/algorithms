@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valid Number — Single-Pass Flag Scanner | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 65 Valid Number. Watch a single left-to-right scan classify characters and toggle four boolean flags.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/65-valid-number.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="valid number, leetcode 65, flag scanner, character classification, algorithm visualization">
+<meta property="og:title" content="Valid Number — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 65. Watch four flags decide if a string is a valid number.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/65-valid-number.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Valid Number — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 65. Watch four flags decide if a string is a valid number.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Valid Number — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 65 Valid Number.","url":"https://ideasbyrobert.github.io/algorithms/65-valid-number.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.flags-panel {
+    display: flex;
+    gap: 6px;
+    margin: 0 0 16px;
+    flex-wrap: wrap;
+}
+.flag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid #C7C7CC;
+    font: 500 11px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #636366;
+    letter-spacing: 0.02em;
+    transition: all 0.25s ease;
+}
+.flag-badge.on {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border-color: #1D1D1F;
+}
+.flag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.4;
+}
+.flag-badge.on .flag-dot {
+    opacity: 1;
+}
+#interactiveMount .cell.rejected {
+    background: #F5F5F7;
+    border: 1.5px dashed #AEAEB2;
+}
+#interactiveMount .cell.rejected .cell-value {
+    color: #AEAEB2;
+}
+@media (max-width: 600px) {
+    .flag-badge { padding: 5px 10px; font-size: 10px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+    <section class="hero">
+        <div>
+            <span class="label">65 · Valid Number</span>
+            <h1>One Pass, Four Flags</h1>
+            <p>
+                A valid number can include an optional sign, digits, an optional
+                decimal point, and an optional exponent with its own sign and digits.
+                A single left-to-right scan with four boolean flags — <em>hasDigit</em>,
+                <em>hasDot</em>, <em>hasExponent</em>, <em>hasDigitAfterExponent</em> —
+                decides every character's fate in O(n) time.
+            </p>
+        </div>
+        <svg viewBox="0 0 200 80" class="concept-svg" role="img" aria-label="Character scan with flag toggles">
+            <rect x="10" y="18" width="24" height="24" rx="5" fill="none" stroke="#1D1D1F" stroke-width="1.5"/>
+            <text x="22" y="34" text-anchor="middle" fill="#1D1D1F" font-family="Menlo, monospace" font-size="11">-</text>
+            <rect x="40" y="18" width="24" height="24" rx="5" fill="#1D1D1F"/>
+            <text x="52" y="34" text-anchor="middle" fill="#FFF" font-family="Menlo, monospace" font-size="11">9</text>
+            <rect x="70" y="18" width="24" height="24" rx="5" fill="none" stroke="#C7C7CC" stroke-width="1"/>
+            <text x="82" y="34" text-anchor="middle" fill="#AEAEB2" font-family="Menlo, monospace" font-size="11">.</text>
+            <rect x="100" y="18" width="24" height="24" rx="5" fill="none" stroke="#C7C7CC" stroke-width="1"/>
+            <text x="112" y="34" text-anchor="middle" fill="#AEAEB2" font-family="Menlo, monospace" font-size="11">5</text>
+            <rect x="130" y="18" width="24" height="24" rx="5" fill="none" stroke="#C7C7CC" stroke-width="1"/>
+            <text x="142" y="34" text-anchor="middle" fill="#AEAEB2" font-family="Menlo, monospace" font-size="11">e</text>
+            <rect x="160" y="18" width="24" height="24" rx="5" fill="none" stroke="#C7C7CC" stroke-width="1"/>
+            <text x="172" y="34" text-anchor="middle" fill="#AEAEB2" font-family="Menlo, monospace" font-size="11">3</text>
+            <line x1="52" y1="46" x2="52" y2="56" stroke="#1D1D1F" stroke-width="1"/>
+            <text x="52" y="66" text-anchor="middle" fill="#1D1D1F" font-family="SF Pro Text, -apple-system, sans-serif" font-size="6" font-weight="500">digit ●</text>
+        </svg>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="interactive" id="interactiveMount"></section>
+
+    <div class="divider"></div>
+
+    <section>
+        <h2>Classify, check, update, advance</h2>
+        <p>Every character belongs to exactly one category, and its legality depends on what has been seen so far.</p>
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>character classes</h3>
+                <p>Five possible classes: <strong>digit</strong> (0–9), <strong>sign</strong> (+/−), <strong>dot</strong> (.), <strong>exponent</strong> (e/E), or <strong>invalid</strong>. Any character outside these classes immediately rejects the string.</p>
+            </article>
+            <article class="concept-card">
+                <h3>context-sensitive rules</h3>
+                <p>A sign is only legal at position 0 or directly after an exponent. A dot is rejected if one already appeared or if an exponent has started. An exponent requires that at least one digit has been seen.</p>
+            </article>
+            <article class="concept-card">
+                <h3>end-of-scan conditions</h3>
+                <p>Passing every character check is necessary but not sufficient. Two final conditions must hold: at least one digit was seen (<code>hasDigit</code>), and if an exponent appeared, at least one digit followed it (<code>hasDigitAfterExponent</code>).</p>
+            </article>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section>
+        <h2>The scan loop</h2>
+        <p>One pass, four flags, immediate rejection on any illegal character.</p>
+        <ol class="steps">
+            <li>
+                <h4>Initialize flags</h4>
+                <p>Set <code>hasDigit = false</code>, <code>hasDot = false</code>, <code>hasExponent = false</code>, <code>hasDigitAfterExponent = true</code> (vacuously true — no exponent yet).</p>
+            </li>
+            <li>
+                <h4>Classify the character</h4>
+                <p>Map the current character to one of five classes: digit, sign, dot, exponent, or invalid. Invalid characters reject the string immediately.</p>
+            </li>
+            <li>
+                <h4>Check context and update flags</h4>
+                <p>Each class has rules. Digits always accepted — set <code>hasDigit</code> and possibly <code>hasDigitAfterExponent</code>. Signs require position 0 or post-exponent. Dots require no prior dot and no active exponent. Exponents require a prior digit and no prior exponent.</p>
+            </li>
+            <li>
+                <h4>Final verdict</h4>
+                <p>After scanning all characters: check <code>hasDigit</code> and <code>hasDigitAfterExponent</code>. Both must be true for the string to be a valid number.</p>
+            </li>
+        </ol>
+    </section>
+
+    <div class="divider"></div>
+
+    <section>
+        <h2>Where the scan traps you</h2>
+        <p>Three categories of tricky inputs that test your flag logic.</p>
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Leading or trailing dot</h3>
+                <p><code>".1"</code> and <code>"4."</code> are both valid. A decimal point does not require digits on both sides — it only requires that <em>at least one digit exists somewhere</em>. Demanding digits on both sides of the dot is the classic mistake.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Exponent without trailing digit</h3>
+                <p><code>"1e+"</code> is invalid even though every character is individually legal. The sign after the exponent is fine, but <code>hasDigitAfterExponent</code> stays false because no digit follows. The end-of-scan check catches this.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Dot after exponent</h3>
+                <p><code>"99e2.5"</code> is invalid. Once the exponent portion begins, the mantissa is sealed — no decimal points are allowed in the exponent. The <code>hasExponent</code> flag blocks the dot.</p>
+            </article>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "scanning" },
+        { dot: true, label: "accepted" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "idx",      label: "Index" },
+        { id: "char",     label: "Char" },
+        { id: "decision", label: "Decision" },
+        { id: "accepted", label: "Accepted" }
+    ],
+    values: [
+        { id: "vDigit",    label: "digit" },
+        { id: "vDot",      label: "dot" },
+        { id: "vExp",      label: "exponent" },
+        { id: "vExpDigit", label: "exp digit" }
+    ],
+    orderTitle: "Classification Trace"
+});
+
+/* ── Flags panel ───────────────────────────────────────── */
+
+var flagsPanel = document.createElement("div");
+flagsPanel.className = "flags-panel";
+flagsPanel.innerHTML =
+    '<div class="flag-badge" id="fDigit"><span class="flag-dot"></span>digit</div>' +
+    '<div class="flag-badge" id="fDot"><span class="flag-dot"></span>dot</div>' +
+    '<div class="flag-badge" id="fExp"><span class="flag-dot"></span>exponent</div>' +
+    '<div class="flag-badge" id="fExpDigit"><span class="flag-dot"></span>exp digit</div>';
+refs.grid.parentNode.insertBefore(flagsPanel, refs.grid);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "\u201C-90.5e+3\u201D \u2014 valid, all features",
+        text: "-90.5e+3"
+    },
+    {
+        name: "\u201C-0.1\u201D \u2014 signed decimal",
+        text: "-0.1",
+        mobileDefault: true
+    },
+    {
+        name: "\u201C99e2.5\u201D \u2014 invalid: dot after exponent",
+        text: "99e2.5"
+    },
+    {
+        name: "\u201C1e+\u201D \u2014 invalid: missing exponent digit",
+        text: "1e+"
+    },
+    {
+        name: "\u201C.1\u201D \u2014 valid: leading dot",
+        text: ".1"
+    },
+    {
+        name: "\u201C--6\u201D \u2014 invalid: sign in wrong position",
+        text: "--6"
+    },
+    {
+        name: "\u201C0089\u201D \u2014 valid: leading zeros OK",
+        text: "0089"
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var text = preset.text;
+    var steps = [];
+    var order = [];
+    var hasDigit = false;
+    var hasDot = false;
+    var hasExponent = false;
+    var hasDigitAfterExponent = true;
+    var failed = false;
+
+    for (var i = 0; i < text.length; i++) {
+        var ch = text[i];
+        var decision;
+        var accepted = true;
+
+        if (ch >= "0" && ch <= "9") {
+            hasDigit = true;
+            if (hasExponent) hasDigitAfterExponent = true;
+            decision = "digit";
+        } else if (ch === "+" || ch === "-") {
+            var signOk = i === 0 || text[i - 1] === "e" || text[i - 1] === "E";
+            if (!signOk) {
+                decision = "bad sign pos";
+                accepted = false;
+            } else {
+                decision = "sign";
+            }
+        } else if (ch === ".") {
+            if (hasDot) {
+                decision = "second dot";
+                accepted = false;
+            } else if (hasExponent) {
+                decision = "dot after exp";
+                accepted = false;
+            } else {
+                hasDot = true;
+                decision = "dot";
+            }
+        } else if (ch === "e" || ch === "E") {
+            if (hasExponent) {
+                decision = "second exp";
+                accepted = false;
+            } else if (!hasDigit) {
+                decision = "exp w/o digit";
+                accepted = false;
+            } else {
+                hasExponent = true;
+                hasDigitAfterExponent = false;
+                decision = "exponent";
+            }
+        } else {
+            decision = "invalid char";
+            accepted = false;
+        }
+
+        steps.push({
+            index: i,
+            ch: ch,
+            decision: decision,
+            accepted: accepted,
+            hasDigit: hasDigit,
+            hasDot: hasDot,
+            hasExponent: hasExponent,
+            hasDigitAfterExponent: hasDigitAfterExponent
+        });
+        order.push(decision);
+
+        if (!accepted) {
+            failed = true;
+            break;
+        }
+    }
+
+    var isValid;
+    var failReason = "";
+
+    if (failed) {
+        isValid = false;
+        failReason = steps[steps.length - 1].decision;
+    } else if (!hasDigit) {
+        isValid = false;
+        failReason = "no digit";
+    } else if (!hasDigitAfterExponent) {
+        isValid = false;
+        failReason = "missing exp digit";
+    } else {
+        isValid = true;
+    }
+
+    steps.push({
+        index: -1,
+        ch: "",
+        decision: isValid ? "\u2713 valid" : "\u2717 " + failReason,
+        accepted: isValid,
+        verdict: true,
+        hasDigit: hasDigit,
+        hasDot: hasDot,
+        hasExponent: hasExponent,
+        hasDigitAfterExponent: hasDigitAfterExponent
+    });
+    order.push(isValid ? "\u2713" : "\u2717");
+
+    return {
+        steps: steps,
+        order: order,
+        chars: text.split(""),
+        text: text,
+        isValid: isValid,
+        failReason: failReason
+    };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    var display = trace.chars.slice();
+    var current = null;
+    var highlights = new Map();
+    var active = new Set();
+
+    if (step) {
+        if (step.verdict) {
+            for (var i = 0; i < trace.chars.length; i++) active.add(i);
+            var lastScan = trace.steps.length >= 2 ? trace.steps[trace.steps.length - 2] : null;
+            if (trace.isValid) {
+                for (var i = 0; i < trace.chars.length; i++) highlights.set(i, "sweep");
+            } else if (lastScan && !lastScan.accepted) {
+                for (var i = 0; i < lastScan.index; i++) highlights.set(i, "sweep");
+                highlights.set(lastScan.index, "rejected");
+            } else {
+                for (var i = 0; i < trace.chars.length; i++) highlights.set(i, "sweep");
+            }
+        } else {
+            for (var i = 0; i <= step.index; i++) active.add(i);
+            if (step.accepted) {
+                current = step.index;
+                for (var i = 0; i < step.index; i++) highlights.set(i, "sweep");
+            } else {
+                for (var i = 0; i < step.index; i++) highlights.set(i, "sweep");
+                highlights.set(step.index, "rejected");
+            }
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: display,
+        current: current,
+        highlights: highlights,
+        active: active
+    });
+
+    /* Flags panel */
+    var fDigit = document.getElementById("fDigit");
+    var fDot = document.getElementById("fDot");
+    var fExp = document.getElementById("fExp");
+    var fExpDigit = document.getElementById("fExpDigit");
+
+    if (step) {
+        fDigit.className = "flag-badge" + (step.hasDigit ? " on" : "");
+        fDot.className = "flag-badge" + (step.hasDot ? " on" : "");
+        fExp.className = "flag-badge" + (step.hasExponent ? " on" : "");
+        fExpDigit.className = "flag-badge" + (step.hasDigitAfterExponent ? " on" : "");
+    } else {
+        fDigit.className = "flag-badge";
+        fDot.className = "flag-badge";
+        fExp.className = "flag-badge";
+        fExpDigit.className = "flag-badge on";
+    }
+
+    /* Status bar */
+    if (step) {
+        refs.status.idx.textContent = step.verdict ? "\u2014" : String(step.index);
+        refs.status.char.textContent = step.verdict ? "\u2014" : step.ch;
+        refs.status.decision.textContent = step.decision;
+        refs.status.accepted.textContent = step.accepted ? "\u2713" : "\u2717";
+    } else {
+        refs.status.idx.textContent = "\u2014";
+        refs.status.char.textContent = "\u2014";
+        refs.status.decision.textContent = "\u2014";
+        refs.status.accepted.textContent = "\u2014";
+    }
+
+    /* Values bar (mirror flags as text) */
+    var s = step || { hasDigit: false, hasDot: false, hasExponent: false, hasDigitAfterExponent: true };
+    refs.values.vDigit.textContent = s.hasDigit ? "\u2713" : "\u00B7";
+    refs.values.vDot.textContent = s.hasDot ? "\u2713" : "\u00B7";
+    refs.values.vExp.textContent = s.hasExponent ? "\u2713" : "\u00B7";
+    refs.values.vExpDigit.textContent = s.hasDigitAfterExponent ? "\u2713" : "\u00B7";
+
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+
+    if (!step) {
+        return "Input: \u201C" + trace.text + "\u201D (" + trace.text.length +
+            " char" + (trace.text.length !== 1 ? "s" : "") +
+            "). Press Play or Next to scan.";
+    }
+
+    if (step.verdict) {
+        if (trace.isValid) {
+            var note = "\u201C" + trace.text + "\u201D is valid. All characters accepted";
+            if (step.hasExponent) note += ", digit found after exponent";
+            return note + ".";
+        }
+        if (trace.failReason === "no digit") {
+            return "Invalid \u2014 every character was accepted individually, but no digit was ever seen.";
+        }
+        if (trace.failReason === "missing exp digit") {
+            return "Invalid \u2014 exponent marker appeared but no digit followed it. hasDigitAfterExponent = false.";
+        }
+        var lastScan = trace.steps[trace.steps.length - 2];
+        return "Invalid \u2014 \u201C" + lastScan.ch + "\u201D at index " +
+            lastScan.index + " rejected: " + lastScan.decision + ".";
+    }
+
+    var desc = "Index " + step.index + ": \u201C" + step.ch + "\u201D \u2192 ";
+
+    if (!step.accepted) {
+        return desc + step.decision + ". Scan rejects and stops.";
+    }
+
+    if (step.decision === "digit") {
+        desc += "digit. hasDigit = true.";
+        if (step.hasExponent) desc += " hasDigitAfterExponent = true.";
+    } else if (step.decision === "sign") {
+        desc += "sign. Allowed " + (step.index === 0 ? "at start of string." : "directly after exponent marker.");
+    } else if (step.decision === "dot") {
+        desc += "dot. hasDot = true. No prior dot or exponent, so it\u2019s legal.";
+    } else if (step.decision === "exponent") {
+        desc += "exponent. hasExponent = true. hasDigitAfterExponent reset to false \u2014 needs a digit.";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
