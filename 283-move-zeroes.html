@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Move Zeroes — Write Pointer Compaction · Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of the Move Zeroes algorithm. Watch read and write pointers diverge as non-zero values compact forward and zeroes fill the tail. O(n) in-place.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="move zeroes, LeetCode 283, write pointer, array compaction, two pointers, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/283-move-zeroes.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Move Zeroes — Write Pointer Compaction · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of the Move Zeroes algorithm. Watch read and write pointers diverge as non-zero values compact forward.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/283-move-zeroes.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Move Zeroes — Write Pointer Compaction · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of the Move Zeroes algorithm. Watch read and write pointers diverge as non-zero values compact forward.">
+<meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Move Zeroes — Write Pointer Compaction","description":"Interactive step-by-step visualization of the Move Zeroes algorithm. Watch read and write pointers diverge as non-zero values compact forward and zeroes fill the tail.","url":"https://ideasbyrobert.github.io/algorithms/283-move-zeroes.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/283-move-zeroes.html","inLanguage":"en","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"move zeroes, LeetCode 283, write pointer, array compaction, two pointers, algorithm visualization"}</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Move Zeroes · Optimal Solution</span>
+        <h1>Compact forward, fill behind.</h1>
+        <p class="hero-text">
+            A sensor grid streams readings where zero means "no signal." Before downstream
+            processing, you must pack all live readings to the front — preserving their original
+            order — then zero-fill the vacated tail. Two pointers do it in one pass: a read pointer
+            scans every element, a write pointer accepts only non-zeroes. When the scan finishes,
+            fill from write to the end with zeroes. <code>O(n)</code> time. <code>O(1)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the pointers diverge</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>The write pointer invariant</h2>
+        <p class="section-intro">
+            The read pointer visits every element exactly once. The write pointer advances
+            only when a non-zero value is placed. This means <code>write ≤ read</code>
+            at all times — non-zeroes land only in already-scanned territory, preserving order.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>read pointer</h3>
+                <p>Scans left to right, examining every element. Advances unconditionally on each iteration.</p>
+            </article>
+            <article class="concept-card">
+                <h3>write pointer</h3>
+                <p>Marks the next available slot for a non-zero value. Advances only when a live value is placed.</p>
+            </article>
+            <article class="concept-card">
+                <h3>zero fill</h3>
+                <p>After the scan, every position from <code>write</code> to the end is a vacated slot that must become zero.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Scan once, compact, then fill</h2>
+        <p class="section-intro">
+            The algorithm runs in two phases. Phase one compacts non-zero values to the front.
+            Phase two fills the remainder with zeroes.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize write pointer at 0</h4>
+                    <p>The write pointer starts at the beginning — the first slot where a non-zero value can land.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Scan with read pointer</h4>
+                    <p>For each element: if <code>nums[read] ≠ 0</code>, copy it to <code>nums[write]</code> and advance <code>write</code>. Otherwise, skip — the read pointer moves on.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Fill the tail with zeroes</h4>
+                    <p>From <code>write</code> to the end, set every element to 0. These are the slots vacated by compaction.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where the pointers tell the story</h2>
+        <p class="section-intro">
+            The gap between read and write reveals the algorithm's behaviour under different inputs.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>No zeroes at all</h3>
+                <p>
+                    When every element is non-zero, the write pointer tracks the read pointer
+                    exactly — every value copies to itself. The fill phase writes nothing.
+                    The algorithm degrades gracefully to a no-op.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>All zeroes</h3>
+                <p>
+                    When every element is zero, the write pointer never advances. The fill
+                    phase rewrites the entire array with zeroes — effectively a no-op, since
+                    the values were already zero. The read pointer alone does all the work.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Zeroes only at the end</h3>
+                <p>
+                    The write pointer keeps pace with read through all non-zero elements, then
+                    stalls. The fill phase handles the trailing zeroes — which are already zero.
+                    No value actually moves.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current cell" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "read",   label: "Read (r)" },
+        { id: "write",  label: "Write (w)" },
+        { id: "value",  label: "Value" },
+        { id: "action", label: "Action" },
+        { id: "phase",  label: "Phase" }
+    ],
+    values: [
+        { id: "read",  label: "r" },
+        { id: "write", label: "w" }
+    ],
+    orderTitle: "Final Array"
+});
+
+const ptrElements = VizArray.createPointers(refs.container, [
+    { id: "r", label: "r", position: "above" },
+    { id: "w", label: "w", position: "below" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "12 elements — scattered zeroes (comprehensive)",
+        array: [4, 0, 1, 0, 0, 7, 3, 0, 8, 0, 2, 5],
+        desc: "Five zeroes scattered across 12 elements. Watch the gap between read and write grow each time a zero is skipped, then the fill phase claims the vacated tail."
+    },
+    {
+        name: "11 elements — front-loaded zeroes",
+        array: [0, 0, 0, 0, 6, 3, 8, 1, 5, 9, 2],
+        desc: "Four consecutive zeroes at the start. The write pointer sits at 0 while read scans past them, then rapidly copies all seven non-zeroes in a burst."
+    },
+    {
+        name: "12 elements — consecutive block in the middle",
+        array: [3, 7, 2, 0, 0, 0, 0, 5, 1, 4, 6, 8],
+        desc: "A block of four zeroes in the middle. Read and write advance together through the first three elements, then the gap opens suddenly and stays constant."
+    },
+    {
+        name: "12 elements — alternating zero / non-zero",
+        array: [0, 3, 0, 5, 0, 1, 0, 8, 0, 2, 0, 6],
+        desc: "Every other element is zero — the worst case for compaction. The write pointer advances on every second step, building the maximum possible gap gradually."
+    },
+    {
+        name: "10 elements — zeroes only at the end",
+        array: [7, 3, 1, 8, 4, 2, 5, 0, 0, 0],
+        desc: "All non-zeroes sit at the front. The pointers advance in lockstep until index 7, then read finishes alone. The fill phase writes zeroes that were already zero."
+    },
+    {
+        name: "11 elements — single zero at the front",
+        array: [0, 9, 4, 7, 2, 6, 1, 3, 8, 5, 11],
+        desc: "One zero at index 0 causes a permanent one-position lag. Every subsequent non-zero shifts left by exactly one slot. The fill phase writes a single zero at the end."
+    },
+    {
+        name: "10 elements — dense zeroes, few survivors",
+        array: [0, 0, 3, 0, 0, 0, 7, 0, 0, 1],
+        desc: "Only three non-zeroes survive out of ten. The write pointer barely moves while read scans the whole array. The fill phase dominates — seven zeroes to write."
+    },
+    {
+        name: "10 elements — no zeroes at all",
+        array: [5, 2, 8, 1, 4, 9, 3, 7, 6, 10],
+        desc: "No zeroes means no compaction. Read and write advance in perfect lockstep. Every value copies to itself. The fill phase has nothing to do."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const arr = [...preset.array];
+    const steps = [];
+    let w = 0;
+
+    // Phase 1: Compact
+    for (let r = 0; r < arr.length; r++) {
+        const value = arr[r];
+        const isNonZero = value !== 0;
+
+        if (isNonZero) {
+            arr[w] = arr[r];
+            steps.push({
+                phase: "scan",
+                readIndex: r,
+                writeIndex: w,
+                value,
+                action: "compact",
+                arrayState: [...arr],
+                wAfter: w + 1
+            });
+            w++;
+        } else {
+            steps.push({
+                phase: "scan",
+                readIndex: r,
+                writeIndex: w,
+                value,
+                action: "skip",
+                arrayState: [...arr],
+                wAfter: w
+            });
+        }
+    }
+
+    // Phase 2: Fill
+    for (let f = w; f < arr.length; f++) {
+        arr[f] = 0;
+        steps.push({
+            phase: "fill",
+            readIndex: null,
+            writeIndex: f,
+            value: 0,
+            action: "fill",
+            arrayState: [...arr],
+            wAfter: f + 1
+        });
+    }
+
+    const order = [...arr];
+    return { steps, order, array: preset.array, desc: preset.desc };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+
+    // Status bar
+    if (!step) {
+        refs.status.read.textContent  = "\u2014";
+        refs.status.write.textContent = "0";
+        refs.status.value.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+        refs.status.phase.textContent = "\u2014";
+    } else {
+        refs.status.read.textContent  = step.readIndex != null ? String(step.readIndex) : "\u2014";
+        refs.status.write.textContent = String(step.writeIndex);
+        refs.status.value.textContent = String(step.value);
+        refs.status.phase.textContent = step.phase === "scan" ? "Scan" : "Fill";
+
+        if (step.action === "compact")
+            refs.status.action.textContent = `Copy ${step.value} → index ${step.writeIndex}`;
+        else if (step.action === "skip")
+            refs.status.action.textContent = "Skip (zero)";
+        else
+            refs.status.action.textContent = `Fill 0 → index ${step.writeIndex}`;
+    }
+
+    // Values bar
+    if (step) {
+        refs.values.read.textContent  = step.readIndex != null ? String(step.readIndex) : "\u2014";
+        refs.values.write.textContent = String(step.writeIndex);
+    } else {
+        refs.values.read.textContent  = "\u2014";
+        refs.values.write.textContent = "0";
+    }
+
+    // Note
+    refs.note.textContent = describeStep(engine);
+
+    // Determine array state and current highlight
+    const displayArray = step ? step.arrayState : trace.array;
+    const currentIndex = step
+        ? (step.phase === "scan" ? step.readIndex : step.writeIndex)
+        : undefined;
+
+    // Build visited map: every index read pointer has scanned
+    const visited = new Map();
+    for (let i = 0; i <= engine.position && i < trace.steps.length; i++) {
+        const s = trace.steps[i];
+        const idx = s.phase === "scan" ? s.readIndex : s.writeIndex;
+        if (idx != null && !visited.has(idx)) {
+            visited.set(idx, i + 1);
+        }
+    }
+
+    // Highlight the write target when compacting or filling
+    const highlights = new Map();
+    if (step && step.action === "compact" && step.writeIndex !== step.readIndex) {
+        highlights.set(step.writeIndex, "sweep");
+    }
+    if (step && step.action === "fill") {
+        highlights.set(step.writeIndex, "sweep");
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: displayArray,
+        current: currentIndex,
+        visited,
+        highlights
+    });
+
+    // Position pointers
+    requestAnimationFrame(() => {
+        const ptrs = {};
+        if (!step) {
+            ptrs.r = { index: 0 };
+            ptrs.w = { index: 0 };
+        } else if (step.phase === "scan") {
+            ptrs.r = { index: step.readIndex };
+            ptrs.w = { index: step.writeIndex };
+        } else {
+            ptrs.r = { index: -1 };
+            ptrs.w = { index: step.writeIndex };
+        }
+
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: ptrs,
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const step = engine.currentStep();
+    if (!step) return `${engine.trace.desc} Press Play or Next to begin.`;
+
+    if (step.action === "compact") {
+        if (step.readIndex === step.writeIndex)
+            return `Read index ${step.readIndex}: value ${step.value} is non-zero. Write pointer is at the same position — value stays in place. Advance both pointers.`;
+        return `Read index ${step.readIndex}: value ${step.value} is non-zero. Copy to write position ${step.writeIndex}. Both pointers advance.`;
+    }
+
+    if (step.action === "skip")
+        return `Read index ${step.readIndex}: value is 0. Skip — write pointer stays at ${step.writeIndex}. Only the read pointer advances.`;
+
+    return `Fill phase: writing 0 to index ${step.writeIndex}. Clearing vacated slot.`;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 800
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
