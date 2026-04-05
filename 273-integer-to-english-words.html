@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Integer to English Words — Recursive Group Decomposition | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 273 Integer to English Words. Watch scale decomposition convert numbers to English group by group.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/273-integer-to-english-words.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="integer to english words, leetcode 273, number to words, scale decomposition, algorithm visualization">
+<meta property="og:title" content="Integer to English Words — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 273. Watch scale decomposition convert numbers to English.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/273-integer-to-english-words.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Integer to English Words — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 273. Watch scale decomposition convert numbers to English.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Integer to English Words — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 273 Integer to English Words.","url":"https://ideasbyrobert.github.io/algorithms/273-integer-to-english-words.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.number-display {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 0 0 16px;
+}
+.number-label {
+    font: 500 12px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #636366;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.number-formatted {
+    font: 600 26px/1 'Menlo', 'SF Mono', monospace;
+    color: #1D1D1F;
+    letter-spacing: 0.02em;
+}
+.cell-scale {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font: 500 10px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #636366;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    text-transform: uppercase;
+}
+#interactiveMount .viz-array {
+    overflow: visible;
+    padding-bottom: 28px;
+}
+@media (max-width: 600px) {
+    .number-formatted { font-size: 20px; }
+    .cell-scale { font-size: 9px; bottom: -16px; }
+    #interactiveMount .viz-array { padding-bottom: 22px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Integer to English Words · Optimal Solution</span>
+        <h1>Decompose by thousands, speak each chunk.</h1>
+        <p class="hero-text">
+            When a check-printing system writes "One Million Two Hundred Thirty Four
+            Thousand Five Hundred Sixty Seven" beneath a dollar amount, it decomposes
+            the number into three-digit groups — billions, millions, thousands, ones —
+            converts each chunk independently using a small vocabulary of ones, teens,
+            tens, and "Hundred," then attaches the scale word. Zero-valued groups are
+            silently skipped. <code>O(1)</code> time. <code>O(1)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the number decompose group by group</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Three layers of conversion</h2>
+        <p class="section-intro">
+            The algorithm works in three nested levels: scale decomposition,
+            below-thousand conversion, and vocabulary lookup.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>scale decomposition</h3>
+                <p>Divide the number by 1 billion, 1 million, 1 thousand, and 1 in descending order. Each quotient becomes a chunk. Each non-zero chunk gets converted and its scale word is appended.</p>
+            </article>
+            <article class="concept-card">
+                <h3>below-thousand conversion</h3>
+                <p>Each chunk (0–999) follows one rule: if ≥ 100, speak the hundreds digit + "Hundred"; if ≥ 20, speak the tens word; if the remainder is 1–19, speak the ones or teen word directly.</p>
+            </article>
+            <article class="concept-card">
+                <h3>skip zero chunks</h3>
+                <p>When a chunk is zero, its entire group — including the scale word — is omitted. This is why 1,000,010 becomes "One Million Ten" with no "Thousand" in between.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Divide, convert, attach, repeat</h2>
+        <p class="section-intro">
+            A loop over four scale groups with a helper for below-thousand conversion.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Handle zero</h4>
+                    <p>If the number is 0, return "Zero" immediately. Zero has no scale decomposition.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Extract each scale chunk</h4>
+                    <p>For each scale (Billion → Million → Thousand → ones): divide the remaining number by the scale value. The quotient is the chunk; the remainder carries forward.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Convert below thousand</h4>
+                    <p>For non-zero chunks, convert the value (0–999) to words: hundreds place, tens place, then ones or teens. Attach the scale word if the group is above ones.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Join all parts</h4>
+                    <p>Concatenate the word fragments from all non-zero groups with single spaces.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where groups vanish or collapse</h2>
+        <p class="section-intro">
+            Most pitfalls involve groups that produce no words or values that
+            bypass the normal tens + ones pattern.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Zero-valued groups</h3>
+                <p>
+                    1,000,010 has a zero thousands chunk. Without the skip check, the
+                    output would incorrectly include "Thousand" with no preceding words.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Teens (10–19)</h3>
+                <p>
+                    Values 10 through 19 use dedicated words — "Eleven", "Twelve" —
+                    instead of combining a tens word with a ones word. The range check
+                    <code>n &lt; 20</code> must precede the tens lookup.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Exact hundreds and thousands</h3>
+                <p>
+                    100 is "One Hundred", not "One Hundred Zero". 1,000 is "One Thousand",
+                    not "One Thousand Zero Hundred". Every sub-conversion must guard
+                    against appending words for zero sub-values.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Vocabulary ────────────────────────────────────────── */
+
+var ONES = [
+    "", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
+    "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
+    "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"
+];
+
+var TENS_WORDS = [
+    "", "", "Twenty", "Thirty", "Forty", "Fifty",
+    "Sixty", "Seventy", "Eighty", "Ninety"
+];
+
+var SCALE_DEFS = [
+    { divisor: 1000000000, name: "Billion" },
+    { divisor: 1000000,    name: "Million" },
+    { divisor: 1000,       name: "Thousand" },
+    { divisor: 1,          name: "" }
+];
+
+function convertBelowThousand(n) {
+    var words = [];
+    if (n >= 100) {
+        words.push(ONES[Math.floor(n / 100)]);
+        words.push("Hundred");
+        n %= 100;
+    }
+    if (n >= 20) {
+        words.push(TENS_WORDS[Math.floor(n / 10)]);
+        n %= 10;
+    }
+    if (n > 0) {
+        words.push(ONES[n]);
+    }
+    return words;
+}
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current group" },
+        { dot: true, label: "already converted" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "scale",      label: "Scale" },
+        { id: "chunk",      label: "Chunk" },
+        { id: "conversion", label: "Conversion" }
+    ],
+    values: [
+        { id: "input",     label: "Input" },
+        { id: "remaining", label: "Remaining" }
+    ],
+    orderTitle: "English Words"
+});
+
+/* ── Number display ────────────────────────────────────── */
+
+var numDisplay = document.createElement("div");
+numDisplay.className = "number-display";
+numDisplay.innerHTML = '<span class="number-label">Number</span>' +
+    '<span class="number-formatted" id="numFormatted"></span>';
+refs.grid.parentNode.insertBefore(numDisplay, refs.grid);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "1,234,567 \u2014 millions, thousands, ones",
+        num: 1234567,
+        desc: "Three non-zero groups. Each chunk converts independently and its scale word is attached."
+    },
+    {
+        name: "123 \u2014 hundreds, tens, ones",
+        num: 123,
+        desc: "A single three-digit chunk. No scale word needed.",
+        mobileDefault: true
+    },
+    {
+        name: "0 \u2014 special zero case",
+        num: 0,
+        desc: "Zero has its own dedicated word. No scale decomposition."
+    },
+    {
+        name: "1,000,010 \u2014 skipped thousands",
+        num: 1000010,
+        desc: "The thousands chunk is zero and silently skipped \u2014 \u201CThousand\u201D never appears."
+    },
+    {
+        name: "12,345 \u2014 teen chunk in thousands",
+        num: 12345,
+        desc: "The thousands chunk is 12, a teen value with its own direct vocabulary."
+    },
+    {
+        name: "50 \u2014 round tens only",
+        num: 50,
+        desc: "A pure tens value. No hundreds, no ones \u2014 just one word."
+    },
+    {
+        name: "1,000,000,000 \u2014 one billion",
+        num: 1000000000,
+        desc: "Maximum scale. The billions chunk is 1. All three lower groups are zero and skipped."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function formatNum(n) {
+    if (n === 0) return "0";
+    var s = String(n);
+    var result = "";
+    for (var i = s.length - 1, c = 0; i >= 0; i--, c++) {
+        if (c > 0 && c % 3 === 0) result = "," + result;
+        result = s[i] + result;
+    }
+    return result;
+}
+
+function buildTrace(preset) {
+    var num = preset.num;
+    var formatted = formatNum(num);
+
+    if (num === 0) {
+        return {
+            num: 0, formatted: formatted,
+            groups: [{ displayValue: "0", scale: "", chunk: 0 }],
+            steps: [{
+                groupIndex: 0, chunk: 0, isZero: true, isSkip: false,
+                words: ["Zero"], chunkWords: "Zero", scaleName: "",
+                remaining: 0
+            }],
+            order: ["Zero"],
+            desc: preset.desc
+        };
+    }
+
+    var startIdx = 0;
+    for (var i = 0; i < SCALE_DEFS.length; i++) {
+        if (Math.floor(num / SCALE_DEFS[i].divisor) > 0) {
+            startIdx = i;
+            break;
+        }
+    }
+
+    var groups = [];
+    var steps = [];
+    var allWords = [];
+    var remaining = num;
+
+    for (var i = startIdx; i < SCALE_DEFS.length; i++) {
+        var chunk = Math.floor(remaining / SCALE_DEFS[i].divisor);
+        remaining %= SCALE_DEFS[i].divisor;
+
+        var isFirst = (i === startIdx);
+        var dv = isFirst ? String(chunk) : String(chunk).padStart(3, "0");
+
+        groups.push({ displayValue: dv, scale: SCALE_DEFS[i].name, chunk: chunk });
+
+        if (chunk === 0) {
+            steps.push({
+                groupIndex: groups.length - 1, chunk: 0,
+                isSkip: true, isZero: false,
+                words: [], chunkWords: "",
+                scaleName: SCALE_DEFS[i].name,
+                remaining: remaining
+            });
+        } else {
+            var w = convertBelowThousand(chunk);
+            var chunkWords = w.join(" ");
+            if (SCALE_DEFS[i].name) w.push(SCALE_DEFS[i].name);
+            allWords = allWords.concat(w);
+            steps.push({
+                groupIndex: groups.length - 1, chunk: chunk,
+                isSkip: false, isZero: false,
+                words: w, chunkWords: chunkWords,
+                scaleName: SCALE_DEFS[i].name,
+                remaining: remaining
+            });
+        }
+    }
+
+    var order = steps.map(function(s) {
+        if (s.isZero) return "Zero";
+        if (s.isSkip) return "\u2014";
+        return s.words.join(" ");
+    });
+
+    return {
+        num: num, formatted: formatted,
+        groups: groups, steps: steps, order: order,
+        allWords: allWords, desc: preset.desc
+    };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    var numEl = document.getElementById("numFormatted");
+    if (numEl) numEl.textContent = trace.formatted;
+
+    var display = trace.groups.map(function(g) { return g.displayValue; });
+    var current = null;
+    var highlights = new Map();
+    var active = new Set();
+
+    if (step) {
+        current = step.groupIndex;
+        for (var j = 0; j <= step.groupIndex; j++) active.add(j);
+        for (var j = 0; j < step.groupIndex; j++) highlights.set(j, "sweep");
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: display, current: current,
+        highlights: highlights, active: active
+    });
+
+    var cells = refs.grid.querySelectorAll(".cell");
+    for (var i = 0; i < trace.groups.length; i++) {
+        if (cells[i]) {
+            cells[i].style.position = "relative";
+            if (trace.groups[i].scale) {
+                var lbl = document.createElement("span");
+                lbl.className = "cell-scale";
+                lbl.textContent = trace.groups[i].scale;
+                cells[i].appendChild(lbl);
+            }
+        }
+    }
+
+    if (step) {
+        refs.status.scale.textContent = step.scaleName || "ones";
+        refs.status.chunk.textContent = String(step.chunk);
+        refs.status.conversion.textContent = step.isZero ? "Zero (special)" :
+            step.isSkip ? "\u2014 skipped (zero chunk)" : step.chunkWords;
+    } else {
+        refs.status.scale.textContent = "\u2014";
+        refs.status.chunk.textContent = "\u2014";
+        refs.status.conversion.textContent = "\u2014";
+    }
+
+    refs.values.input.textContent = trace.formatted;
+    refs.values.remaining.textContent = step
+        ? (step.remaining === 0 ? "0" : formatNum(step.remaining))
+        : trace.formatted;
+
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    if (!step) {
+        return "Number: " + trace.formatted + ". " +
+            trace.groups.length + " group" +
+            (trace.groups.length !== 1 ? "s" : "") +
+            " to process. " + trace.desc +
+            " Press Play or Next to begin.";
+    }
+
+    var desc;
+
+    if (step.isZero) {
+        desc = "Input is 0. Return \u201CZero\u201D immediately \u2014 " +
+            "no scale decomposition needed.";
+    } else if (step.isSkip) {
+        desc = (step.scaleName || "Ones") + " group: chunk is 0. " +
+            "Skip entirely \u2014 \u201C" + step.scaleName +
+            "\u201D does not appear in the output.";
+        if (step.remaining > 0) {
+            desc += " Remaining: " + formatNum(step.remaining) + ".";
+        }
+    } else {
+        desc = (step.scaleName || "Ones") + " group: chunk = " +
+            step.chunk + ". ";
+
+        var n = step.chunk;
+        var parts = [];
+        if (n >= 100) {
+            parts.push(ONES[Math.floor(n / 100)] + " Hundred");
+            n %= 100;
+        }
+        if (n >= 20) {
+            var tenWord = TENS_WORDS[Math.floor(n / 10)];
+            n %= 10;
+            if (n > 0) tenWord += " " + ONES[n];
+            parts.push(tenWord);
+        } else if (n > 0) {
+            parts.push(ONES[n] + (n >= 10 ? " (teen)" : ""));
+        }
+
+        desc += "Convert: " + parts.join(", then ") + ".";
+
+        if (step.scaleName) {
+            desc += " Attach \u201C" + step.scaleName + "\u201D.";
+        }
+
+        if (step.remaining > 0) {
+            desc += " Remaining: " + formatNum(step.remaining) + ".";
+        }
+    }
+
+    if (pos === trace.steps.length - 1) {
+        var result = trace.allWords ? trace.allWords.join(" ") :
+            (step.isZero ? "Zero" : "");
+        desc += " Done: \u201C" + result + "\u201D.";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 800
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
