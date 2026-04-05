@@ -1,109 +1,576 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Formal Proof of the Right-to-Left Binary Addition Algorithm</title>
-  <meta name="description" content="Formal proof and correctness analysis for the right-to-left binary addition algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/67-add-binary.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithm Proofs" />
-  <meta property="og:title" content="Formal Proof of the Right-to-Left Binary Addition Algorithm" />
-  <meta property="og:description" content="Formal proof and correctness analysis for the right-to-left binary addition algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/67-add-binary.html" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Formal Proof of the Right-to-Left Binary Addition Algorithm" />
-  <meta name="twitter:description" content="Formal proof and correctness analysis for the right-to-left binary addition algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Formal Proof of the Right-to-Left Binary Addition Algorithm","description":"Formal proof and correctness analysis for the right-to-left binary addition algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms.","url":"https://ideasbyrobert.github.io/algorithms/67-add-binary.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/67-add-binary.html","inLanguage":"en","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"formal proof, algorithm correctness, LeetCode, interview algorithms, Right-to-Left Binary Addition"}</script>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png" />
-  <link rel="stylesheet" href="assets/styles/document-page.css" />
-  <script src="assets/scripts/mathjax-config.js"></script>
-  <script src="assets/scripts/load-mathjax.js" data-cdn-source="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" data-local-source="assets/vendor/mathjax/tex-mml-chtml.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Binary — Right-to-Left Column Addition | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 67 Add Binary. Watch right-to-left column addition with carry propagation build the binary sum bit by bit.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/67-add-binary.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="add binary, leetcode 67, binary addition, carry propagation, algorithm visualization, right-to-left addition">
+<meta property="og:title" content="Add Binary — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 67. Watch binary addition with carry propagation.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/67-add-binary.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Add Binary — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 67. Watch binary addition with carry propagation.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Add Binary — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 67 Add Binary.","url":"https://ideasbyrobert.github.io/algorithms/67-add-binary.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.binary-sources {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 0 20px;
+}
+.source-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.source-label {
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: #636366;
+    min-width: 46px;
+    text-align: right;
+    flex-shrink: 0;
+}
+.source-chars {
+    display: flex;
+    gap: 4px;
+}
+.source-cell {
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 15px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    border: 1.5px solid #C7C7CC;
+    color: #1D1D1F;
+    transition: all 0.25s ease;
+}
+.source-cell.empty {
+    border-color: transparent;
+}
+.source-cell.consumed {
+    opacity: 0.22;
+    border-color: transparent;
+}
+.source-cell.active-source {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border-color: #1D1D1F;
+    font-weight: 600;
+}
+.carry-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.carry-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 10px;
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 14px;
+    border: 1.5px solid #C7C7CC;
+    color: #636366;
+    transition: all 0.25s ease;
+}
+.carry-badge.active {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border-color: #1D1D1F;
+}
+@media (max-width: 600px) {
+    .source-cell {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+    .source-label {
+        font-size: 11px;
+        min-width: 38px;
+    }
+    .carry-badge {
+        font-size: 12px;
+        min-width: 24px;
+        height: 24px;
+    }
+}
+</style>
 </head>
 <body>
-  <main>
-    <article><h1>Formal Proof of the Right-to-Left Binary Addition Algorithm</h1>
-<p>To establish the correctness of the Right-to-Left Binary Addition algorithm, we must rigorously prove three properties: that the carry never exceeds a single bit, that each column's modular arithmetic faithfully implements a binary full-adder, and that the accumulated result bits compose the binary representation of the input sum. We will dismantle the problem into a carry-bound theorem (§2), a full-adder identity (§3), and a column-value invariant (§4).</p>
-<h2>1. First Principles &amp; System Definitions</h2>
-<p><strong>Problem objects.</strong> Let <span class="inline-math">$A$</span> and <span class="inline-math">$B$</span> be finite binary strings of lengths <span class="inline-math">$m$</span> and <span class="inline-math">$n$</span> respectively. Define bit positions by their power of 2: <span class="inline-math">$a_k \in \{0, 1\}$</span> is the bit at position <span class="inline-math">$k$</span> of <span class="inline-math">$A$</span> (weight <span class="inline-math">$2^k$</span>), with position <span class="inline-math">$0$</span> being the least significant bit. Extend both strings with zeros beyond their length:</p>
-<div class="equation">$$a_k = 0 \;\text{ for }\; k \ge m, \qquad b_k = 0 \;\text{ for }\; k \ge n$$</div>
-<p>The <em>numeric values</em> are:</p>
-<div class="equation">$$\text{val}(A) = \sum_{i=0}^{m-1} a_i \cdot 2^i, \qquad \text{val}(B) = \sum_{j=0}^{n-1} b_j \cdot 2^j$$</div>
-<p>The <em>binary sum</em> is the unique binary string <span class="inline-math">$R = (r_{K-1}, \ldots, r_1, r_0)$</span> satisfying <span class="inline-math">$r_i \in \{0, 1\}$</span> for all <span class="inline-math">$i$</span>, <span class="inline-math">$\text{val}(R) = \text{val}(A) + \text{val}(B)$</span>, and either <span class="inline-math">$K = 1$</span> (the sum is zero) or <span class="inline-math">$r_{K-1} = 1$</span> (no leading zeros).</p>
-<p><strong>Preconditions and contract assumptions.</strong></p>
-<ul><li><p><em>Binary validity:</em> <span class="inline-math">$a_k, b_j \in \{0, 1\}$</span> for all relevant positions.</p></li><li><p><em>Non-empty:</em> <span class="inline-math">$m \ge 1$</span> and <span class="inline-math">$n \ge 1$</span>.</p></li><li><p><em>No leading zeros:</em> <span class="inline-math">$a_{m-1} = 1$</span> unless <span class="inline-math">$m = 1$</span> and <span class="inline-math">$a_0 = 0$</span>; likewise for <span class="inline-math">$B$</span>.</p></li><li><p><em>Unbounded length:</em> The algorithm operates digit-by-digit without converting to fixed-width integers.</p></li></ul>
-<p><strong>Postcondition.</strong></p>
-<div class="equation">$$\text{val}(R) = \text{val}(A) + \text{val}(B)$$</div>
-<p><strong>State variables.</strong></p>
-<ul><li><p><span class="inline-math">$k \in \{0, 1, \ldots\}$</span> — current bit position, advancing from LSB toward MSB.</p></li><li><p><span class="inline-math">$c_k \in \mathbb{Z}_{\ge 0}$</span> — carry into position <span class="inline-math">$k$</span>.</p></li><li><p><span class="inline-math">$r_k \in \{0, 1\}$</span> — result bit at position <span class="inline-math">$k$</span>.</p></li><li><p><span class="inline-math">$\sigma_k \in \mathbb{Z}_{\ge 0}$</span> — column sum at position <span class="inline-math">$k$</span>.</p></li></ul>
-<p><strong>Initialization.</strong></p>
-<div class="equation">$$k = 0, \quad c_0 = 0$$</div>
-<p><strong>Iteration.</strong> At each position <span class="inline-math">$k$</span>, the algorithm computes:</p>
-<div class="equation">$$\sigma_k = a_k + b_k + c_k, \qquad r_k = \sigma_k \bmod 2, \qquad c_{k+1} = \lfloor \sigma_k / 2 \rfloor$$</div>
-<p>Then <span class="inline-math">$k$</span> advances to <span class="inline-math">$k + 1$</span>.</p>
-<p><strong>Termination.</strong> The loop runs while <span class="inline-math">$k &lt; m$</span> or <span class="inline-math">$k &lt; n$</span> or <span class="inline-math">$c_k \neq 0$</span>. It exits at the first position <span class="inline-math">$K$</span> where all three conditions fail simultaneously.</p>
-<h2>2. The Carry Bound (Safety)</h2>
-<p><strong>Theorem 1: The carry satisfies <span class="inline-math">$c_k \in \{0, 1\}$</span> at every position <span class="inline-math">$k \ge 0$</span>.</strong></p>
-<p><em>Proof:</em></p>
-<ol><li><p><em>Base case.</em> <span class="inline-math">$c_0 = 0 \in \{0, 1\}$</span>.</p></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$c_k \in \{0, 1\}$</span>. The column sum is:</p>
-<div class="equation">$$\sigma_k = a_k + b_k + c_k$$</div>
-<p>Since <span class="inline-math">$a_k \in \{0, 1\}$</span>, <span class="inline-math">$b_k \in \{0, 1\}$</span>, and <span class="inline-math">$c_k \in \{0, 1\}$</span>:</p>
-<div class="equation">$$\sigma_k \in \{0, 1, 2, 3\}$$</div>
-<p>Therefore:</p>
-<div class="equation">$$c_{k+1} = \lfloor \sigma_k / 2 \rfloor \in \{0, 1\}$$</div></li><li><p>By induction, <span class="inline-math">$c_k \in \{0, 1\}$</span> for all <span class="inline-math">$k \ge 0$</span>. <span class="inline-math">$\blacksquare$</span></p></li></ol>
-<p><strong>Corollary 1.1: The result bit <span class="inline-math">$r_k \in \{0, 1\}$</span>.</strong> Since <span class="inline-math">$\sigma_k \in \{0, 1, 2, 3\}$</span>, <span class="inline-math">$r_k = \sigma_k \bmod 2 \in \{0, 1\}$</span>. Every result bit is a valid binary digit.</p>
-<p><strong>Corollary 1.2: The loop terminates.</strong> Let <span class="inline-math">$L = \max(m, n)$</span>. For all <span class="inline-math">$k \ge L$</span>, <span class="inline-math">$a_k = b_k = 0$</span>, so <span class="inline-math">$\sigma_k = c_k \in \{0, 1\}$</span>. If <span class="inline-math">$c_L = 0$</span>, the loop exits at <span class="inline-math">$K = L$</span>. If <span class="inline-math">$c_L = 1$</span>, then <span class="inline-math">$\sigma_L = 1$</span>, <span class="inline-math">$r_L = 1$</span>, <span class="inline-math">$c_{L+1} = 0$</span>, and the loop exits at <span class="inline-math">$K = L + 1$</span>. The result has at most <span class="inline-math">$\max(m, n) + 1$</span> bits.</p>
-<h2>3. Algorithm Mapping: The Binary Full-Adder</h2>
-<p>At each position <span class="inline-math">$k$</span>, the algorithm performs integer division of the column sum <span class="inline-math">$\sigma_k$</span> by 2, extracting a remainder (the result bit) and a quotient (the outgoing carry). This is the classical binary full-adder operation.</p>
-<p><strong>Lemma 1: The full-adder identity holds at every position.</strong></p>
-<div class="equation">$$r_k + 2 \cdot c_{k+1} = a_k + b_k + c_k \quad \text{for all } k \ge 0$$</div>
-<p><em>Proof:</em></p>
-<p>By the division algorithm applied to <span class="inline-math">$\sigma_k$</span> with divisor 2:</p>
-<div class="equation">$$\sigma_k = 2 \cdot \lfloor \sigma_k / 2 \rfloor + (\sigma_k \bmod 2) = 2 \cdot c_{k+1} + r_k$$</div>
-<p>Rearranging: <span class="inline-math">$r_k + 2 \cdot c_{k+1} = \sigma_k = a_k + b_k + c_k$</span>. <span class="inline-math">$\blacksquare$</span></p>
-<p>The full-adder decomposes the column sum into its "stays here" component (<span class="inline-math">$r_k$</span>, the bit written at position <span class="inline-math">$k$</span>) and its "moves left" component (<span class="inline-math">$c_{k+1}$</span>, the carry into the next higher position). The identity ensures no information is created or destroyed — the column sum is perfectly partitioned between the result bit and the carry.</p>
-<h2>4. Proof of Correctness: The Column-Value Invariant</h2>
-<p><strong>Theorem 2: Upon termination, <span class="inline-math">$\text{val}(R) = \text{val}(A) + \text{val}(B)$</span>.</strong></p>
-<p><em>Proof:</em></p>
-<p>Define the loop invariant at the start of iteration <span class="inline-math">$k$</span>:</p>
-<div class="equation">$$\text{INV}(k): \quad \sum_{i=0}^{k-1} r_i \cdot 2^i \;+\; c_k \cdot 2^k \;=\; \sum_{i=0}^{k-1} (a_i + b_i) \cdot 2^i$$</div>
-<p>The invariant states that the numeric value of the result bits computed so far, augmented by the carry at its positional weight, equals the column-by-column sum of the inputs processed so far.</p>
-<ol><li><p><em>Base case (<span class="inline-math">$k = 0$</span>).</em> No result bits have been computed. The sums on both sides are empty, and <span class="inline-math">$c_0 = 0$</span>:</p>
-<div class="equation">$$0 + 0 \cdot 2^0 = 0$$</div>
-<p><span class="inline-math">$\text{INV}(0)$</span> holds vacuously.</p></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$\text{INV}(k)$</span> holds. After processing position <span class="inline-math">$k$</span>:</p>
-<div class="equation">$$\begin{aligned}
-\sum_{i=0}^{k} r_i \cdot 2^i + c_{k+1} \cdot 2^{k+1}
-&amp;= \sum_{i=0}^{k-1} r_i \cdot 2^i + r_k \cdot 2^k + c_{k+1} \cdot 2^{k+1} \\
-&amp;= \sum_{i=0}^{k-1} r_i \cdot 2^i + (r_k + 2 \cdot c_{k+1}) \cdot 2^k
-\end{aligned}$$</div>
-<p>By Lemma 1, <span class="inline-math">$r_k + 2 \cdot c_{k+1} = a_k + b_k + c_k$</span>. Substituting:</p>
-<div class="equation">$$\begin{aligned}
-&amp;= \sum_{i=0}^{k-1} r_i \cdot 2^i + (a_k + b_k + c_k) \cdot 2^k \\
-&amp;= \underbrace{\sum_{i=0}^{k-1} r_i \cdot 2^i + c_k \cdot 2^k}_{\text{INV}(k)} + (a_k + b_k) \cdot 2^k \\
-&amp;= \sum_{i=0}^{k-1} (a_i + b_i) \cdot 2^i + (a_k + b_k) \cdot 2^k \\
-&amp;= \sum_{i=0}^{k} (a_i + b_i) \cdot 2^i
-\end{aligned}$$</div>
-<p>This is <span class="inline-math">$\text{INV}(k+1)$</span>.</p></li><li><p><em>Termination.</em> The loop exits at position <span class="inline-math">$K$</span> with <span class="inline-math">$c_K = 0$</span> and <span class="inline-math">$K \ge \max(m, n)$</span>. By <span class="inline-math">$\text{INV}(K)$</span>:</p>
-<div class="equation">$$\sum_{i=0}^{K-1} r_i \cdot 2^i + \underbrace{c_K}_{0} \cdot 2^K = \sum_{i=0}^{K-1} (a_i + b_i) \cdot 2^i$$</div>
-<p>Since <span class="inline-math">$a_i = 0$</span> for <span class="inline-math">$i \ge m$</span> and <span class="inline-math">$b_i = 0$</span> for <span class="inline-math">$i \ge n$</span>:</p>
-<div class="equation">$$\text{val}(R) = \sum_{i=0}^{K-1} r_i \cdot 2^i = \sum_{i=0}^{m-1} a_i \cdot 2^i + \sum_{i=0}^{n-1} b_i \cdot 2^i = \text{val}(A) + \text{val}(B)$$</div>
-<p>By Corollary 1.1, every <span class="inline-math">$r_i \in \{0, 1\}$</span>, so <span class="inline-math">$R$</span> is a valid binary string. <span class="inline-math">$\blacksquare$</span></p></li></ol>
-<p><strong>Corollary 2.1:</strong> If <span class="inline-math">$\text{val}(A) = \text{val}(B) = 0$</span>, the loop processes one position (<span class="inline-math">$\sigma_0 = 0$</span>, <span class="inline-math">$r_0 = 0$</span>, <span class="inline-math">$c_1 = 0$</span>) and the result is <span class="inline-math">$R = \text{"0"}$</span>.</p>
-<p><strong>Corollary 2.2:</strong> If one input is "0", then <span class="inline-math">$c_k = 0$</span> for all <span class="inline-math">$k$</span> (since the column sum never exceeds 1), and <span class="inline-math">$r_k$</span> equals the corresponding bit of the non-zero input. The result is the other input unchanged.</p>
-<p><strong>Corollary 2.3:</strong> The result has at most <span class="inline-math">$\max(m, n) + 1$</span> bits. The extra bit appears if and only if <span class="inline-math">$c_{\max(m,n)} = 1$</span> — that is, the carry survives past both input strings. This occurs precisely when the sum overflows the wider operand's bit width.</p>
-<hr />
-<h2>5. Mechanical Execution (System Trace)</h2>
-<p><strong>Input System.</strong> <span class="inline-math">$A = \text{``1010"}$</span>, <span class="inline-math">$B = \text{"1011"}$</span>. Bit positions: <span class="inline-math">$a_3 = 1, a_2 = 0, a_1 = 1, a_0 = 0$</span>; <span class="inline-math">$b_3 = 1, b_2 = 0, b_1 = 1, b_0 = 1$</span>. <span class="inline-math">$m = n = 4$</span>, <span class="inline-math">$L = 4$</span>.</p>
-<div class="table-wrap"><table><thead><tr><th>Step</th><th><span class="inline-math">$k$</span></th><th><span class="inline-math">$a_k$</span></th><th><span class="inline-math">$b_k$</span></th><th><span class="inline-math">$c_k$</span></th><th><span class="inline-math">$\sigma_k$</span></th><th><span class="inline-math">$r_k$</span></th><th><span class="inline-math">$c_{k+1}$</span></th><th><span class="inline-math">$R$</span> (MSB first)</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$\text{1}$</span></td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$\text{01}$</span></td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$\text{101}$</span></td></tr><tr><td><strong>4</strong></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$\text{0101}$</span></td></tr><tr><td><strong>5</strong></td><td><span class="inline-math">$4$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$\text{10101}$</span></td></tr></tbody></table></div>
-<p><strong>Result:</strong> <span class="inline-math">$c_5 = 0$</span>, both strings exhausted. <span class="inline-math">$R = \text{"10101"}$</span>, <span class="inline-math">$\text{val}(R) = 16 + 4 + 1 = 21 = 10 + 11 = \text{val}(A) + \text{val}(B)$</span>.</p>
-<p><em>Note on Step 5: Both input strings are exhausted (<span class="inline-math">$k = 4 \ge m = n = 4$</span>, so <span class="inline-math">$a_4 = b_4 = 0$</span>), but the carry <span class="inline-math">$c_4 = 1$</span> from Step 4 forces one additional iteration. This is the only step where the carry alone sustains the loop — the three-way termination condition (<span class="inline-math">$k &lt; m$</span> or <span class="inline-math">$k &lt; n$</span> or <span class="inline-math">$c_k \neq 0$</span>) is essential here. Without the carry check, the algorithm would stop after Step 4 and output <span class="inline-math">$\text{"0101"} = 5$</span>, losing the most significant bit. Theorem 1's carry bound guarantees this extra step produces exactly one additional bit (<span class="inline-math">$c_4 = 1$</span> yields <span class="inline-math">$r_4 = 1, c_5 = 0$</span>), so the loop cannot extend beyond a single overflow position.</em></p>
-<p>The theoretical guarantees translate into the mechanical result: Theorem 1 ensured the carry never exceeded a single bit, Lemma 1 confirmed each step faithfully partitioned the column sum into a result bit and a carry, and Theorem 2's invariant accumulated the five result bits into the binary sum <span class="inline-math">$\text{"10101"}$</span>.</p></article>
-  </main>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Add Binary · Optimal Solution</span>
+        <h1>Column addition, one bit at a time.</h1>
+        <p class="hero-text">
+            A hardware adder in every CPU performs binary addition exactly this way:
+            start from the rightmost bit, add the two digits plus any carry from the
+            previous column, record the result, and propagate the carry left. Given two
+            binary strings, return their sum as a binary string. Walk both inputs from
+            right to left, computing each column as
+            <code>(a + b + carry) mod 2</code> with carry
+            <code>(a + b + carry) / 2</code>.
+            <code>O(n)</code> time. <code>O(n)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch binary addition column by column</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Three ideas behind binary addition</h2>
+        <p class="section-intro">
+            Every column follows the same rule. Carry is the only state that
+            connects one column to the next.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>right-to-left scan</h3>
+                <p>Process columns from the least significant bit (rightmost) to the most significant. This mirrors how we add decimal numbers by hand — the carry can only flow left, never right.</p>
+            </article>
+            <article class="concept-card">
+                <h3>carry propagation</h3>
+                <p>When a column's sum reaches 2 or 3, the overflow carries into the next column as a 1. A single carry can cascade through many consecutive 1-bits — <code>1111 + 1</code> becomes <code>10000</code>.</p>
+            </article>
+            <article class="concept-card">
+                <h3>the result can grow</h3>
+                <p>The sum may be one bit longer than the longer input. If carry survives past all input bits, it becomes a new leading 1. Without this final check the result would be silently truncated.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>One loop, one carry register</h2>
+        <p class="section-intro">
+            Two pointers walk inward. A single integer tracks the carry.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize pointers and carry</h4>
+                    <p>Set pointers at the rightmost positions of both strings. Set carry to 0.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Process each column</h4>
+                    <p>While either pointer is valid or carry is non-zero: extract each string's current bit (0 if that string is exhausted). Compute column sum = a-bit + b-bit + carry.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Extract result bit and carry</h4>
+                    <p>Result bit = <code>sum % 2</code>. New carry = <code>sum / 2</code> (integer division). Prepend the result bit to the output.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Advance pointers</h4>
+                    <p>Decrement both pointers. If a pointer was already past the start of its string, its bit is treated as 0 in subsequent columns.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where carry changes everything</h2>
+        <p class="section-intro">
+            Most edge cases reduce to whether carry propagates, cascades, or creates a new bit.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Different lengths</h3>
+                <p>
+                    The shorter string runs out first. Missing positions contribute 0,
+                    not an error. The loop continues as long as the longer string's pointer
+                    is valid or carry is non-zero.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Cascading carry</h3>
+                <p>
+                    <code>1111 + 1</code> produces a carry at every column. The single 1
+                    ripples through all four 1-bits, flipping each to 0 and producing
+                    <code>10000</code> — one bit longer than the longer input.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Final carry bit</h3>
+                <p>
+                    When both strings are exhausted but carry equals 1, a new leading bit
+                    must be emitted. The <code>carry != 0</code> condition in the loop
+                    guard handles this — without it, the result would be silently truncated.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current column" },
+        { dot: true, label: "already placed" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "column",   label: "Column" },
+        { id: "equation", label: "Equation" },
+        { id: "result",   label: "Result Bit" },
+        { id: "carry",    label: "Carry Out" }
+    ],
+    values: [
+        { id: "inputA",  label: "a" },
+        { id: "inputB",  label: "b" }
+    ],
+    orderTitle: "Column Arithmetic"
+});
+
+/* ── Source display ────────────────────────────────────── */
+
+var sourceDisplay = document.createElement("div");
+sourceDisplay.className = "binary-sources";
+sourceDisplay.innerHTML = [
+    '<div class="source-row">',
+    '<span class="source-label">a</span>',
+    '<div class="source-chars" id="srcA"></div>',
+    '</div>',
+    '<div class="source-row">',
+    '<span class="source-label">b</span>',
+    '<div class="source-chars" id="srcB"></div>',
+    '</div>',
+    '<div class="carry-row">',
+    '<span class="source-label">carry</span>',
+    '<span class="carry-badge" id="carryBadge">0</span>',
+    '</div>'
+].join("");
+refs.grid.parentNode.insertBefore(sourceDisplay, refs.grid);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "\"1010\" + \"1011\" \u2014 carries and equal length",
+        a: "1010", b: "1011",
+        desc: "Equal-length addition with two carries. Sum grows to five bits."
+    },
+    {
+        name: "\"11\" + \"1\" \u2014 simple carry",
+        a: "11", b: "1",
+        desc: "One carry propagates to create a new leading bit.",
+        mobileDefault: true
+    },
+    {
+        name: "\"1010\" + \"0101\" \u2014 no carry at any position",
+        a: "1010", b: "0101",
+        desc: "Complementary bits. Every column sums to exactly 1 \u2014 no carry anywhere."
+    },
+    {
+        name: "\"1111\" + \"1\" \u2014 cascading carry",
+        a: "1111", b: "1",
+        desc: "One carry cascades through all four 1-bits. Result is 10000."
+    },
+    {
+        name: "\"1010\" + \"11\" \u2014 different lengths",
+        a: "1010", b: "11",
+        desc: "Shorter string runs out first. Missing bits contribute 0."
+    },
+    {
+        name: "\"1\" + \"1\" \u2014 minimal carry",
+        a: "1", b: "1",
+        desc: "Two single bits. 1 + 1 = 10 in binary. Result is one bit longer."
+    },
+    {
+        name: "\"0\" + \"0\" \u2014 zero plus zero",
+        a: "0", b: "0",
+        desc: "Both inputs are zero. No carry, no conversion."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var a = preset.a;
+    var b = preset.b;
+    var ai = a.length - 1;
+    var bi = b.length - 1;
+    var carry = 0;
+    var resultBits = [];
+    var rawSteps = [];
+
+    while (ai >= 0 || bi >= 0 || carry > 0) {
+        var aBit = ai >= 0 ? (a.charCodeAt(ai) - 48) : 0;
+        var bBit = bi >= 0 ? (b.charCodeAt(bi) - 48) : 0;
+        var inCarry = carry;
+        var sum = aBit + bBit + inCarry;
+        var resultBit = sum % 2;
+        carry = (sum - resultBit) / 2;
+
+        rawSteps.push({
+            ai: ai, bi: bi, aBit: aBit, bBit: bBit,
+            inCarry: inCarry, sum: sum,
+            resultBit: resultBit, outCarry: carry,
+            isCarryStep: ai < 0 && bi < 0
+        });
+
+        resultBits.unshift(resultBit);
+        ai--;
+        bi--;
+    }
+
+    var result = resultBits.join("");
+    var width = result.length;
+
+    var aPad = [];
+    var bPad = [];
+    var pad = width - a.length;
+    for (var i = 0; i < width; i++) {
+        aPad.push(i < pad ? "" : a[i - pad]);
+    }
+    pad = width - b.length;
+    for (var i = 0; i < width; i++) {
+        bPad.push(i < pad ? "" : b[i - pad]);
+    }
+
+    var steps = rawSteps.map(function(s, idx) {
+        return {
+            ai: s.ai, bi: s.bi, aBit: s.aBit, bBit: s.bBit,
+            inCarry: s.inCarry, sum: s.sum,
+            resultBit: s.resultBit, outCarry: s.outCarry,
+            isCarryStep: s.isCarryStep,
+            col: width - 1 - idx
+        };
+    });
+
+    var order = steps.map(function(s) {
+        if (s.isCarryStep) return "\u00B9\u2192" + s.resultBit;
+        var eq = s.aBit + "+" + s.bBit;
+        if (s.inCarry) eq += "+1";
+        eq += "\u2192" + s.resultBit;
+        if (s.outCarry) eq += "\u00B9";
+        return eq;
+    });
+
+    return {
+        a: a, b: b, result: result, width: width,
+        aPad: aPad, bPad: bPad,
+        resultArr: result.split(""),
+        steps: steps, order: order,
+        desc: preset.desc, totalSteps: steps.length
+    };
+}
+
+/* ── Source cell rendering ─────────────────────────────── */
+
+function renderSource(containerId, padArr, step, pos) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    var html = "";
+    for (var i = 0; i < padArr.length; i++) {
+        var ch = padArr[i];
+        var cls = "source-cell";
+        if (ch === "") {
+            cls += " empty";
+        } else if (pos < 0) {
+            /* before first step — default */
+        } else if (i === step.col) {
+            cls += " active-source";
+        } else if (i > step.col) {
+            cls += " consumed";
+        }
+        html += '<span class="' + cls + '">' + ch + '</span>';
+    }
+    el.innerHTML = html;
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    renderSource("srcA", trace.aPad, step, pos);
+    renderSource("srcB", trace.bPad, step, pos);
+
+    var badge = document.getElementById("carryBadge");
+    if (badge) {
+        if (pos < 0) {
+            badge.textContent = "0";
+            badge.className = "carry-badge";
+        } else {
+            badge.textContent = String(step.outCarry);
+            badge.className = "carry-badge" + (step.outCarry ? " active" : "");
+        }
+    }
+
+    var display = [];
+    for (var i = 0; i < trace.width; i++) display.push("");
+    if (pos >= 0) {
+        var fillFrom = step.col;
+        for (var i = fillFrom; i < trace.width; i++) {
+            display[i] = trace.resultArr[i];
+        }
+    }
+
+    var current = null;
+    var highlights = new Map();
+    var active = new Set();
+
+    if (step) {
+        current = step.col;
+        for (var j = step.col + 1; j < trace.width; j++) {
+            highlights.set(j, "sweep");
+        }
+        for (var j = step.col; j < trace.width; j++) {
+            active.add(j);
+        }
+    }
+
+    VizArray.renderCells(refs.grid, { array: display, current: current, highlights: highlights, active: active });
+
+    if (step) {
+        refs.status.column.textContent = step.isCarryStep ? "carry" : String(step.col);
+        var eq = step.aBit + " + " + step.bBit;
+        if (step.inCarry) eq += " + 1";
+        eq += " = " + step.sum;
+        refs.status.equation.textContent = eq;
+        refs.status.result.textContent = String(step.resultBit);
+        refs.status.carry.textContent = String(step.outCarry);
+    } else {
+        refs.status.column.textContent = "\u2014";
+        refs.status.equation.textContent = "\u2014";
+        refs.status.result.textContent = "\u2014";
+        refs.status.carry.textContent = "\u2014";
+    }
+
+    refs.values.inputA.textContent = trace.a;
+    refs.values.inputB.textContent = trace.b;
+
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    if (!step) {
+        return "Binary strings: a = \u201C" + trace.a + "\u201D, b = \u201C" + trace.b +
+            "\u201D (" + trace.totalSteps + " column" +
+            (trace.totalSteps !== 1 ? "s" : "") + "). " +
+            trace.desc + " Press Play or Next to begin.";
+    }
+
+    var desc;
+    if (step.isCarryStep) {
+        desc = "Both strings exhausted. Incoming carry = 1. " +
+            "Place 1 as a new leading bit. Carry out: 0.";
+    } else {
+        var colLabel = step.col === trace.width - 1 ? "Column " + step.col + " (rightmost)" : "Column " + step.col;
+        desc = colLabel + ": a contributes " + step.aBit +
+            ", b contributes " + step.bBit;
+        if (step.inCarry) {
+            desc += ", carry in " + step.inCarry;
+        } else {
+            desc += ", no incoming carry";
+        }
+        desc += ". " + step.aBit + " + " + step.bBit;
+        if (step.inCarry) desc += " + " + step.inCarry;
+        desc += " = " + step.sum + ". Place " + step.resultBit + ".";
+        if (step.outCarry) {
+            desc += " Carry 1 forward.";
+        } else {
+            desc += " No carry out.";
+        }
+    }
+
+    if (pos === trace.steps.length - 1) {
+        desc += " Done: \u201C" + trace.a + "\u201D + \u201C" + trace.b +
+            "\u201D = \u201C" + trace.result + "\u201D.";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+</script>
 </body>
 </html>
