@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two Sum — Complement Lookup</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+    #hashSection { margin: 0 40px 40px; }
+</style>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Two Sum · Optimal Solution</span>
+        <h1>Trading memory for answers.</h1>
+        <p class="hero-text">
+            For each number, calculate its complement — the value that would complete the pair.
+            If the complement already exists in a hash map, you have the answer.
+            If not, store the current number and move on.
+            One pass. <code>O(n)</code> time. <code>O(n)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>The complement insight</h2>
+        <p class="section-intro">
+            Instead of checking every pair (which takes <code>O(n²)</code>), you ask a simpler
+            question at each position: <em>"Have I already seen the number I need?"</em>
+            A hash map answers that question in <code>O(1)</code>.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>complement</h3>
+                <p><code>target − nums[i]</code>. The exact value that, paired with the current number, reaches the target sum.</p>
+            </article>
+            <article class="concept-card">
+                <h3>hash map</h3>
+                <p>Stores every number already visited, keyed by value, mapped to its index. Lookup is <code>O(1)</code>.</p>
+            </article>
+            <article class="concept-card">
+                <h3>single pass</h3>
+                <p>One left-to-right scan. Each element is checked and stored once. Total work: <code>O(n)</code>.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>One pass, one map, one answer</h2>
+        <p class="section-intro">
+            Walk the array from left to right. At each position, either find the pair or record
+            the current number for future lookups.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Calculate the complement</h4>
+                    <p>At index <code>i</code>, compute <code>complement = target − nums[i]</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Check the hash map</h4>
+                    <p>Look up <code>complement</code> in the map. If it exists, return its stored index and <code>i</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Store the current number</h4>
+                    <p>If no match was found, insert <code>nums[i] → i</code> into the map and continue.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the map grow</h2>
+
+        <div id="interactiveMount"></div>
+        <div id="hashSection"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Subtle traps</h2>
+        <p class="section-intro">
+            The hash map approach handles cases that trip up naive implementations.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Duplicate values</h3>
+                <p>
+                    When two copies of the same number sum to the target — like <code>[3, 3]</code>
+                    with target 6 — the first 3 is stored, and the second 3 finds it as its complement.
+                    The check-before-store order prevents an element from pairing with itself.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Negative numbers</h3>
+                <p>
+                    The complement formula works identically with negative values. For <code>[-3, 4, 3, 90]</code>
+                    with target 0, the complement of -3 is 3 — and 3 appears later at index 2.
+                    The map stores -3 at index 0; when we reach 3, the lookup succeeds.
+                </p>
+            </article>
+        </div>
+    </section>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current index" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "index",      label: "Index" },
+        { id: "value",      label: "nums[i]" },
+        { id: "complement", label: "Complement" },
+        { id: "lookup",     label: "In Map?" },
+        { id: "action",     label: "Action" }
+    ],
+    values: [],
+    orderTitle: "Result"
+});
+
+const ptrElements = VizArray.createPointers(refs.container, [
+    { id: "i", label: "i", position: "below" }
+]);
+
+/* ── Hash Map Display ──────────────────────────────────── */
+
+const hashSection = document.getElementById("hashSection");
+hashSection.innerHTML = [
+    '<div class="hash-display">',
+    '<div class="hash-display-title">HashMap &#123; value → index &#125;</div>',
+    '<div id="hashEntries" class="hash-entries">',
+    '<span class="hash-empty">empty</span>',
+    '</div>',
+    '</div>'
+].join("");
+
+const hashEntriesEl = document.getElementById("hashEntries");
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "12 integers — target 60 (11 steps, deep scan)",
+        array: [8, 15, 3, 22, 47, 11, 6, 34, 19, 28, 41, 52],
+        target: 60,
+        desc: "Watch the hash map grow to 10 entries before the complement 19 is found at index 8. The pair [19, 41] sums to 60."
+    },
+    {
+        name: "15 elements — target 27 (9 steps)",
+        array: [1, 5, 8, 3, 12, 7, 9, 2, 15, 6, 11, 4, 14, 10, 13],
+        target: 27,
+        desc: "A 15-element array. The map accumulates 8 entries before finding complement 12 at index 4. The pair [12, 15] sums to 27."
+    },
+    {
+        name: "10 elements with negatives — target 5",
+        array: [-5, 0, 3, -8, 12, 7, -2, 15, 9, -4],
+        target: 5,
+        desc: "Negative numbers work identically. The complement of -2 is 7, found at index 5. The map handles negative keys without issue."
+    },
+    {
+        name: "8 elements — target 101 (large values)",
+        array: [100, 4, 23, 67, 89, 12, 45, 1],
+        target: 101,
+        desc: "Large values. Multiple pairs could theoretically sum to 101, but the first discovered match is [89, 12] at indices 4 and 5."
+    },
+    {
+        name: "Classic: [2, 7, 11, 15] target = 9",
+        array: [2, 7, 11, 15],
+        target: 9,
+        desc: "The canonical Two Sum. The complement of 7 is 2, which was stored at index 0. Answer found in just 2 steps."
+    },
+    {
+        name: "Duplicate values: [4, 4, 2, 7, 8, 11] target = 8",
+        array: [4, 4, 2, 7, 8, 11],
+        target: 8,
+        desc: "Two copies of 4 sum to 8. The first 4 is stored at index 0. The second 4 finds its complement immediately. The check-before-store order prevents self-pairing."
+    },
+    {
+        name: "Negatives: [-3, 4, 3, 90] target = 0",
+        array: [-3, 4, 3, 90],
+        target: 0,
+        desc: "Target zero with negative numbers. The complement of 3 is -3, stored at index 0. The formula target − nums[i] works regardless of sign."
+    },
+    {
+        name: "Minimal pair: [3, 3] target = 6",
+        array: [3, 3],
+        target: 6,
+        desc: "The smallest possible input. Store 3 at index 0, then immediately find complement 3 in the map. Two steps, one match."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const { array, target } = preset;
+    const steps = [];
+    const map = new Map();
+
+    for (let i = 0; i < array.length; i++) {
+        const value = array[i];
+        const complement = target - value;
+        const found = map.has(complement);
+        const matchIndex = found ? map.get(complement) : null;
+
+        const mapSnapshot = new Map(map);
+
+        steps.push({
+            arrayIndex: i,
+            value,
+            complement,
+            found,
+            matchIndex,
+            mapSnapshot,
+            action: found ? "match" : "store"
+        });
+
+        if (found) break;
+        map.set(value, i);
+    }
+
+    const lastStep = steps[steps.length - 1];
+    const order = lastStep.found
+        ? [`[${lastStep.matchIndex}, ${lastStep.arrayIndex}]`]
+        : ["No pair found"];
+
+    return { steps, order, array, target, desc: preset.desc };
+}
+
+/* ── Hash Map Renderer ─────────────────────────────────── */
+
+function renderHashMap(mapSnapshot, complement, found) {
+    if (!mapSnapshot || mapSnapshot.size === 0) {
+        hashEntriesEl.innerHTML = '<span class="hash-empty">empty</span>';
+        return;
+    }
+
+    hashEntriesEl.innerHTML = "";
+    const sorted = [...mapSnapshot.entries()].sort((a, b) => a[0] - b[0]);
+
+    for (const [key, val] of sorted) {
+        const entry = document.createElement("div");
+        entry.className = "hash-entry";
+        if (found && key === complement) entry.classList.add("hash-found");
+        if (!found && key === complement) entry.classList.add("hash-current");
+        entry.innerHTML = `<span class="hash-key">${key}</span><span class="hash-sep">→</span><span class="hash-val">${val}</span>`;
+        hashEntriesEl.appendChild(entry);
+    }
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+
+    refs.status.index.textContent      = step ? String(step.arrayIndex) : "\u2014";
+    refs.status.value.textContent      = step ? String(step.value) : "\u2014";
+    refs.status.complement.textContent = step ? String(step.complement) : "\u2014";
+
+    if (!step) {
+        refs.status.lookup.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+    } else {
+        refs.status.lookup.textContent = step.found ? `Yes (index ${step.matchIndex})` : "No";
+        refs.status.action.textContent = step.found
+            ? `Return [${step.matchIndex}, ${step.arrayIndex}]`
+            : `Store ${step.value} → ${step.arrayIndex}`;
+    }
+
+    refs.note.textContent = describeStep(engine);
+
+    const highlights = new Map();
+    if (step && step.found) {
+        highlights.set(step.matchIndex, "sweep");
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: trace.array,
+        current: step ? step.arrayIndex : undefined,
+        visited: VizArray.buildVisited(trace.steps, engine.position),
+        highlights
+    });
+
+    requestAnimationFrame(() => VizArray.positionPointers(refs.container, refs.grid, {
+        pointers: step ? { i: { index: step.arrayIndex } } : { i: { index: 0 } },
+        elements: ptrElements
+    }));
+
+    renderHashMap(
+        step ? step.mapSnapshot : new Map(),
+        step ? step.complement : null,
+        step ? step.found : false
+    );
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const step = engine.currentStep();
+    if (!step) return `${engine.trace.desc} Press Play or Next to begin scanning the array.`;
+
+    if (step.found)
+        return `Match! The complement ${step.complement} was found at index ${step.matchIndex}. Answer: [${step.matchIndex}, ${step.arrayIndex}].`;
+
+    return `At index ${step.arrayIndex}, nums[${step.arrayIndex}] = ${step.value}. Complement needed: ${step.complement}. Not in the map yet — storing ${step.value} → ${step.arrayIndex}.`;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 1200
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>

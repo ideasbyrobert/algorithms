@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Binary Search — Decision Boundaries</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+    /* Page-specific styles if needed */
+</style>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Binary Search · Optimal Solution</span>
+        <h1>Halving the search space, one comparison at a time.</h1>
+        <p class="hero-text">
+            A sorted array of <em>n</em> elements. Two pointers — <code>low</code> and
+            <code>high</code> — define the interval that could still contain the target.
+            Each iteration computes the midpoint, compares, and discards an entire half.
+            The answer arrives in <code>O(log n)</code> comparisons.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Three pointers, one invariant</h2>
+        <p class="section-intro">
+            The algorithm maintains a single invariant: the target, if present, is somewhere
+            between <code>low</code> and <code>high</code> inclusive. Every comparison
+            shrinks that window by half.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>low</h3>
+                <p>Left boundary of the search interval. Moves right when the midpoint value is too small.</p>
+                <span class="guard-code">low = mid + 1</span>
+            </article>
+            <article class="concept-card">
+                <h3>high</h3>
+                <p>Right boundary of the search interval. Moves left when the midpoint value is too large.</p>
+                <span class="guard-code">high = mid − 1</span>
+            </article>
+            <article class="concept-card">
+                <h3>mid</h3>
+                <p>Computed each iteration as <code>low + (high − low) / 2</code>.
+                The value at mid is compared with the target.</p>
+                <span class="guard-code">avoids overflow</span>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Each iteration halves the interval</h2>
+        <p class="section-intro">
+            The outer condition <code>while (low ≤ high)</code> ensures we stop once the
+            interval has collapsed — meaning the target is absent.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Compute midpoint</h4>
+                    <p>Calculate <code>mid = low + (high − low) / 2</code>. This formula avoids integer overflow.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Compare mid value with target</h4>
+                    <p>Read <code>nums[mid]</code> and check if it equals, is less than, or is greater than the target.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Discard a half</h4>
+                    <p>If <code>nums[mid] &lt; target</code>, the answer must be to the right → set <code>low = mid + 1</code>.
+                    If <code>nums[mid] &gt; target</code>, the answer must be to the left → set <code>high = mid − 1</code>.
+                    If equal, we have found it.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Repeat or terminate</h4>
+                    <p>Loop continues until <code>low &gt; high</code> (target absent) or the target is found.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the interval shrink</h2>
+
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>When the search fails</h2>
+        <p class="section-intro">
+            Binary search does not always find its target. Understanding the failure mode
+            is as important as understanding the success path.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Target absent</h3>
+                <p>
+                    When <code>low</code> crosses past <code>high</code>, the search interval
+                    is empty. No element in the array equals the target. The algorithm returns −1.
+                    Try the <strong>"target absent"</strong> preset to watch the interval collapse.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Single element</h3>
+                <p>
+                    When the array has just one element, <code>low = high = 0</code> and
+                    <code>mid = 0</code>. A single comparison resolves the answer immediately.
+                    Try the <strong>"single element"</strong> preset.
+                </p>
+            </article>
+        </div>
+    </section>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "mid comparison" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "low",        label: "low" },
+        { id: "high",       label: "high" },
+        { id: "mid",        label: "mid" },
+        { id: "midValue",   label: "nums[mid]" },
+        { id: "comparison", label: "Comparison" },
+        { id: "action",     label: "Action" }
+    ],
+    values: [],
+    orderTitle: "Comparisons"
+});
+
+const ptrElements = VizArray.createPointers(refs.container, [
+    { id: "low",  label: "low",  position: "below" },
+    { id: "high", label: "high", position: "below" },
+    { id: "mid",  label: "mid",  position: "above" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "15 sorted integers — find 72 (4 comparisons)",
+        array: [2, 5, 8, 12, 16, 23, 28, 37, 42, 50, 56, 63, 72, 84, 99],
+        target: 72,
+        desc: "A 15-element array. The algorithm bounces right, right, left, and right — finding 72 at index 12 in exactly 4 comparisons."
+    },
+    {
+        name: "20 elements — find 93 (5 comparisons, max depth)",
+        array: [3, 7, 12, 18, 24, 29, 35, 41, 48, 53, 59, 64, 70, 76, 82, 88, 93, 97, 104, 110],
+        target: 93,
+        desc: "20 elements, 5 comparisons — the theoretical maximum for this array size. Watch how each halving narrows the interval until only one candidate remains."
+    },
+    {
+        name: "Perfect squares — find 64 (3 comparisons)",
+        array: [1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144, 169],
+        target: 64,
+        desc: "13 perfect squares from 1² to 13². Binary search finds 64 = 8² in just 3 comparisons."
+    },
+    {
+        name: "With negatives — find 7 (3 comparisons)",
+        array: [-8, -3, 0, 2, 5, 7, 12, 18, 25, 31],
+        target: 7,
+        desc: "Negative and positive integers interleaved. The algorithm works identically — values are sorted, so halving applies."
+    },
+    {
+        name: "15 integers — target 35 absent (full collapse)",
+        array: [2, 5, 8, 12, 16, 23, 28, 37, 42, 50, 56, 63, 72, 84, 99],
+        target: 35,
+        desc: "The target 35 does not exist in the array. After 4 comparisons, low crosses past high and the interval collapses to nothing."
+    },
+    {
+        name: "15 integers — find first element 2 (always left)",
+        array: [2, 5, 8, 12, 16, 23, 28, 37, 42, 50, 56, 63, 72, 84, 99],
+        target: 2,
+        desc: "The target is the very first element. The midpoint is always too large, so the algorithm repeatedly discards the right half."
+    },
+    {
+        name: "Classic: [-1, 0, 3, 5, 9, 12] target = 9",
+        array: [-1, 0, 3, 5, 9, 12],
+        target: 9,
+        desc: "The textbook example. A 6-element sorted array — the target 9 is found at index 4 after 2 comparisons."
+    },
+    {
+        name: "Single element: [42] target = 42",
+        array: [42],
+        target: 42,
+        desc: "A single-element array. low = high = 0, mid = 0. One comparison resolves the answer immediately."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const { array, target } = preset;
+    const steps = [];
+    let low = 0, high = array.length - 1;
+    let found = -1;
+
+    while (low <= high) {
+        const mid = low + Math.floor((high - low) / 2);
+        const midValue = array[mid];
+        let action, comparison;
+
+        if (midValue === target) {
+            comparison = "equal";
+            action = "found";
+            found = mid;
+        } else if (midValue < target) {
+            comparison = "less";
+            action = "discard-left-half";
+        } else {
+            comparison = "greater";
+            action = "discard-right-half";
+        }
+
+        steps.push({
+            arrayIndex: mid,
+            low, high, mid, midValue,
+            comparison, action, found: found !== -1
+        });
+
+        if (found !== -1) break;
+        if (midValue < target) low = mid + 1;
+        else high = mid - 1;
+    }
+
+    if (found === -1) {
+        steps.push({
+            arrayIndex: null,
+            low, high, mid: null, midValue: null,
+            comparison: "collapsed",
+            action: "not-found",
+            found: false
+        });
+    }
+
+    const order = steps.filter(s => s.mid != null).map(s => `[${s.mid}]=${s.midValue}`);
+    return { steps, order, array, target, found, desc: preset.desc };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+
+    const low  = step ? step.low : 0;
+    const high = step ? step.high : trace.array.length - 1;
+    const mid  = step ? step.mid : null;
+
+    refs.status.low.textContent  = step ? String(step.low)  : "0";
+    refs.status.high.textContent = step ? String(step.high) : String(trace.array.length - 1);
+    refs.status.mid.textContent  = mid != null ? String(mid) : "\u2014";
+    refs.status.midValue.textContent = step && step.midValue != null ? String(step.midValue) : "\u2014";
+
+    if (!step) {
+        refs.status.comparison.textContent = "\u2014";
+        refs.status.action.textContent     = "\u2014";
+    } else {
+        const comparisonText = {
+            less: `${step.midValue} < ${trace.target}`,
+            greater: `${step.midValue} > ${trace.target}`,
+            equal: `${step.midValue} = ${trace.target}`,
+            collapsed: "low > high"
+        };
+        const actionText = {
+            "discard-left-half": "low = mid + 1",
+            "discard-right-half": "high = mid − 1",
+            "found": "Found!",
+            "not-found": "Not found"
+        };
+        refs.status.comparison.textContent = comparisonText[step.comparison] || "\u2014";
+        refs.status.action.textContent     = actionText[step.action] || "\u2014";
+    }
+
+    refs.note.textContent = describeStep(engine);
+
+    const active = new Set();
+    if (step && step.action !== "not-found") {
+        for (let i = low; i <= high; i++) active.add(i);
+    }
+
+    const visited = VizArray.buildVisited(trace.steps, engine.position);
+
+    VizArray.renderCells(refs.grid, {
+        array: trace.array,
+        active: active.size > 0 ? active : undefined,
+        current: mid,
+        visited
+    });
+
+    const pointerState = {};
+    if (step && step.action !== "not-found") {
+        pointerState.low  = { index: low };
+        pointerState.high = { index: high };
+        if (mid != null) pointerState.mid = { index: mid };
+    } else if (!step) {
+        pointerState.low  = { index: 0 };
+        pointerState.high = { index: trace.array.length - 1 };
+    }
+
+    requestAnimationFrame(() => VizArray.positionPointers(refs.container, refs.grid, {
+        pointers: pointerState,
+        elements: ptrElements
+    }));
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const step = engine.currentStep();
+    if (!step) return `${engine.trace.desc} The pointers show the full interval before any comparison is made.`;
+
+    if (step.action === "not-found")
+        return `The interval has collapsed — low (${step.low}) has crossed past high (${step.high}). The target ${engine.trace.target} is not in the array.`;
+    if (step.action === "found")
+        return `Found! nums[${step.mid}] = ${step.midValue} equals the target ${engine.trace.target}. Search complete.`;
+    if (step.action === "discard-left-half")
+        return `nums[${step.mid}] = ${step.midValue} is less than ${engine.trace.target}. The left half is discarded — low moves to ${step.mid + 1}.`;
+    return `nums[${step.mid}] = ${step.midValue} is greater than ${engine.trace.target}. The right half is discarded — high moves to ${step.mid - 1}.`;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 1200
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
