@@ -89,7 +89,13 @@ const VizEngine = (() => {
             wireTransport();
             wireSlider();
             wireKeyboard();
-            load(0);
+            const isMobile = window.innerWidth < 768;
+            let start = 0;
+            if (isMobile) {
+                const mi = presets.findIndex(p => p.mobileDefault);
+                if (mi >= 0) start = mi;
+            }
+            load(start);
         }
 
         /* ── Preset switching ──────────────────────────── */

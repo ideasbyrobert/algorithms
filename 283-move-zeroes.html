@@ -203,6 +203,12 @@ const PRESETS = [
         desc: "Five zeroes scattered across 12 elements. Watch the gap between read and write grow each time a zero is skipped, then the fill phase claims the vacated tail."
     },
     {
+        name: "6 elements — scattered zeroes",
+        array: [0, 3, 0, 5, 1, 0],
+        desc: "Three zeroes among six elements. The gap between read and write grows at each zero, then the fill phase claims half the array.",
+        mobileDefault: true
+    },
+    {
         name: "11 elements — front-loaded zeroes",
         array: [0, 0, 0, 0, 6, 3, 8, 1, 5, 9, 2],
         desc: "Four consecutive zeroes at the start. The write pointer sits at 0 while read scans past them, then rapidly copies all seven non-zeroes in a burst."

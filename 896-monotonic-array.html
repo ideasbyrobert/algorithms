@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Monotonic Array — Two Direction Flags · Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of the Monotonic Array algorithm. Watch two boolean flags track non-decreasing and non-increasing through adjacent-pair comparisons. O(n) single pass.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="monotonic array, LeetCode 896, non-decreasing, non-increasing, boolean flags, adjacent pairs, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/896-monotonic-array.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Monotonic Array — Two Direction Flags · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of the Monotonic Array algorithm. Watch two boolean flags survive — or die — as adjacent pairs are compared.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/896-monotonic-array.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Monotonic Array — Two Direction Flags · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of the Monotonic Array algorithm. Watch two boolean flags survive — or die — as adjacent pairs are compared.">
+<meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Monotonic Array — Two Direction Flags","description":"Interactive step-by-step visualization of the Monotonic Array algorithm. Watch two boolean flags track non-decreasing and non-increasing through adjacent-pair comparisons.","url":"https://ideasbyrobert.github.io/algorithms/896-monotonic-array.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/896-monotonic-array.html","inLanguage":"en","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"monotonic array, LeetCode 896, non-decreasing, non-increasing, boolean flags, adjacent pairs, algorithm visualization"}</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+</head>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Monotonic Array · Optimal Solution</span>
+        <h1>Two flags. One scan. One answer.</h1>
+        <p class="hero-text">
+            A reactor monitoring system captures coolant temperatures every second. Before
+            triggering an alert, it must verify whether the latest reading window trends in
+            a single direction — steadily rising, steadily falling, or holding flat. An array
+            is monotonic if it is entirely non-decreasing or entirely non-increasing. Two boolean
+            flags start alive; each adjacent-pair comparison can only kill a flag, never revive one.
+            If either survives, the array is monotonic. <code>O(n)</code> time. <code>O(1)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the flags survive — or die</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>The dual-flag invariant</h2>
+        <p class="section-intro">
+            Start with two hypotheses about the array. Each comparison can only eliminate
+            one — never restore it. The algorithm succeeds if at least one hypothesis survives.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>adjacent pairs</h3>
+                <p>The algorithm compares each consecutive pair exactly once. No revisiting, no lookahead — a single left-to-right scan.</p>
+            </article>
+            <article class="concept-card">
+                <h3>two flags</h3>
+                <p>Begin assuming the array could be non-decreasing <em>and</em> non-increasing. A rise kills the non-increasing flag. A fall kills non-decreasing. Equal kills neither.</p>
+            </article>
+            <article class="concept-card">
+                <h3>one survivor suffices</h3>
+                <p>The array is monotonic if at least one flag is still alive when the scan ends. If both die, the array had both a rise and a fall — not monotonic.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Scan, compare, eliminate</h2>
+        <p class="section-intro">
+            The algorithm tracks two boolean flags through a single pass over adjacent pairs.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize both flags as true</h4>
+                    <p><code>canBeNonDecreasing = true</code> and <code>canBeNonIncreasing = true</code>. Both directions are possible until contradicted.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Scan adjacent pairs</h4>
+                    <p>For each pair <code>(nums[i−1], nums[i])</code>: if <code>nums[i] &gt; nums[i−1]</code>, kill non-increasing. If <code>nums[i] &lt; nums[i−1]</code>, kill non-decreasing. If equal, kill neither.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Early termination</h4>
+                    <p>If both flags are dead, return <code>false</code> immediately — the array has both a rise and a fall, so no future pair can change the verdict.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Verdict</h4>
+                    <p>After all pairs: return <code>canBeNonDecreasing || canBeNonIncreasing</code>. If either survived, the array is monotonic.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where the flags tell the story</h2>
+        <p class="section-intro">
+            The flag states at the end reveal the array's structure.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>All equal elements</h3>
+                <p>
+                    Every comparison is equal, so neither flag is ever killed. Both survive — the array
+                    is simultaneously non-decreasing and non-increasing. This is the purest monotonic case.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Equal prefix</h3>
+                <p>
+                    Equal pairs at the beginning keep both flags alive. The direction is only decided
+                    at the first unequal pair. This is why the first-pair heuristic fails — it would
+                    lock in a direction too early and reject valid monotonic arrays.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Single element</h3>
+                <p>
+                    No adjacent pairs to compare means zero iterations. Both flags remain alive by
+                    default — trivially monotonic. The empty loop handles this without a special case.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current pair" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "index",   label: "Index (i)" },
+        { id: "pair",    label: "Pair" },
+        { id: "result",  label: "Result" },
+        { id: "verdict", label: "Verdict" }
+    ],
+    values: [
+        { id: "flagND", label: "↑ non-decreasing" },
+        { id: "flagNI", label: "↓ non-increasing" }
+    ],
+    orderTitle: "Comparison Sequence"
+});
+
+const ptrElements = VizArray.createPointers(refs.container, [
+    { id: "i", label: "i", position: "above" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "8 elements — non-decreasing with plateaus",
+        array: [1, 2, 2, 3, 4, 5, 5, 8],
+        desc: "A gently rising sequence with two flat plateaus. The non-decreasing flag survives while non-increasing dies at the first rise."
+    },
+    {
+        name: "6 elements — non-decreasing with plateau",
+        array: [1, 3, 3, 5, 7, 9],
+        desc: "A compact rising sequence with one equal plateau. Non-decreasing survives, non-increasing dies at step one.",
+        mobileDefault: true
+    },
+    {
+        name: "7 elements — non-increasing with plateau",
+        array: [9, 7, 7, 5, 3, 3, 1],
+        desc: "A steadily falling array with one flat plateau. Non-increasing survives while the first fall kills non-decreasing."
+    },
+    {
+        name: "8 elements — not monotonic (valley)",
+        array: [1, 3, 5, 7, 4, 2, 6, 8],
+        desc: "Rises to 7, drops to 2, then rises again. The first rise kills non-increasing, then the fall kills non-decreasing — both flags dead, early termination."
+    },
+    {
+        name: "6 elements — all equal",
+        array: [4, 4, 4, 4, 4, 4],
+        desc: "Every comparison is equal — both flags survive every step. The purest monotonic case."
+    },
+    {
+        name: "7 elements — equal prefix then rise",
+        array: [2, 2, 2, 3, 5, 7, 9],
+        desc: "Three equal pairs keep both flags alive, then the rise at index 3 kills non-increasing. The tricky case that defeats the first-pair heuristic."
+    },
+    {
+        name: "7 elements — not monotonic (early bail)",
+        array: [3, 5, 2, 4, 7, 6, 1],
+        desc: "A rise followed immediately by a fall — both flags die in just two comparisons. Five elements never get examined."
+    },
+    {
+        name: "1 element — trivially monotonic",
+        array: [7],
+        desc: "A single element has no adjacent pairs. Both flags remain alive — trivially monotonic."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const nums = preset.array;
+    const steps = [];
+    let canND = true;
+    let canNI = true;
+
+    for (let i = 1; i < nums.length; i++) {
+        const left = nums[i - 1];
+        const right = nums[i];
+        let action;
+
+        if (right > left) {
+            canNI = false;
+            action = "rise";
+        } else if (right < left) {
+            canND = false;
+            action = "fall";
+        } else {
+            action = "equal";
+        }
+
+        steps.push({
+            index: i,
+            leftIndex: i - 1,
+            leftValue: left,
+            rightValue: right,
+            action,
+            canND,
+            canNI,
+            earlyBail: !canND && !canNI
+        });
+
+        if (!canND && !canNI) break;
+    }
+
+    const isMonotonic = canND || canNI;
+    const order = steps.map(s =>
+        s.action === "rise" ? "\u25B2" : s.action === "fall" ? "\u25BC" : "\u25AC"
+    );
+
+    return { steps, order, array: nums, desc: preset.desc, isMonotonic };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+
+    let currentIdx, highlights;
+    if (step) {
+        currentIdx = step.index;
+        highlights = new Map();
+        highlights.set(step.leftIndex, "sweep");
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: trace.array,
+        current: currentIdx,
+        highlights
+    });
+
+    // Status bar
+    if (step) {
+        refs.status.index.textContent = String(step.index);
+        refs.status.pair.textContent = `${step.leftValue} \u2192 ${step.rightValue}`;
+        refs.status.result.textContent = step.action === "rise" ? "Rise (>)"
+            : step.action === "fall" ? "Fall (<)" : "Equal (=)";
+
+        if (step.earlyBail)
+            refs.status.verdict.textContent = "Not monotonic \u2717";
+        else if (engine.position === trace.steps.length - 1)
+            refs.status.verdict.textContent = trace.isMonotonic ? "Monotonic \u2713" : "Not monotonic \u2717";
+        else
+            refs.status.verdict.textContent = "Scanning\u2026";
+    } else {
+        refs.status.index.textContent = "\u2014";
+        refs.status.pair.textContent = "\u2014";
+        refs.status.result.textContent = "\u2014";
+        refs.status.verdict.textContent = trace.steps.length === 0 ? "Monotonic \u2713 (trivial)" : "\u2014";
+    }
+
+    // Values bar — flag states
+    if (step) {
+        refs.values.flagND.textContent = step.canND ? "\u2713 alive" : "\u2717 killed";
+        refs.values.flagNI.textContent = step.canNI ? "\u2713 alive" : "\u2717 killed";
+    } else {
+        refs.values.flagND.textContent = "\u2713 alive";
+        refs.values.flagNI.textContent = "\u2713 alive";
+    }
+
+    // Note
+    refs.note.textContent = describeStep(engine);
+
+    // Pointer
+    requestAnimationFrame(() => {
+        const ptrs = {};
+        if (step) {
+            ptrs.i = { index: step.index };
+        } else {
+            ptrs.i = { index: trace.array.length > 1 ? 1 : 0 };
+        }
+
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: ptrs,
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const step = engine.currentStep();
+    const trace = engine.trace;
+
+    if (!step) {
+        if (trace.steps.length === 0)
+            return "Single element \u2014 no pairs to compare. Trivially monotonic.";
+        return `${trace.desc} Press Play or Next to begin.`;
+    }
+
+    let desc = `Compare index ${step.leftIndex} (${step.leftValue}) with index ${step.index} (${step.rightValue}): `;
+
+    if (step.action === "rise")
+        desc += `${step.rightValue} > ${step.leftValue} \u2014 a rise. Non-increasing flag is killed.`;
+    else if (step.action === "fall")
+        desc += `${step.rightValue} < ${step.leftValue} \u2014 a fall. Non-decreasing flag is killed.`;
+    else
+        desc += `${step.rightValue} = ${step.leftValue} \u2014 equal. Both flags survive.`;
+
+    if (step.earlyBail)
+        desc += " Both flags are now dead \u2014 the array is not monotonic. Early termination.";
+    else if (engine.position === trace.steps.length - 1) {
+        if (trace.isMonotonic) {
+            if (step.canND && step.canNI)
+                desc += " Both flags survived \u2014 monotonic in both directions.";
+            else if (step.canND)
+                desc += " Scan complete. Non-decreasing survived \u2014 the array is monotone non-decreasing.";
+            else
+                desc += " Scan complete. Non-increasing survived \u2014 the array is monotone non-increasing.";
+        }
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 800
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
