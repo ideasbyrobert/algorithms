@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Justification — Greedy Packing + Space Distribution | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 68 Text Justification. Watch greedy packing and space distribution format words into justified lines.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/68-text-justification.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="text justification, leetcode 68, greedy packing, space distribution, algorithm visualization">
+<meta property="og:title" content="Text Justification — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 68. Watch greedy line packing and even space distribution.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/68-text-justification.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Text Justification — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 68. Watch greedy line packing and even space distribution.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Text Justification — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 68 Text Justification.","url":"https://ideasbyrobert.github.io/algorithms/68-text-justification.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.output-display {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin: 0 0 24px;
+    padding: 16px;
+    background: #F5F5F7;
+    border-radius: 14px;
+}
+.output-line-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    border: 0.5px solid rgba(0, 0, 0, 0.06);
+    transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+.output-line-row.packing {
+    border-style: dashed;
+    border-color: rgba(0, 0, 0, 0.12);
+    opacity: 0.72;
+}
+.output-text {
+    font: 500 14px/1.5 'Menlo', 'SF Mono', monospace;
+    white-space: pre;
+    letter-spacing: 0;
+}
+.output-text .w { color: #1D1D1F; font-weight: 600; }
+.output-text .g { color: #C7C7CC; }
+.output-text .t { color: #AEAEB2; }
+.line-tag {
+    font: 500 9px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #8E8E93;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.output-empty {
+    font: 400 13px/1.5 'SF Pro Text', -apple-system, sans-serif;
+    color: #AEAEB2;
+    text-align: center;
+    padding: 16px;
+}
+#interactiveMount .viz-array .cell {
+    width: auto;
+    min-width: 44px;
+    padding: 0 12px;
+    height: 44px;
+    border-radius: 10px;
+}
+#interactiveMount .cell-value { font-size: 0.82rem; }
+@media (max-width: 600px) {
+    #interactiveMount .viz-array .cell {
+        min-width: 36px;
+        padding: 0 8px;
+        height: 38px;
+    }
+    #interactiveMount .cell-value { font-size: 0.74rem; }
+    .output-text { font-size: 12px; }
+    .output-display { padding: 12px; }
+    .output-line-row { padding: 8px 10px; gap: 8px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+    <section class="hero">
+        <div>
+            <span class="label">68 · Text Justification</span>
+            <h1>Greedy Packing, Even Spacing</h1>
+            <p>
+                Book typography justified text long before computers existed.
+                This algorithm packs as many words as possible onto each line,
+                then distributes the remaining whitespace evenly across the gaps —
+                leftmost gaps absorb any remainder. The final line stays
+                left-aligned, exactly like a paragraph's closing sentence.
+            </p>
+        </div>
+        <svg viewBox="0 0 200 88" class="concept-svg" role="img" aria-label="Three justified text lines">
+            <line x1="10" y1="4" x2="190" y2="4" stroke="#C7C7CC" stroke-width="0.5"/>
+            <line x1="10" y1="1" x2="10" y2="7" stroke="#C7C7CC" stroke-width="0.5"/>
+            <line x1="190" y1="1" x2="190" y2="7" stroke="#C7C7CC" stroke-width="0.5"/>
+            <text x="100" y="4" text-anchor="middle" dy="-4" fill="#AEAEB2" font-family="SF Pro Text, -apple-system, sans-serif" font-size="5" letter-spacing="0.08em">MAX WIDTH</text>
+            <rect x="10" y="16" width="36" height="14" rx="3" fill="#1D1D1F"/>
+            <rect x="64" y="16" width="24" height="14" rx="3" fill="#1D1D1F"/>
+            <rect x="106" y="16" width="84" height="14" rx="3" fill="#1D1D1F"/>
+            <rect x="10" y="40" width="60" height="14" rx="3" fill="#1D1D1F"/>
+            <rect x="86" y="40" width="20" height="14" rx="3" fill="#1D1D1F"/>
+            <rect x="122" y="40" width="68" height="14" rx="3" fill="#1D1D1F"/>
+            <rect x="10" y="64" width="48" height="14" rx="3" fill="#1D1D1F"/>
+            <rect x="64" y="64" width="28" height="14" rx="3" fill="#1D1D1F"/>
+            <line x1="98" y1="71" x2="190" y2="71" stroke="#C7C7CC" stroke-width="0.5" stroke-dasharray="2,3"/>
+        </svg>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="interactive" id="interactiveMount"></section>
+
+    <div class="divider"></div>
+
+    <section>
+        <h2>Three rules, one formatter</h2>
+        <p>Every line follows exactly one of three spacing rules depending on its word count and position.</p>
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>greedy packing</h3>
+                <p>Keep adding words until the next word won't fit. Count each word's length plus one mandatory space between words. When the total exceeds the line width, stop and format.</p>
+            </article>
+            <article class="concept-card">
+                <h3>space distribution</h3>
+                <p>An interior line has <code>totalSpaces = maxWidth − letters</code> to spread across its gaps. Divide evenly: <code>base = totalSpaces ÷ gaps</code>, remainder <code>extra = totalSpaces mod gaps</code>. The leftmost gaps each absorb one extra space.</p>
+            </article>
+            <article class="concept-card">
+                <h3>last line exception</h3>
+                <p>The final line uses single spaces between words and pads the remaining width on the right — just like natural paragraph endings. A single-word line follows the same trailing-pad rule.</p>
+            </article>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section>
+        <h2>Pack, then format</h2>
+        <p>Two phases per line. One greedy scan, one formatting pass.</p>
+        <ol class="steps">
+            <li>
+                <h4>Greedy word scan</h4>
+                <p>Starting from the current word, accumulate words onto the line. A word fits if <code>letters + word.length + gapCount ≤ maxWidth</code>. Stop when the next word would overflow.</p>
+            </li>
+            <li>
+                <h4>Classify the line</h4>
+                <p>If only one word occupies the line, or this is the last line, use left-justification with trailing padding. Otherwise, use full justification with distributed spaces.</p>
+            </li>
+            <li>
+                <h4>Distribute spaces</h4>
+                <p>For interior lines: compute <code>base = (maxWidth − letters) ÷ gaps</code> and <code>extra = (maxWidth − letters) mod gaps</code>. Place <code>base + 1</code> spaces in the first <code>extra</code> gaps, <code>base</code> in the rest.</p>
+            </li>
+            <li>
+                <h4>Emit and advance</h4>
+                <p>Append the formatted line to the output. Move the word pointer past the line's last word. Repeat until all words are consumed.</p>
+            </li>
+        </ol>
+    </section>
+
+    <div class="divider"></div>
+
+    <section>
+        <h2>Where formatting rules collide</h2>
+        <p>Three scenarios test whether you apply the right rule at the right time.</p>
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Single-word interior line</h3>
+                <p>A word so long it fills the line alone. There are zero gaps — you cannot divide by zero. The word is left-justified with trailing spaces, exactly like a last line.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Uneven space distribution</h3>
+                <p>When <code>totalSpaces mod gaps ≠ 0</code>, the leftmost gaps absorb the extras. For <code>"one··two·six·ten"</code>: 4 spaces across 3 gaps gives base 1, extra 1. The first gap gets 2 spaces, the rest get 1.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Last line with multiple words</h3>
+                <p>Even if there's room to distribute spaces evenly, the last line must use single spaces and pad the right. Treating it like an interior line would stretch words apart unnaturally.</p>
+            </article>
+        </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "scanning" },
+        { dot: true, label: "on this line" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "line",    label: "Line" },
+        { id: "width",   label: "Width" },
+        { id: "letters", label: "Letters" },
+        { id: "room",    label: "Room" }
+    ],
+    values: [
+        { id: "gaps",     label: "Gaps" },
+        { id: "base",     label: "Base" },
+        { id: "extra",    label: "Extra" },
+        { id: "trailing", label: "Trailing" }
+    ],
+    orderTitle: "Pack / Format Trace"
+});
+
+/* ── Output display ────────────────────────────────────── */
+
+var outputDisplay = document.createElement("div");
+outputDisplay.className = "output-display";
+outputDisplay.innerHTML = '<div class="output-empty">Output lines appear here as the algorithm formats them.</div>';
+refs.grid.parentNode.insertBefore(outputDisplay, refs.grid);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "Canonical \u2014 7 words, width 16",
+        words: ["This", "is", "an", "example", "of", "text", "justification."],
+        maxWidth: 16
+    },
+    {
+        name: "Uneven gaps \u2014 5 words, width 16",
+        words: ["one", "two", "six", "ten", "last"],
+        maxWidth: 16,
+        mobileDefault: true
+    },
+    {
+        name: "Single-word interior \u2014 6 words",
+        words: ["What", "must", "be", "acknowledgment", "shall", "be"],
+        maxWidth: 16
+    },
+    {
+        name: "Two-word stretch \u2014 width 8",
+        words: ["ab", "cd", "efg"],
+        maxWidth: 8
+    },
+    {
+        name: "Single word \u2014 width 10",
+        words: ["longword"],
+        maxWidth: 10
+    },
+    {
+        name: "Exact fit \u2014 width 11",
+        words: ["abc", "def", "ghi"],
+        maxWidth: 11
+    }
+];
+
+/* ── Helpers ────────────────────────────────────────────── */
+
+function repeat(ch, n) {
+    var s = "";
+    for (var i = 0; i < n; i++) s += ch;
+    return s;
+}
+
+function formatLine(lineWords, letters, maxWidth, shouldLeftJustify) {
+    var gapCount = lineWords.length - 1;
+
+    if (shouldLeftJustify) {
+        var text = lineWords.join(" ");
+        var trailing = maxWidth - text.length;
+        return {
+            words: lineWords,
+            gaps: gapCount > 0 ? new Array(gapCount).fill(1) : [],
+            trailing: trailing,
+            text: text + repeat(" ", trailing),
+            rule: lineWords.length === 1 ? "single" : "last",
+            baseGap: gapCount > 0 ? 1 : 0,
+            extraCount: 0,
+            totalSpaces: maxWidth - letters
+        };
+    }
+
+    var totalSpaces = maxWidth - letters;
+    var baseGap = Math.floor(totalSpaces / gapCount);
+    var extraCount = totalSpaces % gapCount;
+    var gaps = [];
+    var pieces = [];
+
+    for (var i = 0; i < lineWords.length; i++) {
+        pieces.push(lineWords[i]);
+        if (i < gapCount) {
+            var gap = baseGap + (i < extraCount ? 1 : 0);
+            gaps.push(gap);
+            pieces.push(repeat(" ", gap));
+        }
+    }
+
+    return {
+        words: lineWords,
+        gaps: gaps,
+        trailing: 0,
+        text: pieces.join(""),
+        rule: "interior",
+        baseGap: baseGap,
+        extraCount: extraCount,
+        totalSpaces: totalSpaces
+    };
+}
+
+function lineHTML(line) {
+    var html = "";
+    for (var i = 0; i < line.words.length; i++) {
+        html += '<span class="w">' + line.words[i] + '</span>';
+        if (i < line.gaps.length) {
+            html += '<span class="g">' + repeat("\u00B7", line.gaps[i]) + '</span>';
+        }
+    }
+    if (line.trailing > 0) {
+        html += '<span class="t">' + repeat("\u00B7", line.trailing) + '</span>';
+    }
+    return html;
+}
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var words = preset.words;
+    var maxWidth = preset.maxWidth;
+    var steps = [];
+    var lines = [];
+    var order = [];
+    var wi = 0;
+
+    while (wi < words.length) {
+        var lineStart = wi;
+        var letters = 0;
+
+        while (wi < words.length && letters + words[wi].length + (wi - lineStart) <= maxWidth) {
+            letters += words[wi].length;
+            wi++;
+            var wordsOnLine = wi - lineStart;
+            var minSpaces = wordsOnLine - 1;
+            var room = maxWidth - letters - minSpaces;
+
+            steps.push({
+                action: "pack",
+                wordIndex: wi - 1,
+                word: words[wi - 1],
+                lineNum: lines.length,
+                lineStart: lineStart,
+                lineEnd: wi,
+                letters: letters,
+                wordsOnLine: wordsOnLine,
+                minSpaces: minSpaces,
+                room: room
+            });
+            order.push(words[wi - 1]);
+        }
+
+        var lineWords = words.slice(lineStart, wi);
+        var isLast = wi >= words.length;
+        var singleWord = lineWords.length === 1;
+        var shouldLeftJustify = singleWord || isLast;
+        var formatted = formatLine(lineWords, letters, maxWidth, shouldLeftJustify);
+        formatted.isLast = isLast;
+        formatted.lineNum = lines.length;
+        lines.push(formatted);
+
+        var nextWord = wi < words.length ? words[wi] : null;
+
+        steps.push({
+            action: "format",
+            lineNum: lines.length - 1,
+            lineStart: lineStart,
+            lineEnd: wi,
+            formatted: formatted,
+            nextWord: nextWord,
+            letters: letters
+        });
+        order.push("\u25B8 L" + (lines.length - 1));
+    }
+
+    return { steps: steps, lines: lines, words: words, maxWidth: maxWidth, order: order };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    var display = trace.words.slice();
+    var current = null;
+    var highlights = new Map();
+    var active = new Set();
+
+    if (step) {
+        for (var i = 0; i < step.lineStart; i++) active.add(i);
+
+        if (step.action === "pack") {
+            for (var i = step.lineStart; i <= step.wordIndex; i++) active.add(i);
+            current = step.wordIndex;
+            for (var i = step.lineStart; i < step.wordIndex; i++) highlights.set(i, "sweep");
+        } else {
+            for (var i = step.lineStart; i < step.lineEnd; i++) {
+                active.add(i);
+                highlights.set(i, "sweep");
+            }
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: display,
+        current: current,
+        highlights: highlights,
+        active: active
+    });
+
+    /* Output display */
+    var completedLines = 0;
+    if (step) {
+        completedLines = step.action === "format" ? step.lineNum + 1 : step.lineNum;
+    }
+
+    var html = "";
+    for (var i = 0; i < completedLines; i++) {
+        var line = trace.lines[i];
+        html += '<div class="output-line-row">';
+        html += '<span class="output-text">' + lineHTML(line) + '</span>';
+        html += '<span class="line-tag">' + line.rule + '</span>';
+        html += '</div>';
+    }
+
+    if (step && step.action === "pack") {
+        var packingWords = trace.words.slice(step.lineStart, step.lineEnd);
+        html += '<div class="output-line-row packing">';
+        html += '<span class="output-text">';
+        for (var i = 0; i < packingWords.length; i++) {
+            html += '<span class="w">' + packingWords[i] + '</span>';
+            if (i < packingWords.length - 1) {
+                html += '<span class="g">\u00B7</span>';
+            }
+        }
+        var used = step.letters + step.minSpaces;
+        var remaining = trace.maxWidth - used;
+        if (remaining > 0) {
+            html += '<span class="t">' + repeat("\u00B7", remaining) + '</span>';
+        }
+        html += '</span>';
+        html += '<span class="line-tag">packing</span>';
+        html += '</div>';
+    }
+
+    if (!html) {
+        html = '<div class="output-empty">Output lines appear here as the algorithm formats them.</div>';
+    }
+
+    outputDisplay.innerHTML = html;
+
+    /* Status bar */
+    if (step) {
+        refs.status.line.textContent = step.lineNum;
+        refs.status.width.textContent = trace.maxWidth;
+        refs.status.letters.textContent = step.letters;
+        refs.status.room.textContent = step.action === "pack" ? step.room : "0";
+
+        if (step.action === "format") {
+            var f = step.formatted;
+            refs.values.gaps.textContent = f.gaps.length;
+            refs.values.base.textContent = f.baseGap;
+            refs.values.extra.textContent = f.extraCount;
+            refs.values.trailing.textContent = f.trailing;
+        } else {
+            refs.values.gaps.textContent = step.wordsOnLine > 1 ? step.wordsOnLine - 1 : 0;
+            refs.values.base.textContent = "\u2014";
+            refs.values.extra.textContent = "\u2014";
+            refs.values.trailing.textContent = "\u2014";
+        }
+    } else {
+        refs.status.line.textContent = "\u2014";
+        refs.status.width.textContent = trace.maxWidth;
+        refs.status.letters.textContent = "\u2014";
+        refs.status.room.textContent = "\u2014";
+        refs.values.gaps.textContent = "\u2014";
+        refs.values.base.textContent = "\u2014";
+        refs.values.extra.textContent = "\u2014";
+        refs.values.trailing.textContent = "\u2014";
+    }
+
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    if (!step) {
+        return "Words: [" + trace.words.join(", ") + "], maxWidth = " +
+            trace.maxWidth + ". Press Play or Next to begin.";
+    }
+
+    if (step.action === "pack") {
+        var verb = step.wordsOnLine === 1
+            ? "Starting line " + step.lineNum + " with"
+            : "Adding";
+        return verb + " \u201C" + step.word + "\u201D (" + step.word.length +
+            " chars). " + step.letters + " letters across " + step.wordsOnLine +
+            " word" + (step.wordsOnLine !== 1 ? "s" : "") + ". Room for " +
+            step.room + " more.";
+    }
+
+    var f = step.formatted;
+    if (f.rule === "interior") {
+        var desc = "Line " + step.lineNum + " formatted";
+        if (step.nextWord) {
+            desc += " \u2014 \u201C" + step.nextWord + "\u201D (" +
+                step.nextWord.length + " chars) won\u2019t fit";
+        }
+        desc += ". " + f.totalSpaces + " spaces across " + f.gaps.length +
+            " gap" + (f.gaps.length !== 1 ? "s" : "") + " \u2192 base " + f.baseGap;
+        if (f.extraCount > 0) {
+            desc += ", +" + "1 to " + f.extraCount +
+                " leftmost gap" + (f.extraCount !== 1 ? "s" : "");
+        }
+        desc += ".";
+        return desc;
+    }
+
+    if (f.rule === "last") {
+        return "Final line \u2014 left-justified with single spaces. " +
+            f.trailing + " trailing space" + (f.trailing !== 1 ? "s" : "") +
+            " pad to width.";
+    }
+
+    return "Single word fills line " + step.lineNum + ". " +
+        f.trailing + " trailing space" + (f.trailing !== 1 ? "s" : "") +
+        " pad to width.";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
