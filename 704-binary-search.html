@@ -193,10 +193,10 @@ const PRESETS = [
         desc: "A 15-element array. The algorithm bounces right, right, left, and right — finding 72 at index 12 in exactly 4 comparisons."
     },
     {
-        name: "20 elements — find 93 (5 comparisons, max depth)",
-        array: [3, 7, 12, 18, 24, 29, 35, 41, 48, 53, 59, 64, 70, 76, 82, 88, 93, 97, 104, 110],
-        target: 93,
-        desc: "Twenty elements, 5 comparisons — the theoretical maximum for this array size. Watch how each halving narrows the interval until only one candidate remains."
+        name: "15 elements — find 82 (4 comparisons, max depth)",
+        array: [3, 8, 14, 19, 25, 31, 37, 42, 48, 54, 60, 66, 72, 78, 82],
+        target: 82,
+        desc: "Fifteen elements, 4 comparisons — the deepest leaf of the search tree. The target sits at the rightmost position, requiring the maximum number of halvings."
     },
     {
         name: "Perfect squares — find 64 (3 comparisons)",
@@ -229,10 +229,10 @@ const PRESETS = [
         desc: "The target is the last element. Every comparison goes right, pushing low upward repeatedly until the final candidate is the answer."
     },
     {
-        name: "18 elements — find 55 (zigzag path, 4 comparisons)",
-        array: [2, 7, 13, 19, 24, 30, 36, 41, 48, 55, 61, 67, 73, 79, 85, 91, 97, 103],
+        name: "14 elements — find 55 (zigzag path, 4 comparisons)",
+        array: [2, 7, 13, 19, 24, 30, 36, 41, 48, 55, 61, 67, 73, 79],
         target: 55,
-        desc: "An 18-element array. The algorithm goes right, then left, then left again, then right — a zigzag path that narrows to the answer in 4 comparisons."
+        desc: "A 14-element array. The algorithm goes right, then left, then right, then right — a zigzag path that narrows to the answer in 4 comparisons."
     }
 ];
 

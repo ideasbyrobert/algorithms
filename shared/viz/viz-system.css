@@ -403,6 +403,7 @@ button.primary:hover { background: var(--black); }
     position: relative;
     padding: 80px;
     margin-bottom: 40px;
+    overflow-x: auto;
     border-radius: 0;
     background: transparent;
 }
@@ -1127,6 +1128,13 @@ input[type="range"]::-webkit-slider-thumb {
     .viz-container {
         padding: 48px 20px;
     }
+
+    /* Larger touch targets on mobile */
+    button { padding: 12px 20px; min-height: 44px; }
+    select { padding: 12px 38px 12px 14px; min-height: 44px; }
+
+    input[type="range"] { height: 4px; }
+    input[type="range"]::-webkit-slider-thumb { width: 24px; height: 24px; }
 
     .boundary-label { font-size: 0.68rem; }
 

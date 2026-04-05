@@ -193,6 +193,19 @@ const VizArray = (() => {
 
         layoutGroup(above, true);
         layoutGroup(below, false);
+
+        // Auto-scroll container to keep current cell visible on mobile
+        const currentCell = gridEl.querySelector(".cell.current");
+        if (currentCell) {
+            const cr = containerEl.getBoundingClientRect();
+            const cellR = currentCell.getBoundingClientRect();
+            const cellCx = cellR.left + cellR.width / 2;
+            const viewCx = cr.left + cr.width / 2;
+            const dx = cellCx - viewCx;
+            if (Math.abs(dx) > cr.width * 0.3) {
+                containerEl.scrollBy({ left: dx, behavior: "smooth" });
+            }
+        }
     }
 
     /**

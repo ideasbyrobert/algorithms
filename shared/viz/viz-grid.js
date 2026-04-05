@@ -118,6 +118,18 @@ const VizGrid = (() => {
         labels.left.style.left   = `${fL - g}px`;
         labels.right.style.top   = `${my}px`;
         labels.right.style.left  = `${fR + g}px`;
+
+        // Auto-scroll container to keep current cell visible on mobile
+        const currentCell = gridEl.querySelector(".cell.current");
+        if (currentCell) {
+            const cellR = currentCell.getBoundingClientRect();
+            const cellCx = cellR.left + cellR.width / 2;
+            const viewCx = cr.left + cr.width / 2;
+            const dx = cellCx - viewCx;
+            if (Math.abs(dx) > cr.width * 0.3) {
+                containerEl.scrollBy({ left: dx, behavior: "smooth" });
+            }
+        }
     }
 
     /**
