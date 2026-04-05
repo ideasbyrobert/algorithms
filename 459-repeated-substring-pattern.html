@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repeated Substring Pattern — Double, Trim, Search | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 459 Repeated Substring Pattern. Watch the doubled-and-trimmed trick reveal whether a string is periodic.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/459-repeated-substring-pattern.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="repeated substring pattern, leetcode 459, string periodicity, doubled string trick, algorithm visualization, substring search">
+<meta property="og:title" content="Repeated Substring Pattern — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 459. Watch the doubled-and-trimmed trick reveal periodicity.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/459-repeated-substring-pattern.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Repeated Substring Pattern — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 459. Watch the doubled-and-trimmed trick reveal periodicity.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧮</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Repeated Substring Pattern — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 459 Repeated Substring Pattern.","url":"https://ideasbyrobert.github.io/algorithms/459-repeated-substring-pattern.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.pattern-source {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 20px;
+}
+.pattern-source .source-label {
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: #636366;
+    min-width: 54px;
+    text-align: right;
+    flex-shrink: 0;
+}
+.pattern-source .source-chars {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+.pattern-source .source-char {
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 15px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    border: 1.5px solid #C7C7CC;
+    color: #1D1D1F;
+    transition: all 0.25s ease;
+}
+.pattern-source .source-char.matched {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border-color: #1D1D1F;
+    font-weight: 600;
+}
+.pattern-source .source-char.mismatch-point {
+    border-color: #1D1D1F;
+    border-width: 2px;
+    border-style: dashed;
+}
+@media (max-width: 600px) {
+    .pattern-source .source-char {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+    .pattern-source .source-label {
+        font-size: 11px;
+        min-width: 44px;
+    }
+}
+</style>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Repeated Substring Pattern · Optimal Solution</span>
+        <h1>Double, trim, and search.</h1>
+        <p class="hero-text">
+            A genome sequencer checks whether a DNA fragment is built by repeating a shorter
+            motif — like "ATGATG" being two copies of "ATG". Given any string, determine whether
+            it can be constructed by repeating a substring two or more times. The elegant trick:
+            concatenate the string with itself, remove the boundary characters, and check whether
+            the original still appears inside. <code>O(n)</code> time. <code>O(n)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the doubled string reveal the pattern</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Why doubling exposes repetition</h2>
+        <p class="section-intro">
+            The doubled-and-trimmed trick reduces a structural question about periodicity
+            to a simple substring search.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>the doubling trick</h3>
+                <p>If <code>s</code> is made of repeated copies of a pattern <code>p</code>, then <code>s + s</code> creates overlapping copies where a new occurrence of <code>s</code> appears at an offset equal to <code>p.length</code> — inside the doubled string, not at the boundary.</p>
+            </article>
+            <article class="concept-card">
+                <h3>why trimming works</h3>
+                <p>The original <code>s</code> trivially appears at position 0 and position <code>n</code> in the doubled string. Removing the first and last character eliminates exactly these two trivial anchors without destroying any internal alignment.</p>
+            </article>
+            <article class="concept-card">
+                <h3>false positives are impossible</h3>
+                <p>If <code>s</code> is not periodic, every candidate window in the trimmed string straddles the junction between the two copies, breaking the match. The search correctly returns false.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Three operations, one answer</h2>
+        <p class="section-intro">
+            No loop over divisors. No pattern matching setup. Just concatenation, trimming, and a single search.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Concatenate the string with itself</h4>
+                    <p>Build <code>doubled = s + s</code>. This creates a string of length <code>2n</code> containing two adjacent copies.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Remove the first and last character</h4>
+                    <p>Set <code>trimmed = doubled[1..^1]</code>. This removes the trivial match at position 0 and the one at position <code>n</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Search for the original inside</h4>
+                    <p>If <code>trimmed.contains(s)</code> is true, the string is built from a repeated substring. Otherwise it is not.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where the answer is immediate</h2>
+        <p class="section-intro">
+            Some inputs resolve before the search even starts.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Single character</h3>
+                <p>
+                    The doubled string has only two characters. After trimming, nothing remains
+                    to search — the result is always false. A single character has no proper
+                    substring to repeat.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>All identical characters</h3>
+                <p>
+                    Strings like "aaaa" match at the very first candidate position. Every character
+                    is a repetition of one, so the search succeeds immediately.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Prefix overlap without full repetition</h3>
+                <p>
+                    Strings like "abcab" share structure between prefix and suffix, but cannot
+                    be decomposed into complete copies of any substring. Every candidate window
+                    fails.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+const refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "comparison point" },
+        { dot: true, label: "matched prefix" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "phase",  label: "Phase" },
+        { id: "window", label: "Window" },
+        { id: "match",  label: "Prefix Match" },
+        { id: "result", label: "Result" }
+    ],
+    values: [
+        { id: "original", label: "Original" },
+        { id: "length",   label: "Length" },
+        { id: "windows",  label: "Windows Checked" }
+    ],
+    orderTitle: "Window Results"
+});
+
+/* ── Source display (original string reference) ────────── */
+
+const sourceEl = document.createElement("div");
+sourceEl.className = "pattern-source";
+sourceEl.innerHTML =
+    '<span class="source-label">original</span>' +
+    '<div class="source-chars" id="originalChars"></div>';
+refs.container.parentNode.insertBefore(sourceEl, refs.container);
+
+const originalCharsEl = document.getElementById("originalChars");
+
+/* ── Presets ────────────────────────────────────────────── */
+
+const PRESETS = [
+    {
+        name: "\"abcabc\" \u2014 two copies of \"abc\" (repeating)",
+        text: "abcabc",
+        desc: "Two copies of \u201Cabc\u201D. After trimming, the original reappears inside the doubled string."
+    },
+    {
+        name: "\"abab\" \u2014 two copies of \"ab\" (repeating)",
+        text: "abab",
+        desc: "Two copies of \u201Cab\u201D. The simplest non-trivial repeating pattern.",
+        mobileDefault: true
+    },
+    {
+        name: "\"ababab\" \u2014 three copies of \"ab\" (repeating)",
+        text: "ababab",
+        desc: "Three copies of \u201Cab\u201D. The match appears early despite the longer string."
+    },
+    {
+        name: "\"aba\" \u2014 overlapping, not repeating",
+        text: "aba",
+        desc: "Starts and ends with \u201Ca\u201D but cannot be built from a shorter repeated block."
+    },
+    {
+        name: "\"aaaa\" \u2014 single character repeated",
+        text: "aaaa",
+        desc: "Four copies of \u201Ca\u201D. The match is immediate \u2014 position 1 in the doubled string."
+    },
+    {
+        name: "\"abcab\" \u2014 prefix overlap, not repeating",
+        text: "abcab",
+        desc: "Shares structure between prefix and suffix, but no full repetition exists."
+    },
+    {
+        name: "\"a\" \u2014 single character (trivially false)",
+        text: "a",
+        desc: "A single character has no proper substring to repeat. The trimmed string is empty."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    const s = preset.text;
+    const n = s.length;
+    const doubled = (s + s).split("");
+    const dn = doubled.length;
+
+    const trimActive = new Set();
+    for (let i = 1; i < dn - 1; i++) trimActive.add(i);
+
+    const steps = [];
+    const order = [];
+    let found = false;
+    let foundAt = -1;
+
+    steps.push({ phase: "trim" });
+
+    if (n > 1) {
+        const candidates = n - 1;
+        for (let ci = 0; ci < candidates; ci++) {
+            const wStart = 1 + ci;
+            let matchLen = 0;
+            for (let j = 0; j < n; j++) {
+                if (doubled[wStart + j] === s[j]) matchLen++;
+                else break;
+            }
+            const isMatch = matchLen === n;
+
+            steps.push({ phase: "search", wStart, matchLen, isMatch, ci });
+            order.push(String(wStart) + (isMatch ? "\u2713" : "\u2717"));
+
+            if (isMatch) { found = true; foundAt = wStart; break; }
+        }
+    }
+
+    return { s, n, doubled, dn, trimActive, steps, order, found, foundAt, desc: preset.desc };
+}
+
+/* ── Source display updater ─────────────────────────────── */
+
+function updateSource(trace, step) {
+    let html = "";
+    for (let i = 0; i < trace.n; i++) {
+        let cls = "source-char";
+        if (step && step.phase === "search") {
+            if (i < step.matchLen) cls += " matched";
+            else if (i === step.matchLen && !step.isMatch) cls += " mismatch-point";
+        }
+        html += '<span class="' + cls + '">' + trace.s[i] + "</span>";
+    }
+    originalCharsEl.innerHTML = html;
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+    const pos = engine.position;
+
+    let current = null;
+    const highlights = new Map();
+    let active;
+
+    if (!step) {
+        active = new Set();
+        for (let i = 0; i < trace.dn; i++) active.add(i);
+    } else if (step.phase === "trim") {
+        active = trace.trimActive;
+    } else {
+        active = new Set();
+        for (let j = step.wStart; j < step.wStart + trace.n; j++) active.add(j);
+
+        for (let j = 0; j < step.matchLen; j++) {
+            highlights.set(step.wStart + j, "sweep");
+        }
+        if (step.isMatch) {
+            current = step.wStart + trace.n - 1;
+        } else if (step.matchLen < trace.n) {
+            current = step.wStart + step.matchLen;
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: trace.doubled,
+        current,
+        highlights,
+        active
+    });
+
+    updateSource(trace, step);
+
+    const isDone = step && pos === trace.steps.length - 1;
+
+    if (!step) {
+        refs.status.phase.textContent = "Ready";
+        refs.status.window.textContent = "\u2014";
+        refs.status.match.textContent = "\u2014";
+        refs.status.result.textContent = "\u2014";
+    } else if (step.phase === "trim") {
+        refs.status.phase.textContent = trace.n <= 1 ? "Done" : "Trim";
+        refs.status.window.textContent = "\u2014";
+        refs.status.match.textContent = "\u2014";
+        refs.status.result.textContent = trace.n <= 1 ? "false" : "\u2014";
+    } else {
+        refs.status.phase.textContent = isDone ? "Done" : "Search";
+        refs.status.window.textContent = "position " + step.wStart;
+        refs.status.match.textContent = step.matchLen + " / " + trace.n;
+        refs.status.result.textContent = step.isMatch ? "\u2713 Found" : "\u2717 Mismatch";
+    }
+
+    refs.values.original.textContent = trace.s;
+    refs.values.length.textContent = String(trace.n);
+    const searched = step && step.phase === "search" ? step.ci + 1 : 0;
+    refs.values.windows.textContent = String(searched);
+
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    const trace = engine.trace;
+    const step = engine.currentStep();
+    const pos = engine.position;
+
+    if (!step) {
+        return "\u201C" + trace.s + "\u201D (" + trace.n + " chars). Doubled: \u201C" +
+            trace.doubled.join("") + "\u201D (" + trace.dn + " chars). " +
+            trace.desc + " Press Play or Next to begin.";
+    }
+
+    if (step.phase === "trim") {
+        if (trace.n <= 1) {
+            return "After removing the first and last character, the search space is empty. " +
+                "A single character has no repeated substring. Result: false.";
+        }
+        const trimmed = trace.doubled.slice(1, -1).join("");
+        return "Remove the first and last character to eliminate trivial boundary matches. " +
+            "Search space: \u201C" + trimmed + "\u201D (" + (trace.dn - 2) +
+            " chars). Now searching for \u201C" + trace.s + "\u201D inside it.";
+    }
+
+    const window = trace.doubled.slice(step.wStart, step.wStart + trace.n).join("");
+
+    if (step.isMatch) {
+        return "Position " + step.wStart + ": \u201C" + window + "\u201D matches \u201C" +
+            trace.s + "\u201D completely. The string is built from a repeated substring. Result: true.";
+    }
+
+    let desc = "Position " + step.wStart + ": \u201C" + window + "\u201D vs \u201C" +
+        trace.s + "\u201D \u2014 ";
+    if (step.matchLen === 0) {
+        desc += "mismatch at the first character.";
+    } else {
+        desc += step.matchLen + " character" + (step.matchLen > 1 ? "s" : "") +
+            " matched, then mismatch at position " + step.matchLen + ".";
+    }
+
+    if (pos === trace.steps.length - 1 && !trace.found) {
+        desc += " No match found in any position. Result: false.";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+const engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace,
+    onRender,
+    describeStep,
+    speed: 700
+});
+
+engine.init();
+
+VizEngine.onResize(() => {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
