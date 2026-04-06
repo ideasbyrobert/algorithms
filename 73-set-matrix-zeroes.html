@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set Matrix Zeroes — In-Place Marker Propagation | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 73 Set Matrix Zeroes. Watch markers propagate through four phases: flag, mark, zero interior, zero edges.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="set matrix zeroes, leetcode 73, in-place markers, zero propagation, algorithm visualization">
+<meta property="og:title" content="Set Matrix Zeroes — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 73. Watch in-place markers propagate zeros through four phases.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Set Matrix Zeroes — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 73. Watch in-place markers propagate zeros through four phases.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Set Matrix Zeroes — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 73 Set Matrix Zeroes.","url":"https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Matrix grid ──────────────────────────────────────── */
+
+.matrix-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+}
+
+.matrix-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.matrix-row.header-row { margin-bottom: 10px; }
+.matrix-row.marker-row-gap { margin-bottom: 14px; }
+
+.row-label {
+    width: 24px;
+    font: 500 11px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #AEAEB2;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.col-header {
+    width: 64px;
+    font: 500 10px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #AEAEB2;
+    text-align: center;
+    letter-spacing: 0.4px;
+}
+
+.m-cell {
+    width: 64px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 400 15px/1 'Menlo', monospace;
+    color: #1D1D1F;
+    background: #FFFFFF;
+    border: 1.5px solid #C7C7CC;
+    border-radius: 10px;
+    transition: background 0.25s ease, border-color 0.25s ease,
+                color 0.25s ease;
+}
+
+.m-cell.marker-col-edge { margin-right: 10px; }
+
+.m-cell.marker-space {
+    background: #FAFAFA;
+    border-color: #AEAEB2;
+}
+
+.m-cell.current {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border: 2px solid #1D1D1F;
+}
+
+.m-cell.scanning {
+    background: #F5F5F7;
+    border: 2px solid #636366;
+}
+
+.m-cell.marker-active {
+    background: #F5F5F7;
+    border: 2px dashed #1D1D1F;
+}
+
+.m-cell.just-changed {
+    background: #F5F5F7;
+    border: 2px solid #48484A;
+}
+
+/* ── Flags panel ──────────────────────────────────────── */
+
+.flags-panel {
+    display: flex;
+    gap: 6px;
+    margin: 0 0 16px;
+    flex-wrap: wrap;
+}
+
+.flag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid #C7C7CC;
+    font: 500 11px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #636366;
+    letter-spacing: 0.02em;
+    transition: all 0.25s ease;
+}
+
+.flag-badge.on {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border-color: #1D1D1F;
+}
+
+.flag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #C7C7CC;
+    transition: background 0.25s ease;
+}
+
+.flag-badge.on .flag-dot { background: #FFFFFF; }
+
+/* ── Mobile ───────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .row-label { width: 18px; font-size: 10px; }
+    .col-header { width: 48px; font-size: 9px; }
+    .m-cell { width: 48px; height: 36px; font-size: 13px; border-radius: 8px; }
+    .m-cell.marker-col-edge { margin-right: 6px; }
+    .matrix-row.marker-row-gap { margin-bottom: 10px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ─── Section 1: Intro ──────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Set Matrix Zeroes</h1>
+    <p class="viz-subtitle">LeetCode 73 · In-Place Marker Propagation</p>
+    <p class="viz-body">
+        Given an m × n matrix, if any cell is&nbsp;0, zero its entire row
+        and column — in place, using O(1) extra space. The trick is to
+        use the <strong>first row and first column</strong> of the matrix
+        itself as marker storage.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 2: Marker Concept ─────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">First Row + Column as Markers</h2>
+    <p class="viz-body">
+        Zeroing cells immediately would create cascading false markers.
+        Instead, for each interior zero at [r][c], we <em>defer</em> the
+        work by writing 0 into the first-column cell [r][0] and the
+        first-row cell [0][c]. These act as flags: "row r needs zeroing"
+        and "column c needs zeroing."
+    </p>
+    <p class="viz-body">
+        Because the markers overwrite the original first row and column,
+        we must save whether those borders originally contained any zero
+        <strong>before</strong> we start marking.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 3: Algorithm Phases ───────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Four Phases</h2>
+    <div class="viz-code-block">
+<pre><code>1. Flag: remember if first row / column
+         originally has a zero
+
+2. Mark: for each interior cell == 0,
+         set matrix[row][0] = 0
+         set matrix[0][col] = 0
+
+3. Zero interior: for each interior cell,
+         if matrix[row][0] == 0 or
+            matrix[0][col] == 0
+         then set cell to 0
+
+4. Zero edges: if first-row flag, zero row 0
+               if first-col flag, zero col 0</code></pre>
+    </div>
+</div>
+</section>
+
+<!-- ─── Section 4: Interactive ────────────────────────── -->
+
+<div id="interactiveMount"></div>
+
+<!-- ─── Section 5: Guard Cases ────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Why Save the Flags First?</h2>
+    <p class="viz-body">
+        <strong>Marker overwrite hazard</strong> — the marking phase writes 0
+        into the first row and first column. If those borders originally had
+        non-zero values, those values are now lost. The saved flags let the
+        final phase decide whether to zero the borders independently of the
+        markers.
+    </p>
+    <p class="viz-body">
+        <strong>Interior before edges</strong> — interior cells must be
+        zeroed first because they <em>read</em> the markers. If we zeroed
+        the first row or column early, every interior cell would see a
+        marker of zero and the entire matrix would collapse.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 6: Complexity ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(m × n) — three passes over the matrix.<br>
+        <strong>Space:</strong> O(1) — markers stored in the matrix itself.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    gridClass: "matrix-grid-wrap",
+    status: [
+        { id: "phase",  label: "Phase" },
+        { id: "cell",   label: "Cell" },
+        { id: "action", label: "Action" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* ── Flags panel (inserted before grid) ───────────────── */
+
+var flagsPanel = document.createElement("div");
+flagsPanel.className = "flags-panel";
+flagsPanel.innerHTML =
+    '<div class="flag-badge" id="fRow"><span class="flag-dot"></span>first row has zero</div>' +
+    '<div class="flag-badge" id="fCol"><span class="flag-dot"></span>first col has zero</div>';
+refs.grid.parentNode.insertBefore(flagsPanel, refs.grid);
+var fRowBadge = document.getElementById("fRow");
+var fColBadge = document.getElementById("fCol");
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "3 \u00d7 3 \u2014 Center Zero",
+        matrix: [[1,1,1],[1,0,1],[1,1,1]]
+    },
+    {
+        name: "3 \u00d7 2 \u2014 Interior Zero",
+        mobileDefault: true,
+        matrix: [[1,1],[1,0],[1,1]]
+    },
+    {
+        name: "3 \u00d7 3 \u2014 Both Edges",
+        matrix: [[1,0,2],[0,4,5],[6,7,8]]
+    },
+    {
+        name: "3 \u00d7 4 \u2014 Multiple Sources",
+        matrix: [[0,1,2,0],[3,4,5,2],[1,3,1,5]]
+    },
+    {
+        name: "2 \u00d7 2 \u2014 No Zeros",
+        matrix: [[1,2],[3,4]]
+    },
+    {
+        name: "3 \u00d7 3 \u2014 Corner Zeros",
+        matrix: [[0,1,1],[1,1,1],[1,1,0]]
+    }
+];
+
+/* ── Deep clone helper ────────────────────────────────── */
+
+function cloneM(m) { return m.map(function(r) { return r.slice(); }); }
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var orig = preset.matrix;
+    var rows = orig.length;
+    var cols = orig[0].length;
+    var matrix = cloneM(orig);
+    var steps = [];
+
+    /* Phase 1: flag scan */
+    var fRow = false;
+    for (var c = 0; c < cols; c++) { if (matrix[0][c] === 0) { fRow = true; break; } }
+    var fCol = false;
+    for (var r = 0; r < rows; r++) { if (matrix[r][0] === 0) { fCol = true; break; } }
+
+    steps.push({ type: "flags", fRow: fRow, fCol: fCol, matrix: cloneM(matrix) });
+
+    /* Phase 2: mark interior */
+    for (var r = 1; r < rows; r++) {
+        for (var c = 1; c < cols; c++) {
+            var found = matrix[r][c] === 0;
+            if (found) {
+                matrix[r][0] = 0;
+                matrix[0][c] = 0;
+            }
+            steps.push({ type: "mark", row: r, col: c, isZero: found, matrix: cloneM(matrix) });
+        }
+    }
+
+    /* Phase 3: zero interior */
+    for (var r = 1; r < rows; r++) {
+        for (var c = 1; c < cols; c++) {
+            var rM = matrix[r][0] === 0;
+            var cM = matrix[0][c] === 0;
+            var hit = rM || cM;
+            if (hit) matrix[r][c] = 0;
+            steps.push({ type: "zero", row: r, col: c, rM: rM, cM: cM, hit: hit, matrix: cloneM(matrix) });
+        }
+    }
+
+    /* Phase 4: zero first row */
+    if (fRow) {
+        for (var c = 0; c < cols; c++) matrix[0][c] = 0;
+        steps.push({ type: "zeroRow", matrix: cloneM(matrix) });
+    }
+
+    /* Phase 5: zero first column */
+    if (fCol) {
+        for (var r = 0; r < rows; r++) matrix[r][0] = 0;
+        steps.push({ type: "zeroCol", matrix: cloneM(matrix) });
+    }
+
+    return { steps: steps, originalMatrix: orig, fRow: fRow, fCol: fCol };
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var steps = trace.steps;
+    var orig = trace.originalMatrix;
+    var rows = orig.length;
+    var cols = orig[0].length;
+
+    var curMatrix = pos >= 0 ? steps[pos].matrix : orig;
+    var prevMatrix = pos > 0 ? steps[pos - 1].matrix : orig;
+    var step = pos >= 0 ? steps[pos] : null;
+
+    /* Flags display */
+    var showFlags = pos >= 0;
+    fRowBadge.classList.toggle("on", showFlags && trace.fRow);
+    fColBadge.classList.toggle("on", showFlags && trace.fCol);
+
+    /* Determine highlights */
+    var curR = -1, curC = -1;
+    var markR = -1, markC = -1;
+    var scanRow = false, scanCol = false;
+
+    if (step) {
+        if (step.type === "flags") { scanRow = true; scanCol = true; }
+        else if (step.type === "mark") {
+            curR = step.row; curC = step.col;
+            if (step.isZero) { markR = step.row; markC = step.col; }
+        }
+        else if (step.type === "zero") {
+            curR = step.row; curC = step.col;
+            markR = step.row; markC = step.col;
+        }
+        else if (step.type === "zeroRow") { scanRow = true; }
+        else if (step.type === "zeroCol") { scanCol = true; }
+    }
+
+    /* Detect changed cells */
+    var changed = {};
+    if (pos >= 0) {
+        for (var r = 0; r < rows; r++) {
+            for (var c = 0; c < cols; c++) {
+                if (curMatrix[r][c] !== prevMatrix[r][c]) changed[r + "," + c] = true;
+            }
+        }
+    }
+
+    /* Build HTML */
+    var h = '<div class="matrix-layout">';
+
+    /* Column headers */
+    h += '<div class="matrix-row header-row">';
+    h += '<div class="row-label"></div>';
+    for (var c = 0; c < cols; c++) {
+        var hcls = "col-header";
+        h += '<div class="' + hcls + '"';
+        if (c === 0 && cols > 1) h += ' style="margin-right:10px"';
+        h += '>' + c + '</div>';
+    }
+    h += '</div>';
+
+    /* Data rows */
+    for (var r = 0; r < rows; r++) {
+        var rcls = "matrix-row";
+        if (r === 0 && rows > 1) rcls += " marker-row-gap";
+        h += '<div class="' + rcls + '">';
+        h += '<div class="row-label">' + r + '</div>';
+
+        for (var c = 0; c < cols; c++) {
+            var key = r + "," + c;
+            var isMarker = (r === 0 || c === 0);
+            var cls = "m-cell";
+
+            if (isMarker) cls += " marker-space";
+            if (c === 0 && cols > 1) cls += " marker-col-edge";
+
+            if (r === curR && c === curC) {
+                cls += " current";
+            } else if ((scanRow && r === 0) || (scanCol && c === 0)) {
+                cls += " scanning";
+            } else if (markR >= 0 && r === markR && c === 0 && r !== curR) {
+                cls += " marker-active";
+            } else if (markC >= 0 && r === 0 && c === markC && c !== curC) {
+                cls += " marker-active";
+            } else if (key in changed) {
+                cls += " just-changed";
+            }
+
+            h += '<div class="' + cls + '">' + curMatrix[r][c] + '</div>';
+        }
+        h += '</div>';
+    }
+
+    h += '</div>';
+    refs.grid.innerHTML = h;
+
+    /* Status */
+    var phaseNames = {
+        flags: "Flag Scan", mark: "Mark Interior",
+        zero: "Zero Interior", zeroRow: "Zero First Row", zeroCol: "Zero First Column"
+    };
+
+    if (step) {
+        refs.status.phase.textContent = phaseNames[step.type];
+
+        if (step.type === "flags") {
+            refs.status.cell.textContent = "row 0 + col 0";
+            refs.status.action.textContent = "row: " + (trace.fRow ? "\u2713" : "\u2717") +
+                "  col: " + (trace.fCol ? "\u2713" : "\u2717");
+        } else if (step.type === "mark") {
+            refs.status.cell.textContent = "[" + step.row + "][" + step.col + "]";
+            refs.status.action.textContent = step.isZero ? "zero \u2192 marked" : "non-zero \u2192 skip";
+        } else if (step.type === "zero") {
+            refs.status.cell.textContent = "[" + step.row + "][" + step.col + "]";
+            if (step.hit) {
+                var reason = step.rM && step.cM ? "both markers" : step.rM ? "row marker" : "col marker";
+                refs.status.action.textContent = reason + " \u2192 zeroed";
+            } else {
+                refs.status.action.textContent = "no marker \u2192 skip";
+            }
+        } else if (step.type === "zeroRow") {
+            refs.status.cell.textContent = "row 0";
+            refs.status.action.textContent = "flag was \u2713 \u2192 zeroed";
+        } else if (step.type === "zeroCol") {
+            refs.status.cell.textContent = "col 0";
+            refs.status.action.textContent = "flag was \u2713 \u2192 zeroed";
+        }
+    } else {
+        refs.status.phase.textContent = "\u2014";
+        refs.status.cell.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+    }
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var step = engine.currentStep();
+    if (step.type === "flags") {
+        return "Scan first row and column for original zeros: row " +
+            (step.fRow ? "has zero" : "clean") + ", col " +
+            (step.fCol ? "has zero" : "clean");
+    }
+    if (step.type === "mark") {
+        if (step.isZero) {
+            return "Interior [" + step.row + "][" + step.col + "] = 0 \u2192 mark [" + step.row + "][0] and [0][" + step.col + "]";
+        }
+        return "Interior [" + step.row + "][" + step.col + "] \u2260 0 \u2192 skip";
+    }
+    if (step.type === "zero") {
+        if (step.hit) {
+            var src = step.rM && step.cM ? "row + col markers" : step.rM ? "row marker [" + step.row + "][0]" : "col marker [0][" + step.col + "]";
+            return "Cell [" + step.row + "][" + step.col + "]: " + src + " = 0 \u2192 zeroed";
+        }
+        return "Cell [" + step.row + "][" + step.col + "]: no marker = 0 \u2192 unchanged";
+    }
+    if (step.type === "zeroRow") return "First-row flag was set \u2192 zero entire row 0";
+    return "First-column flag was set \u2192 zero entire column 0";
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 700
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
