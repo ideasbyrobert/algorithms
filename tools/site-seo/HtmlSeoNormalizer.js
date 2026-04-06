@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const siteMetadata = require('./SiteMetadata')
+const OgImageCatalog = require('./OgImageCatalog')
 
 class HtmlSeoNormalizer
 {
@@ -8,6 +9,7 @@ class HtmlSeoNormalizer
   {
     this.projectRoot = projectRoot
     this.siteMetadata = metadata
+    this.ogImageCatalog = new OgImageCatalog(projectRoot, metadata)
   }
 
   normalizeFile(projectRelativePath)
@@ -54,7 +56,7 @@ class HtmlSeoNormalizer
       description: this.siteMetadata.homeDescription,
       canonicalUrl: this.siteMetadata.homeUrl,
       openGraphType: 'website',
-      socialImageUrl: this.siteMetadata.defaultSocialImageUrl,
+      socialImageUrl: this.ogImageCatalog.assetUrlFor('index.html'),
       socialImageWidth: this.siteMetadata.defaultSocialImageWidth,
       socialImageHeight: this.siteMetadata.defaultSocialImageHeight,
       structuredData: this.createHomeStructuredData()
@@ -65,7 +67,7 @@ class HtmlSeoNormalizer
   {
     const title = this.extractTitle(html) || this.humanizePath(projectRelativePath)
     const description = this.buildArticleDescription(title, html)
-    const socialImageUrl = this.resolveSocialImageUrl(html)
+    const socialImageUrl = this.resolveSocialImageUrl(projectRelativePath, html)
     const canonicalUrl = this.toCanonicalUrl(projectRelativePath)
 
     return {
@@ -95,7 +97,7 @@ class HtmlSeoNormalizer
       description: this.siteMetadata.collectionDescription,
       url: this.siteMetadata.homeUrl,
       inLanguage: this.siteMetadata.language,
-      image: this.siteMetadata.defaultSocialImageUrl,
+      image: this.ogImageCatalog.assetUrlFor('index.html'),
       isPartOf: {
         '@type': 'WebSite',
         name: this.siteMetadata.siteName,
@@ -214,8 +216,13 @@ class HtmlSeoNormalizer
     return match ? this.cleanText(match[1]) : ''
   }
 
-  resolveSocialImageUrl(html)
+  resolveSocialImageUrl(projectRelativePath, html)
   {
+    if (this.ogImageCatalog.hasAssetFor(projectRelativePath))
+    {
+      return this.ogImageCatalog.assetUrlFor(projectRelativePath)
+    }
+
     const existingImage =
       this.extractMetaContent(html, 'property', 'og:image') ||
       this.extractMetaContent(html, 'name', 'twitter:image')

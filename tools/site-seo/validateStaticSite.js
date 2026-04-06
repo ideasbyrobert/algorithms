@@ -24,8 +24,12 @@ articlePages.forEach((htmlPath) =>
 )
 
 publishedHtmlFiles.forEach((htmlPath) =>
-  assertSeoMarkers(htmlPath, readProjectFile(htmlPath))
-)
+{
+  const html = readProjectFile(htmlPath)
+
+  assertSeoMarkers(htmlPath, html)
+  assertSocialImageExists(htmlPath, html)
+})
 
 const robotsTxt = readProjectFile('robots.txt')
 assertContains(
@@ -72,6 +76,29 @@ function assertSeoMarkers(filePath, html)
   ].forEach((marker) =>
     assertContains(html, marker, 'Missing ' + marker + ' in ' + filePath)
   )
+}
+
+function assertSocialImageExists(filePath, html)
+{
+  const match = html.match(
+    /<meta\b(?=[^>]*\bproperty=["']og:image["'])[^>]*\bcontent=["']([^"']+)["'][^>]*\/?>/i
+  )
+
+  if (!match)
+  {
+    throw new Error('Missing og:image content in ' + filePath)
+  }
+
+  const imageUrl = match[1]
+
+  if (!imageUrl.startsWith(siteMetadata.baseUrl + '/'))
+  {
+    return
+  }
+
+  const projectRelativePath = imageUrl.slice(siteMetadata.baseUrl.length + 1)
+
+  assertExists(projectRelativePath)
 }
 
 function assertContains(content, expected, errorMessage)
