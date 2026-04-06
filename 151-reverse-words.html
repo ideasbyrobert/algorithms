@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reverse Words — Normalize, Reverse All, Reverse Each</title>
-  <meta name="description" content="Interactive visualization of LeetCode 151 Reverse Words — Normalize, Reverse All, Reverse Each. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/151-reverse-words.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Reverse Words — Normalize, Reverse All, Reverse Each" />
-  <meta property="og:description" content="Interactive visualization of LeetCode 151 Reverse Words — Normalize, Reverse All, Reverse Each. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/151-reverse-words.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/reverse-words.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Reverse Words — Normalize, Reverse All, Reverse Each" />
-  <meta name="twitter:description" content="Interactive visualization of LeetCode 151 Reverse Words — Normalize, Reverse All, Reverse Each. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/reverse-words.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Reverse Words — Normalize, Reverse All, Reverse Each","description":"Interactive visualization of LeetCode 151 Reverse Words — Normalize, Reverse All, Reverse Each. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/151-reverse-words.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/151-reverse-words.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/reverse-words.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Reverse Words — Normalize, Reverse All, Reverse Each, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 .cell.space-char {
     background: #F5F5F7;
@@ -61,10 +44,11 @@
         <span class="label">Reverse Words in a String · Optimal Solution</span>
         <h1>Three steps: normalize, reverse all, reverse each word.</h1>
         <p class="hero-text">
-            Strip extra spaces, reverse the entire character array, then reverse
-            each word individually. The words end up in reverse order with their
-            letters restored — all in <code>O(n)</code> time and <code>O(n)</code>
-            space for the character array.
+            A teleprompter script needs its sentence order flipped — the closing line read
+            first — without rearranging individual words. Three in-place steps accomplish this:
+            normalize extra whitespace, reverse the entire character array, then reverse each
+            word individually. The words end up in reverse order with their internal letters
+            restored. O(n)&nbsp;time. O(n)&nbsp;space for the character array.
         </p>
     </section>
 

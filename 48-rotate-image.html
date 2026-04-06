@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rotate Image — Transpose + Reverse</title>
-  <meta name="description" content="Interactive visualization of LeetCode 48 Rotate Image — Transpose + Reverse. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/48-rotate-image.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Rotate Image — Transpose + Reverse" />
-  <meta property="og:description" content="Interactive visualization of LeetCode 48 Rotate Image — Transpose + Reverse. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/48-rotate-image.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/rotate-image.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Rotate Image — Transpose + Reverse" />
-  <meta name="twitter:description" content="Interactive visualization of LeetCode 48 Rotate Image — Transpose + Reverse. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/rotate-image.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Rotate Image — Transpose + Reverse","description":"Interactive visualization of LeetCode 48 Rotate Image — Transpose + Reverse. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/48-rotate-image.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/48-rotate-image.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/rotate-image.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Rotate Image — Transpose + Reverse, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
 /* ── Matrix grid ──────────────────────────────────────── */
@@ -113,11 +96,11 @@
         <span class="label">Rotate Image · Optimal Solution</span>
         <h1>In-place 90° rotation through transpose and reverse.</h1>
         <p class="hero-text">
-            Given an n&nbsp;×&nbsp;n matrix, rotate it 90&nbsp;degrees clockwise
-        <strong>in place</strong>. The key insight: a 90° clockwise rotation
-        decomposes into two simple operations — <em>transpose</em> the matrix
-        (reflect across the main diagonal), then <em>reverse each row</em>.
-        No extra space is needed beyond a single swap variable.
+            A photo editor rotates a square image 90° clockwise without allocating a second
+            canvas. The trick: decompose the rotation into two mechanical steps — transpose
+            the pixel grid across the main diagonal, then mirror each row left-to-right.
+            Each step overwrites in place using a single swap variable.
+            O(n²)&nbsp;time. O(1)&nbsp;extra space.
         </p>
     </section>
 

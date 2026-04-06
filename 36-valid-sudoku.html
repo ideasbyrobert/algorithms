@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Valid Sudoku — Row, Column, and Box Validation</title>
-  <meta name="description" content="Interactive visualization of LeetCode 36 Valid Sudoku — Row, Column, and Box Validation. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/36-valid-sudoku.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Valid Sudoku — Row, Column, and Box Validation" />
-  <meta property="og:description" content="Interactive visualization of LeetCode 36 Valid Sudoku — Row, Column, and Box Validation. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/36-valid-sudoku.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/valid-sudoku.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Valid Sudoku — Row, Column, and Box Validation" />
-  <meta name="twitter:description" content="Interactive visualization of LeetCode 36 Valid Sudoku — Row, Column, and Box Validation. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/valid-sudoku.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Valid Sudoku — Row, Column, and Box Validation","description":"Interactive visualization of LeetCode 36 Valid Sudoku — Row, Column, and Box Validation. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/36-valid-sudoku.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/36-valid-sudoku.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/valid-sudoku.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Valid Sudoku — Row, Column, and Box Validation, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
 /* ── Sudoku grid ─────────────────────────────────────── */
@@ -152,11 +135,12 @@
         <span class="label">Valid Sudoku · Optimal Solution</span>
         <h1>Three dimensions, three hash sets, one linear pass.</h1>
         <p class="hero-text">
-            Determine whether a 9×9 Sudoku board is valid. Only the
-        <strong>filled cells</strong> need to be validated — each row,
-        each column, and each of the nine 3×3 sub-boxes must contain
-        the digits 1–9 without repetition. Empty cells (marked
-        <code>'.'</code>) are placeholders and are ignored entirely.
+            A puzzle app validates a player's partially filled Sudoku board before
+            accepting a submission. Each row, each column, and each 3&times;3 sub-box
+            must contain the digits 1–9 without repetition — empty cells are placeholders
+            and ignored entirely. Three sets of hash tables (one per dimension) and a
+            single linear scan over all 81&nbsp;cells detect any rule violation. O(1)&nbsp;time
+            and O(1)&nbsp;space — the board size is fixed.
         </p>
     </section>
 

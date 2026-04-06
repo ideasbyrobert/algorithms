@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Merge Sorted Array — Backward Fill</title>
-  <meta name="description" content="Interactive step-by-step visualization of LeetCode 88 Merge Sorted Array. Watch the backward fill strategy avoid overwriting unread elements. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Merge Sorted Array — Backward Fill" />
-  <meta property="og:description" content="Interactive step-by-step visualization of LeetCode 88 Merge Sorted Array. Watch the backward fill strategy avoid overwriting unread elements. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/merge-sorted-array.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Merge Sorted Array — Backward Fill" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of LeetCode 88 Merge Sorted Array. Watch the backward fill strategy avoid overwriting unread elements. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/merge-sorted-array.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Merge Sorted Array — Backward Fill","description":"Interactive step-by-step visualization of LeetCode 88 Merge Sorted Array. Watch the backward fill strategy avoid overwriting unread elements. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/merge-sorted-array.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Merge Sorted Array — Backward Fill, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
 #interactiveMount .cell.current { }
@@ -149,8 +132,6 @@
 }
 
 </style>
-<meta name="keywords" content="merge sorted array, leetcode 88, backward fill, two pointer merge, algorithm visualization">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
 </head>
 <body>
 <main class="page">
@@ -161,9 +142,11 @@
         <span class="label">Merge Sorted Array · Optimal Solution</span>
         <h1>Fill from the back. No overwrites.</h1>
         <p class="hero-text">
-            Given two sorted arrays where the first has enough trailing space
-        to hold both, merge them in-place into one sorted array. The key
-        insight: fill from the tail to avoid overwriting unread elements.
+            Two sorted card stacks need to combine into one — but the first stack sits on
+            a tray with just enough empty slots at the end to fit both. Filling from the
+            back avoids overwriting unread cards: compare the largest remaining card from
+            each stack, place the winner at the tail, and decrement. When one stack is
+            exhausted, the other is already in position. O(n + m)&nbsp;time. O(1)&nbsp;space.
         </p>
     </section>
 

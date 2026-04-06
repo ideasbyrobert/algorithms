@@ -3,26 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Valid Number — Single-Pass Flag Scanner | Interactive Visualization</title>
-  <meta name="description" content="Interactive step-by-step visualization of LeetCode 65 Valid Number. Watch a single left-to-right scan classify characters and toggle four boolean flags. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/65-valid-number.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Valid Number — Single-Pass Flag Scanner | Interactive Visualization" />
-  <meta property="og:description" content="Interactive step-by-step visualization of LeetCode 65 Valid Number. Watch a single left-to-right scan classify characters and toggle four boolean flags. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/65-valid-number.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/valid-number.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Valid Number — Single-Pass Flag Scanner | Interactive Visualization" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of LeetCode 65 Valid Number. Watch a single left-to-right scan classify characters and toggle four boolean flags. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/valid-number.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Valid Number — Single-Pass Flag Scanner | Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 65 Valid Number. Watch a single left-to-right scan classify characters and toggle four boolean flags. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/65-valid-number.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/65-valid-number.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/valid-number.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Valid Number — Single-Pass Flag Scanner, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <meta name="keywords" content="valid number, leetcode 65, flag scanner, character classification, algorithm visualization">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1f9ee;</text></svg>">
+<title>Valid Number — Single-Pass Flag Scanner</title>
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 .flags-panel {
@@ -78,12 +59,12 @@
             <span class="label">65 · Valid Number</span>
             <h1>One Pass, Four Flags</h1>
             <p class="hero-text">
-                A valid number can include an optional sign, digits, an optional
-                decimal point, and an optional exponent with its own sign and digits.
-                A single left-to-right scan with four boolean flags — <em>hasDigit</em>,
-                <em>hasDot</em>, <em>hasExponent</em>, <em>hasDigitAfterExponent</em> —
-                decides every character's fate in O(n) time.
-            </p>
+            A financial data pipeline rejects malformed entries before parsing — strings like
+            '+3.14', '&minus;1e10', and '0.5E-3' must pass, while 'e', '.', and '1a' must
+            fail. A single left-to-right scan with four boolean flags — tracking whether a
+            digit, dot, exponent, or sign has been seen — validates the structure without
+            backtracking or regex. O(n)&nbsp;time. O(1)&nbsp;space.
+        </p>
         </div>
         <svg viewBox="0 0 200 80" class="concept-svg" role="img" aria-label="Character scan with flag toggles">
             <rect x="10" y="18" width="24" height="24" rx="5" fill="none" stroke="#1D1D1F" stroke-width="1.5"/>

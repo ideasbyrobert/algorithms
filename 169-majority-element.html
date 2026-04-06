@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Majority Element — Boyer-Moore Voting</title>
-  <meta name="description" content="Interactive visualization of LeetCode 169 Majority Element. Watch Boyer-Moore voting track candidate and balance. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/169-majority-element.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Majority Element — Boyer-Moore Voting" />
-  <meta property="og:description" content="Interactive visualization of LeetCode 169 Majority Element. Watch Boyer-Moore voting track candidate and balance. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/169-majority-element.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/majority-element.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Majority Element — Boyer-Moore Voting" />
-  <meta name="twitter:description" content="Interactive visualization of LeetCode 169 Majority Element. Watch Boyer-Moore voting track candidate and balance. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/majority-element.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Majority Element — Boyer-Moore Voting","description":"Interactive visualization of LeetCode 169 Majority Element. Watch Boyer-Moore voting track candidate and balance. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/169-majority-element.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/169-majority-element.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/majority-element.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Majority Element — Boyer-Moore Voting, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 .vote-panel {
     display: flex;
@@ -58,7 +41,6 @@
     .vote-val { font-size: 17px; }
 }
 </style>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
 </head>
 <body>
 <main class="page">
@@ -69,9 +51,12 @@
         <span class="label">Majority Element · Optimal Solution</span>
         <h1>A candidate that survives cancellation.</h1>
         <p class="hero-text">
-            Find the element that appears more than ⌊n/2⌋ times. The voting
-        algorithm needs only one pass and O(1) space — no hash map, no
-        sorting.
+            In a noisy crowd, one chant dominates — more than half the voices repeat
+            the same word. Boyer-Moore's voting algorithm finds it in a single scan:
+            maintain a candidate and a counter. Each matching voice increments the count;
+            each dissenting voice decrements it. When the count hits zero, switch candidates.
+            The majority voice always survives the cancellation.
+            O(n)&nbsp;time. O(1)&nbsp;space.
         </p>
     </section>
 

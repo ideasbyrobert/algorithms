@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Plus One — Right-to-Left Carry</title>
-  <meta name="description" content="Interactive step-by-step visualization of LeetCode 66 Plus One. Watch carry propagation from right to left through a digit array. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/66-plus-one.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Plus One — Right-to-Left Carry" />
-  <meta property="og:description" content="Interactive step-by-step visualization of LeetCode 66 Plus One. Watch carry propagation from right to left through a digit array. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/66-plus-one.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/plus-one.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Plus One — Right-to-Left Carry" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of LeetCode 66 Plus One. Watch carry propagation from right to left through a digit array. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/plus-one.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Plus One — Right-to-Left Carry","description":"Interactive step-by-step visualization of LeetCode 66 Plus One. Watch carry propagation from right to left through a digit array. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/66-plus-one.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/66-plus-one.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/plus-one.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Plus One — Right-to-Left Carry, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
 #interactiveMount .cell.modified {
@@ -36,8 +19,6 @@
 }
 
 </style>
-<meta name="keywords" content="plus one, leetcode 66, carry propagation, digit array, algorithm visualization">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
 </head>
 <body>
 <main class="page">
@@ -48,9 +29,12 @@
         <span class="label">Plus One · Optimal Solution</span>
         <h1>Carry propagation, right to left.</h1>
         <p class="hero-text">
-            A non-negative integer is stored as an array of its decimal digits.
-        Add one to the number and return the updated digit array.
-        The key insight: carry propagation only matters when a digit is&nbsp;9.
+            A mechanical odometer clicks over from 0999 to 1000 — the rightmost wheel
+            advances, and if it rolls past&nbsp;9, it triggers the next wheel left.
+            Incrementing a digit array works the same way: walk from the last digit
+            backward, adding one. If a digit stays below&nbsp;10, stop immediately.
+            If every digit overflows (all nines), prepend a new leading&nbsp;1.
+            O(n)&nbsp;worst case. O(1)&nbsp;typical.
         </p>
     </section>
 

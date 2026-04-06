@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>String Compression — In-Place Run-Length Encoding</title>
-  <meta name="description" content="Interactive visualization of LeetCode 443 String Compression — In-Place Run-Length Encoding. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/443-string-compression.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="String Compression — In-Place Run-Length Encoding" />
-  <meta property="og:description" content="Interactive visualization of LeetCode 443 String Compression — In-Place Run-Length Encoding. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/443-string-compression.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/string-compression.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="String Compression — In-Place Run-Length Encoding" />
-  <meta name="twitter:description" content="Interactive visualization of LeetCode 443 String Compression — In-Place Run-Length Encoding. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/string-compression.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"String Compression — In-Place Run-Length Encoding","description":"Interactive visualization of LeetCode 443 String Compression — In-Place Run-Length Encoding. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/443-string-compression.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/443-string-compression.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/string-compression.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"String Compression — In-Place Run-Length Encoding, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 .cell.reading {
     border: 2px solid #636366;
@@ -46,11 +29,11 @@
         <span class="label">String Compression · Optimal Solution</span>
         <h1>Compress in place — two pointers, one pass.</h1>
         <p class="hero-text">
-            A read pointer races ahead to measure each run of identical characters
-            while a write pointer lags behind, recording each character and its count.
-            Singletons get only the letter; multi-digit counts like 12 become
-            separate digits <code>'1'</code>, <code>'2'</code>.
-            <code>O(n)</code> time. <code>O(1)</code> extra space.
+            A telemetry system compresses sensor logs by replacing runs of identical readings
+            with a character and its count — 'aaabbc' becomes 'a3b2c1', but singletons omit
+            the count. A read pointer races ahead to measure each run while a write pointer
+            lags behind, recording the character and each digit of the count. In-place, one
+            pass. O(n)&nbsp;time. O(1)&nbsp;extra space.
         </p>
     </section>
 

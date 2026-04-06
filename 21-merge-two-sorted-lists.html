@@ -4,25 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization</title>
-  <meta name="description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.…. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization" />
-  <meta property="og:description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.…. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/merge-two-sorted-lists.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.…. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/merge-two-sorted-lists.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization","description":"Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.…. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/merge-two-sorted-lists.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Merge Two Sorted Lists — Tail-Pointer Merge, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <meta name="keywords" content="merge two sorted lists, LeetCode 21, dummy head, tail pointer, linked list merge, algorithm visualization, interactive tutorial, interview algorithms">
+<meta name="description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain. O(n+m) explained visually.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="merge two sorted lists, LeetCode 21, dummy head, tail pointer, linked list merge, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.">
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
@@ -184,11 +179,12 @@
         <span class="label">21 · Merge Two Sorted Lists</span>
         <h1>Two sorted chains become one.</h1>
         <p class="hero-text">
-            Given two linked lists, each already sorted, merge them into a single sorted list
-            by splicing the original nodes together. A dummy head eliminates the first-node
-            special case, a tail pointer tracks the growing result, and a simple front comparison
-            at each step decides which node to attach next. When one list runs out, the remaining
-            suffix is already sorted — it attaches in a single pointer operation.
+            Two assembly lines feed sorted packages onto a single conveyor belt. At each step
+            the operator compares the front item from each line, takes the smaller, and places
+            it on the belt. When one line runs out, the remaining packages arrive already in
+            order — they transfer without further comparison. A dummy head eliminates the
+            first-attachment edge case, and a tail pointer tracks the growing chain. One pass
+            through both lists. O(n + m)&nbsp;time. O(1)&nbsp;extra space.
         </p>
     </section>
 

@@ -4,25 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Reverse Linked List — Pointer Rewiring · Interactive Visualization</title>
-  <meta name="description" content="Interactive step-by-step visualization of Reverse Linked List. Watch prev, curr, and next pointers rewire the chain in place. O(n) explained visually. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/206-reverse-linked-list.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Reverse Linked List — Pointer Rewiring · Interactive Visualization" />
-  <meta property="og:description" content="Interactive step-by-step visualization of Reverse Linked List. Watch prev, curr, and next pointers rewire the chain in place. O(n) explained visually. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/206-reverse-linked-list.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/reverse-linked-list.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Reverse Linked List — Pointer Rewiring · Interactive Visualization" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of Reverse Linked List. Watch prev, curr, and next pointers rewire the chain in place. O(n) explained visually. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/reverse-linked-list.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Reverse Linked List — Pointer Rewiring · Interactive Visualization","description":"Interactive step-by-step visualization of Reverse Linked List. Watch prev, curr, and next pointers rewire the chain in place. O(n) explained visually. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/206-reverse-linked-list.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/206-reverse-linked-list.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/reverse-linked-list.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Reverse Linked List — Pointer Rewiring, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <meta name="keywords" content="reverse linked list, LeetCode 206, pointer reversal, linked list algorithm, algorithm visualization, interactive tutorial, interview algorithms">
+<meta name="description" content="Interactive step-by-step visualization of Reverse Linked List. Watch prev, curr, and next pointers rewire the chain in place. O(n) explained visually.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="reverse linked list, LeetCode 206, pointer reversal, linked list algorithm, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/206-reverse-linked-list.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Reverse Linked List — Pointer Rewiring · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Reverse Linked List. Watch prev, curr, and next pointers rewire the chain in place.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/206-reverse-linked-list.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reverse Linked List — Pointer Rewiring · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Reverse Linked List. Watch prev, curr, and next pointers rewire the chain in place.">
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
@@ -250,12 +245,13 @@
         <span class="label">206 · Reverse Linked List</span>
         <h1>Rewiring the chain, one pointer at a time.</h1>
         <p class="hero-text">
-            A singly linked list flows in one direction: each node holds a value and a reference
-            to the next. Reversing it means redirecting every <code>.Next</code> pointer backward
-            without losing the rest of the chain. Three moving references — <code>prev</code>,
-            <code>curr</code>, and <code>next</code> — walk through the list in a single pass,
-            flipping each link as they go. When <code>curr</code> reaches null, <code>prev</code>
-            holds the new head.
+            A line of train cars coupled nose-to-tail needs to reverse direction at a terminus.
+            A switch operator walks the chain, unhooking each car from the one ahead and
+            re-coupling it behind the growing reversed train. Three moving references —
+            <code>prev</code>, <code>curr</code>, and <code>next</code> — perform the same
+            rewiring on a linked list in a single pass: save the forward link, redirect the
+            current node backward, and advance. When the walk ends, <code>prev</code> holds
+            the new head. O(n)&nbsp;time. O(1)&nbsp;space.
         </p>
     </section>
 

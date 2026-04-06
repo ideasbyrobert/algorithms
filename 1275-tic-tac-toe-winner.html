@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Find Winner on a Tic-Tac-Toe Game — Signed Counters</title>
-  <meta name="description" content="Interactive step-by-step visualization of LeetCode 1275 Tic-Tac-Toe. Watch signed row, column, and diagonal counters track each move to determine the…. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Find Winner on a Tic-Tac-Toe Game — Signed Counters" />
-  <meta property="og:description" content="Interactive step-by-step visualization of LeetCode 1275 Tic-Tac-Toe. Watch signed row, column, and diagonal counters track each move to determine the…. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/tic-tac-toe-winner.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Find Winner on a Tic-Tac-Toe Game — Signed Counters" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of LeetCode 1275 Tic-Tac-Toe. Watch signed row, column, and diagonal counters track each move to determine the…. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/tic-tac-toe-winner.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Find Winner on a Tic-Tac-Toe Game — Signed Counters","description":"Interactive step-by-step visualization of LeetCode 1275 Tic-Tac-Toe. Watch signed row, column, and diagonal counters track each move to determine the…. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/tic-tac-toe-winner.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Find Winner on a Tic-Tac-Toe Game — Signed Counters, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
 #interactiveMount .cell.current { }
@@ -167,8 +150,6 @@
 }
 
 </style>
-<meta name="keywords" content="tic tac toe winner, leetcode 1275, signed counters, algorithm visualization">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
 </head>
 <body>
 <main class="page">
@@ -179,10 +160,12 @@
         <span class="label">Find Winner on a Tic-Tac-Toe Game · Optimal Solution</span>
         <h1>Count moves. Detect a winner.</h1>
         <p class="hero-text">
-            Given a sequence of moves on a 3×3 board, determine the
-        outcome: A wins, B wins, Draw, or Pending. Player A moves on
-        odd turns, B on even. Rather than scanning the whole board
-        after each move, we track running signed counters.
+            Two players take turns marking a 3&times;3 grid in a casual mobile game.
+            Rather than scanning the entire board after every tap, the app tracks running
+            signed counters — one per row, one per column, and one for each diagonal.
+            Player&nbsp;A adds +1, Player&nbsp;B adds &minus;1. If any counter reaches
+            +3 or &minus;3, that player wins immediately. After all moves, a full board
+            with no winner is a draw; otherwise the game is still pending.
         </p>
     </section>
 

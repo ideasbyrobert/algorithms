@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Set Matrix Zeroes — In-Place Marker Propagation</title>
-  <meta name="description" content="Interactive step-by-step visualization of LeetCode 73 Set Matrix Zeroes. Watch markers propagate through four phases: flag, mark, zero interior, zero…. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Set Matrix Zeroes — In-Place Marker Propagation" />
-  <meta property="og:description" content="Interactive step-by-step visualization of LeetCode 73 Set Matrix Zeroes. Watch markers propagate through four phases: flag, mark, zero interior, zero…. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/set-matrix-zeroes.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Set Matrix Zeroes — In-Place Marker Propagation" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of LeetCode 73 Set Matrix Zeroes. Watch markers propagate through four phases: flag, mark, zero interior, zero…. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/set-matrix-zeroes.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Set Matrix Zeroes — In-Place Marker Propagation","description":"Interactive step-by-step visualization of LeetCode 73 Set Matrix Zeroes. Watch markers propagate through four phases: flag, mark, zero interior, zero…. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/set-matrix-zeroes.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Set Matrix Zeroes — In-Place Marker Propagation, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
 /* ── Matrix grid ──────────────────────────────────────── */
@@ -151,8 +134,6 @@
 }
 
 </style>
-<meta name="keywords" content="set matrix zeroes, leetcode 73, in-place markers, zero propagation, algorithm visualization">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
 </head>
 <body>
 <main class="page">
@@ -163,10 +144,12 @@
         <span class="label">Set Matrix Zeroes · Optimal Solution</span>
         <h1>Use the matrix itself as a notebook.</h1>
         <p class="hero-text">
-            Given an m × n matrix, if any cell is&nbsp;0, zero its entire row
-        and column — in place, using O(1) extra space. The trick is to
-        use the <strong>first row and first column</strong> of the matrix
-        itself as marker storage.
+            A spreadsheet auto-clears entire rows and columns that contain a flagged zero
+            cell. Doing this with a separate copy is trivial but wastes space. The trick:
+            commandeer the first row and first column as marker storage — they record which
+            rows and columns must be zeroed. A second pass applies the markers, and a final
+            pass handles the first row and column themselves.
+            O(m&nbsp;&times;&nbsp;n)&nbsp;time. O(1)&nbsp;extra space.
         </p>
     </section>
 

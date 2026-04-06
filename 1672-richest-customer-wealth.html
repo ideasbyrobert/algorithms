@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Richest Customer Wealth — Row-Sum Maximum</title>
-  <meta name="description" content="Interactive step-by-step visualization of LeetCode 1672 Richest Customer Wealth. Watch row sums accumulate and the running maximum update. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Richest Customer Wealth — Row-Sum Maximum" />
-  <meta property="og:description" content="Interactive step-by-step visualization of LeetCode 1672 Richest Customer Wealth. Watch row sums accumulate and the running maximum update. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/richest-customer-wealth.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Richest Customer Wealth — Row-Sum Maximum" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of LeetCode 1672 Richest Customer Wealth. Watch row sums accumulate and the running maximum update. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/richest-customer-wealth.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Richest Customer Wealth — Row-Sum Maximum","description":"Interactive step-by-step visualization of LeetCode 1672 Richest Customer Wealth. Watch row sums accumulate and the running maximum update. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/richest-customer-wealth.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Richest Customer Wealth — Row-Sum Maximum, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
 /* ── Matrix grid ──────────────────────────────────────── */
@@ -165,8 +148,6 @@
 }
 
 </style>
-<meta name="keywords" content="richest customer wealth, leetcode 1672, matrix row sum, algorithm visualization">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
 </head>
 <body>
 <main class="page">
@@ -177,13 +158,11 @@
         <span class="label">Richest Customer Wealth · Optimal Solution</span>
         <h1>Sum each row. Keep the maximum.</h1>
         <p class="hero-text">
-            Given <em>m</em>&nbsp;customers, each with balances across
-            <em>n</em>&nbsp;banks, find the wealthiest customer's total.
-            The answer is the largest row sum of the accounts matrix.
-            The outer loop walks rows — one per customer. The inner loop
-            accumulates every bank balance into a running sum. After each
-            row, compare to the running maximum. <code>O(m × n)</code> time.
-            <code>O(1)</code> extra space.
+            A private bank ranks clients by total holdings spread across multiple accounts.
+            Each row of the ledger represents one client; each column a different account.
+            The teller sums every row and tracks the running maximum — the wealthiest
+            client's total emerges after a single pass over the matrix.
+            O(m&nbsp;&times;&nbsp;n)&nbsp;time. O(1)&nbsp;extra space.
         </p>
     </section>
 

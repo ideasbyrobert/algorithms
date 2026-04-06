@@ -4,24 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Matrix Diagonal Sum — Primary + Secondary</title>
-  <meta name="description" content="Interactive step-by-step visualization of LeetCode 1572 Matrix Diagonal Sum. Watch primary and secondary diagonals accumulate with center overlap…. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1572-matrix-diagonal-sum.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Matrix Diagonal Sum — Primary + Secondary" />
-  <meta property="og:description" content="Interactive step-by-step visualization of LeetCode 1572 Matrix Diagonal Sum. Watch primary and secondary diagonals accumulate with center overlap…. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1572-matrix-diagonal-sum.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/matrix-diagonal-sum.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Matrix Diagonal Sum — Primary + Secondary" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of LeetCode 1572 Matrix Diagonal Sum. Watch primary and secondary diagonals accumulate with center overlap…. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/matrix-diagonal-sum.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Matrix Diagonal Sum — Primary + Secondary","description":"Interactive step-by-step visualization of LeetCode 1572 Matrix Diagonal Sum. Watch primary and secondary diagonals accumulate with center overlap…. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/1572-matrix-diagonal-sum.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/1572-matrix-diagonal-sum.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/matrix-diagonal-sum.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Matrix Diagonal Sum — Primary + Secondary, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <link rel="stylesheet" href="shared/viz/viz-system.css">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
 /* ── Matrix grid ──────────────────────────────────────── */
@@ -138,8 +121,6 @@
 }
 
 </style>
-<meta name="keywords" content="matrix diagonal sum, leetcode 1572, primary diagonal, secondary diagonal, center overlap, algorithm visualization">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
 </head>
 <body>
 <main class="page">
@@ -150,11 +131,12 @@
         <span class="label">Matrix Diagonal Sum · Optimal Solution</span>
         <h1>Two diagonals, one pass, one sum.</h1>
         <p class="hero-text">
-            Given a square matrix, return the sum of both diagonals.
-        The <strong>primary diagonal</strong> runs top-left to bottom-right.
-        The <strong>secondary diagonal</strong> runs top-right to bottom-left.
-        When the matrix has odd size, the center cell sits on both
-        diagonals and must be counted only once.
+            An LED display panel uses a square grid of pixels. A quick diagnostic check
+            lights up both diagonals — primary (top-left to bottom-right) and secondary
+            (top-right to bottom-left) — and measures their combined brightness. A single
+            indexed loop walks both diagonals simultaneously, accumulating the sum. When the
+            grid has odd dimensions, the center pixel sits on both diagonals and must be
+            counted only once.
         </p>
     </section>
 
