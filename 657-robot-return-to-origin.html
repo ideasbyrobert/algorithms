@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robot Return to Origin — Axis Displacement | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 657 Robot Return to Origin. Watch horizontal and vertical displacements track independently.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/657-robot-return-to-origin.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="robot return to origin, leetcode 657, axis displacement, algorithm visualization">
+<meta property="og:title" content="Robot Return to Origin — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 657. Watch axis displacements track independently.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/657-robot-return-to-origin.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Robot Return to Origin — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 657. Watch axis displacements track independently.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Robot Return to Origin — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 657 Robot Return to Origin.","url":"https://ideasbyrobert.github.io/algorithms/657-robot-return-to-origin.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+#interactiveMount .cell.current { }
+
+/* ── Coordinate display ───────────────────────────────── */
+
+.coord-panel {
+    display: flex;
+    gap: 16px;
+    margin: 0 0 16px;
+    justify-content: center;
+}
+
+.coord-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 1.5px solid #C7C7CC;
+    background: #FFFFFF;
+    transition: border-color 0.25s ease, background 0.25s ease;
+    min-width: 80px;
+}
+
+.coord-box.at-zero {
+    border-color: #1D1D1F;
+    background: #F5F5F7;
+}
+
+.coord-label {
+    font: 500 10px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #8E8E93;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.coord-value {
+    font: 600 20px/1 'Menlo', monospace;
+    color: #1D1D1F;
+    transition: color 0.25s ease;
+}
+
+.coord-box.at-zero .coord-value { color: #1D1D1F; }
+
+/* ── Verdict ──────────────────────────────────────────── */
+
+.verdict-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font: 600 12px/1 'SF Pro Text', -apple-system, sans-serif;
+    letter-spacing: 0.02em;
+    margin-top: 8px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.verdict-badge.visible { opacity: 1; }
+.verdict-badge.yes { background: #1D1D1F; color: #FFFFFF; }
+.verdict-badge.no { background: #F5F5F7; color: #636366; border: 1px solid #C7C7CC; }
+
+/* ── Mobile ───────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .coord-box { padding: 8px 14px; min-width: 64px; }
+    .coord-value { font-size: 17px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ─── Section 1: Intro ──────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Robot Return to Origin</h1>
+    <p class="viz-subtitle">LeetCode 657 · Axis Displacement Tracking</p>
+    <p class="viz-body">
+        A robot starts at the origin on a 2D plane. Given a string of
+        moves — U, D, L, R — determine whether the robot returns to
+        the starting point. Each move shifts one axis by&nbsp;±1.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 2: Two-Axis Insight ───────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Independent Axes</h2>
+    <p class="viz-body">
+        The horizontal and vertical axes are independent.
+        L/R change only the horizontal position; U/D change only the
+        vertical position. The robot returns to the origin if and only
+        if <strong>both</strong> final coordinates are zero.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Count and Compare</h2>
+    <div class="viz-code-block">
+<pre><code>h ← 0, v ← 0
+for each move:
+    if L: h -= 1    if R: h += 1
+    if U: v += 1    if D: v -= 1
+return h == 0 and v == 0</code></pre>
+    </div>
+</div>
+</section>
+
+<!-- ─── Section 4: Interactive ────────────────────────── -->
+
+<div id="interactiveMount"></div>
+
+<!-- ─── Section 5: Edge Patterns ──────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Edge Patterns</h2>
+    <p class="viz-body">
+        <strong>One axis balanced, one not</strong> — "UDL" has
+        vertical = 0 but horizontal = −1, so the robot does not
+        return.<br>
+        <strong>Odd-length string</strong> — always fails, since an
+        odd total displacement on any axis cannot be zero.<br>
+        <strong>Empty string</strong> — trivially returns true.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 6: Complexity ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(n) — single pass through the moves.<br>
+        <strong>Space:</strong> O(1) — two integer counters.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current move" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "move",  label: "Move" },
+        { id: "horiz", label: "Horizontal" },
+        { id: "vert",  label: "Vertical" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* ── Coordinate panel (inserted before grid) ──────────── */
+
+var coordWrap = document.createElement("div");
+coordWrap.innerHTML =
+    '<div class="coord-panel">' +
+    '<div class="coord-box" id="hBox"><span class="coord-label">Horizontal</span><span class="coord-value" id="hVal">0</span></div>' +
+    '<div class="coord-box" id="vBox"><span class="coord-label">Vertical</span><span class="coord-value" id="vVal">0</span></div>' +
+    '</div>' +
+    '<div style="text-align:center"><span class="verdict-badge" id="verdict"></span></div>';
+refs.grid.parentNode.insertBefore(coordWrap, refs.grid);
+
+var hBox = document.getElementById("hBox");
+var vBox = document.getElementById("vBox");
+var hVal = document.getElementById("hVal");
+var vVal = document.getElementById("vVal");
+var verdictEl = document.getElementById("verdict");
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    { name: "UUDDLRLR \u2014 Returns", data: "UUDDLRLR".split("") },
+    { name: "URDL \u2014 Returns", mobileDefault: true, data: "URDL".split("") },
+    { name: "ULDR \u2014 Interleaved", data: "ULDR".split("") },
+    { name: "UDL \u2014 One Axis Off", data: "UDL".split("") },
+    { name: "LLRR \u2014 Horizontal Only", data: "LLRR".split("") },
+    { name: "UUDDLL \u2014 Does Not Return", data: "UUDDLL".split("") }
+];
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var moves = preset.data;
+    var steps = [];
+    var h = 0, v = 0;
+
+    for (var i = 0; i < moves.length; i++) {
+        var m = moves[i];
+        if (m === "L") h--;
+        else if (m === "R") h++;
+        else if (m === "U") v++;
+        else if (m === "D") v--;
+
+        steps.push({ index: i, move: m, h: h, v: v });
+    }
+
+    var returned = h === 0 && v === 0;
+    steps.push({ type: "verdict", h: h, v: v, returned: returned });
+
+    return { steps: steps, moves: moves, returned: returned };
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var steps = trace.steps;
+    var moves = trace.moves;
+    var step = pos >= 0 ? steps[pos] : null;
+
+    var isVerdict = step && step.type === "verdict";
+    var curH = step ? step.h : 0;
+    var curV = step ? step.v : 0;
+
+    /* Array rendering */
+    var highlights = new Map();
+    if (step && !isVerdict) {
+        highlights.set(step.index, "current");
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: moves,
+        highlights: highlights
+    });
+
+    /* Coordinate boxes */
+    hVal.textContent = curH;
+    vVal.textContent = curV;
+    hBox.classList.toggle("at-zero", curH === 0);
+    vBox.classList.toggle("at-zero", curV === 0);
+
+    /* Verdict */
+    if (isVerdict) {
+        verdictEl.className = "verdict-badge visible " + (step.returned ? "yes" : "no");
+        verdictEl.textContent = step.returned ? "Returns to Origin" : "Does Not Return";
+    } else {
+        verdictEl.className = "verdict-badge";
+        verdictEl.textContent = "";
+    }
+
+    /* Status */
+    if (step && !isVerdict) {
+        refs.status.move.textContent = step.move;
+        refs.status.horiz.textContent = curH;
+        refs.status.vert.textContent = curV;
+    } else if (isVerdict) {
+        refs.status.move.textContent = "\u2014";
+        refs.status.horiz.textContent = curH + (curH === 0 ? " \u2713" : " \u2717");
+        refs.status.vert.textContent = curV + (curV === 0 ? " \u2713" : " \u2717");
+    } else {
+        refs.status.move.textContent = "\u2014";
+        refs.status.horiz.textContent = "0";
+        refs.status.vert.textContent = "0";
+    }
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var step = engine.currentStep();
+    if (step.type === "verdict") {
+        return step.returned
+            ? "Both axes zero \u2192 robot returns to origin"
+            : "h=" + step.h + ", v=" + step.v + " \u2192 not at origin";
+    }
+    var dirs = { U: "vertical +1", D: "vertical \u22121", L: "horizontal \u22121", R: "horizontal +1" };
+    return "Move " + step.move + " \u2192 " + dirs[step.move] + "  (h=" + step.h + ", v=" + step.v + ")";
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 500
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
