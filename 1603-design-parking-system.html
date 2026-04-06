@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Parking System — Capacity Counters | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 1603 Design Parking System. Watch independent capacity counters accept or reject each car.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1603-design-parking-system.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="design parking system, leetcode 1603, capacity counters, algorithm visualization">
+<meta property="og:title" content="Design Parking System — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 1603. Watch capacity counters accept or reject cars.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1603-design-parking-system.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Design Parking System — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 1603. Watch capacity counters accept or reject cars.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Design Parking System — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 1603 Design Parking System.","url":"https://ideasbyrobert.github.io/algorithms/1603-design-parking-system.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+#interactiveMount .cell.current { }
+
+/* ── Parking lot ──────────────────────────────────────── */
+
+.lot-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+}
+
+.lot-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 340px;
+}
+
+.lot-label {
+    font: 500 11px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #636366;
+    width: 56px;
+    text-align: right;
+    letter-spacing: 0.02em;
+}
+
+.lot-slots {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+}
+
+.lot-slot {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1.5px solid #C7C7CC;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 600 12px/1 'Menlo', monospace;
+    color: transparent;
+    transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.lot-slot.filled {
+    background: #F5F5F7;
+    border-color: #8E8E93;
+    color: #636366;
+}
+
+.lot-slot.just-filled {
+    background: #1D1D1F;
+    border-color: #1D1D1F;
+    color: #FFFFFF;
+}
+
+.lot-slot.rejected-flash {
+    border-color: #636366;
+    border-style: dashed;
+}
+
+.lot-counter {
+    font: 600 14px/1 'Menlo', monospace;
+    color: #1D1D1F;
+    width: 24px;
+    text-align: center;
+    transition: color 0.2s ease;
+}
+
+.lot-counter.zero { color: #AEAEB2; }
+
+/* ── Arrival badge ────────────────────────────────────── */
+
+.arrival-panel {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.arrival-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1.5px solid #C7C7CC;
+    background: #FFFFFF;
+    transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.arrival-badge.accepted {
+    border-color: #1D1D1F;
+    background: #F5F5F7;
+}
+
+.arrival-badge.rejected {
+    border-color: #636366;
+    border-style: dashed;
+    background: #FFFFFF;
+}
+
+.arrival-type {
+    font: 600 12px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #1D1D1F;
+}
+
+.arrival-result {
+    font: 500 11px/1 'Menlo', monospace;
+    color: #636366;
+}
+
+/* ── Mobile ───────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .lot-slot { width: 28px; height: 28px; font-size: 10px; }
+    .lot-label { font-size: 10px; width: 48px; }
+    .lot-counter { font-size: 12px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ─── Section 1: Intro ──────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Design Parking System</h1>
+    <p class="viz-subtitle">LeetCode 1603 · Capacity Counter Design</p>
+    <p class="viz-body">
+        Design a parking system with three types of spaces — big,
+        medium, and small. Each type has a fixed capacity. When a car
+        arrives, it parks in its matching type or is rejected if
+        that type is&nbsp;full.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 2: Insight ────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Independent Buckets</h2>
+    <p class="viz-body">
+        Each car type maps to exactly one counter. A big car cannot
+        take a medium slot. The system is three independent
+        decrement-or-reject counters — no cross-type borrowing.
+    </p>
+    <p class="viz-body" style="margin-top:8px;">
+        The common mistake is using a boolean "has space" flag instead
+        of an integer count. A boolean forgets that capacity can be
+        greater than&nbsp;one.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Algorithm</h2>
+    <div class="viz-code-block">
+<pre><code>remaining = [_, big, medium, small]
+
+AddCar(type):
+    if remaining[type] == 0:
+        return false
+    remaining[type] -= 1
+    return true</code></pre>
+    </div>
+</div>
+</section>
+
+<!-- ─── Section 4: Interactive ────────────────────────── -->
+
+<div id="interactiveMount"></div>
+
+<!-- ─── Section 5: Edge Cases ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Edge Patterns</h2>
+    <p class="viz-body">
+        <strong>Zero initial capacity</strong> — A type initialized to 0
+        rejects every car immediately. No decrement occurs.<br><br>
+        <strong>Exhaustion doesn't affect others</strong> — Filling all big
+        slots leaves medium and small unchanged.<br><br>
+        <strong>Repeated same-type</strong> — Each arrival decrements the
+        counter by one until it reaches zero.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 6: Complexity ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(1) per AddCar — single array lookup and decrement.<br>
+        <strong>Space:</strong> O(1) — three integer counters.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current arrival" }
+    ],
+    gridClass: "",
+    status: [
+        { id: "car",    label: "Car Type" },
+        { id: "before", label: "Before" },
+        { id: "result", label: "Result" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* ── Parking lot visual (injected into grid) ──────────── */
+
+var typeNames = ["", "Big", "Medium", "Small"];
+
+refs.grid.innerHTML =
+    '<div class="arrival-panel"><span class="arrival-badge" id="arrBadge">' +
+    '<span class="arrival-type" id="arrType">\u2014</span>' +
+    '<span class="arrival-result" id="arrResult"></span>' +
+    '</span></div>' +
+    '<div class="lot-wrap" id="lotWrap"></div>';
+
+var arrBadge = document.getElementById("arrBadge");
+var arrType = document.getElementById("arrType");
+var arrResult = document.getElementById("arrResult");
+var lotWrap = document.getElementById("lotWrap");
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "[1, 1, 0] Mixed",
+        data: { caps: [1, 1, 0], cars: [1, 2, 3, 1] }
+    },
+    {
+        name: "[0, 2, 0] Medium Only",
+        mobileDefault: true,
+        data: { caps: [0, 2, 0], cars: [2, 2, 2] }
+    },
+    {
+        name: "[2, 1, 1] Exhaustion",
+        data: { caps: [2, 1, 1], cars: [1, 1, 2, 3, 1, 3] }
+    },
+    {
+        name: "[0, 0, 1] Zero Big & Medium",
+        data: { caps: [0, 0, 1], cars: [1, 2, 3] }
+    },
+    {
+        name: "[1, 1, 1] All Types",
+        data: { caps: [1, 1, 1], cars: [1, 2, 3] }
+    },
+    {
+        name: "[3, 0, 0] Big Only",
+        data: { caps: [3, 0, 0], cars: [1, 1, 1, 1] }
+    }
+];
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var d = preset.data;
+    var caps = d.caps.slice();
+    var cars = d.cars;
+    var remaining = [0, caps[0], caps[1], caps[2]];
+    var steps = [];
+
+    for (var i = 0; i < cars.length; i++) {
+        var type = cars[i];
+        var before = remaining[type];
+        var accepted = before > 0;
+        if (accepted) remaining[type]--;
+
+        steps.push({
+            index: i,
+            carType: type,
+            accepted: accepted,
+            before: before,
+            after: remaining[type],
+            remaining: remaining.slice(),
+            caps: caps.slice()
+        });
+    }
+
+    return { steps: steps, caps: caps.slice(), cars: cars.slice() };
+}
+
+/* ── Render lot ──────────────────────────────────────── */
+
+function renderLot(caps, remaining, currentType, accepted) {
+    lotWrap.innerHTML = "";
+    for (var t = 1; t <= 3; t++) {
+        var row = document.createElement("div");
+        row.className = "lot-row";
+
+        var label = document.createElement("span");
+        label.className = "lot-label";
+        label.textContent = typeNames[t];
+        row.appendChild(label);
+
+        var slots = document.createElement("div");
+        slots.className = "lot-slots";
+
+        var cap = caps[t - 1];
+        var rem = remaining[t];
+        var filled = cap - rem;
+
+        for (var s = 0; s < cap; s++) {
+            var slot = document.createElement("div");
+            slot.className = "lot-slot";
+            if (s < filled) {
+                var isJust = (t === currentType && accepted && s === filled - 1);
+                slot.className += isJust ? " just-filled" : " filled";
+                slot.textContent = "\u25CF";
+            } else if (t === currentType && !accepted && s === 0 && cap === 0) {
+                /* zero cap — nothing to show */
+            }
+            slots.appendChild(slot);
+        }
+
+        /* If zero capacity, show a dashed empty slot */
+        if (cap === 0) {
+            var empty = document.createElement("div");
+            empty.className = "lot-slot";
+            empty.style.borderStyle = "dashed";
+            empty.style.opacity = "0.5";
+            empty.textContent = "\u2013";
+            empty.style.color = "#AEAEB2";
+            slots.appendChild(empty);
+        }
+
+        /* Flash rejected on target type */
+        if (t === currentType && !accepted && currentType !== undefined) {
+            var allSlots = slots.children;
+            for (var f = 0; f < allSlots.length; f++) {
+                if (!allSlots[f].classList.contains("filled") && !allSlots[f].classList.contains("just-filled")) {
+                    allSlots[f].classList.add("rejected-flash");
+                }
+            }
+        }
+
+        row.appendChild(slots);
+
+        var counter = document.createElement("span");
+        counter.className = "lot-counter" + (rem === 0 ? " zero" : "");
+        counter.textContent = rem;
+        row.appendChild(counter);
+
+        lotWrap.appendChild(row);
+    }
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var step = pos >= 0 ? trace.steps[pos] : null;
+
+    var caps = trace.caps;
+    var remaining = step ? step.remaining : [0, caps[0], caps[1], caps[2]];
+
+    renderLot(caps, remaining, step ? step.carType : undefined, step ? step.accepted : undefined);
+
+    /* Arrival badge */
+    if (step) {
+        arrType.textContent = typeNames[step.carType] + " car";
+        arrResult.textContent = step.accepted ? "Accepted" : "Rejected";
+        arrBadge.className = "arrival-badge " + (step.accepted ? "accepted" : "rejected");
+    } else {
+        arrType.textContent = "\u2014";
+        arrResult.textContent = "";
+        arrBadge.className = "arrival-badge";
+    }
+
+    /* Status */
+    if (step) {
+        refs.status.car.textContent = typeNames[step.carType] + " (" + step.carType + ")";
+        refs.status.before.textContent = step.before + " remaining";
+        refs.status.result.textContent = step.accepted ? "Accepted \u2192 " + step.after + " left" : "Rejected (full)";
+    } else {
+        refs.status.car.textContent = "\u2014";
+        refs.status.before.textContent = "\u2014";
+        refs.status.result.textContent = "\u2014";
+    }
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var step = engine.currentStep();
+    var name = typeNames[step.carType].toLowerCase();
+    if (step.accepted) {
+        return name + " car arrives \u2192 " + step.before + " slots \u2192 accept, " + step.after + " remaining";
+    }
+    return name + " car arrives \u2192 0 slots \u2192 rejected";
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
