@@ -478,6 +478,14 @@ button.primary:hover { background: var(--black); }
     margin: 0;
 }
 
+/* ── Body-level interactive mount (Pattern B pages) ─────── */
+
+body > #interactiveMount {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 32px;
+}
+
 /* ── Viz Container (grid-based visualizations) ──────────── */
 
 .viz-container {
@@ -1158,6 +1166,7 @@ input[type="range"]::-webkit-slider-thumb {
 @media (max-width: 960px) {
     .page { padding: 48px 24px 72px; }
     .viz-section { padding-left: 24px; padding-right: 24px; }
+    body > #interactiveMount { padding-left: 24px; padding-right: 24px; }
     .viz-section:first-of-type { padding-top: 48px; }
 
     .hero {
@@ -1195,6 +1204,7 @@ input[type="range"]::-webkit-slider-thumb {
     .page { padding: 36px 16px 56px; }
     .divider { margin: 56px 0; }
     .viz-section { padding-left: 16px; padding-right: 16px; }
+    body > #interactiveMount { padding-left: 16px; padding-right: 16px; }
     .viz-section:first-of-type { padding-top: 36px; }
     .viz-section:last-of-type { padding-bottom: 56px; }
     .viz-section + .viz-section { margin-top: 48px; }

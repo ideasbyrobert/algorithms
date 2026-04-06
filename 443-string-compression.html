@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>String Compression — In-Place Run-Length Encoding</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.cell.reading {
+    border: 2px solid #636366;
+    transform: scale(1.06);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.cell.written {
+    background: #1D1D1F;
+    color: #FFF;
+}
+.cell.stale {
+    opacity: 0.4;
+}
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 443 String Compression — In-Place Run-Length Encoding.">
+<meta property="og:title" content="443 String Compression — In-Place Run-Length Encoding">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/443-string-compression.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/443-string-compression.html">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">String Compression · Optimal Solution</span>
+        <h1>Compress in place — two pointers, one pass.</h1>
+        <p class="hero-text">
+            A read pointer races ahead to measure each run of identical characters
+            while a write pointer lags behind, recording each character and its count.
+            Singletons get only the letter; multi-digit counts like 12 become
+            separate digits <code>'1'</code>, <code>'2'</code>.
+            <code>O(n)</code> time. <code>O(1)</code> extra space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the read pointer scan and the write pointer compress</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>In-place run-length encoding</h2>
+        <p class="section-intro">
+            The algorithm partitions the array into two zones separated by the
+            write pointer: the compressed prefix (final output) and the unprocessed
+            suffix (still to be read). Because the compressed form is never longer
+            than the original, the write pointer never overtakes the read pointer.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>read pointer</h3>
+                <p>Scans forward through each group of consecutive identical characters, counting how many there are before the value changes.</p>
+            </article>
+            <article class="concept-card">
+                <h3>write pointer</h3>
+                <p>Stays behind, writing the group character followed by the digit(s) of the count — but only when the count exceeds one.</p>
+            </article>
+            <article class="concept-card">
+                <h3>safe overlap</h3>
+                <p>The compressed encoding is always ≤ the original length, so writes never corrupt unread data. No auxiliary buffer is needed.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Scan runs, write character, write digits</h2>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize two pointers</h4>
+                    <p>Set <code>readIndex = 0</code> and <code>writeIndex = 0</code>. Both start at the beginning of the character array.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Scan a run of identical characters</h4>
+                    <p>Record the current character. Advance <code>readIndex</code> while the next character matches. The run length is <code>readIndex − groupStart</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Write the character and count</h4>
+                    <p>Write the character at <code>writeIndex</code>. If the run length exceeds 1, convert it to a string and write each digit as a separate character.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Return the new length</h4>
+                    <p>After all groups are processed, <code>writeIndex</code> is the length of the compressed array. Characters beyond it are irrelevant.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where the pointers reveal the structure</h2>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>All unique characters</h3>
+                <p>
+                    Every run has length 1, so no count digits are written.
+                    The write pointer matches the read pointer step for step
+                    and the array remains unchanged.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Single character</h3>
+                <p>
+                    With only one element, there is exactly one run of length 1.
+                    The algorithm writes the character and returns length 1.
+                    No digits are needed.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Multi-digit counts</h3>
+                <p>
+                    A run of 12 identical characters produces digits '1' and '2',
+                    each occupying its own cell. The count is always decomposed
+                    into individual digit characters, never stored as a number.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current run" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "read",    label: "Read" },
+        { id: "write",   label: "Write" },
+        { id: "action",  label: "Action" },
+        { id: "runInfo", label: "Run" }
+    ],
+    values: [
+        { id: "compressed", label: "Compressed" },
+        { id: "compLen",    label: "Compressed Length" }
+    ],
+    orderTitle: "Compression Log"
+});
+
+var ptrElements = VizArray.createPointers(refs.container, [
+    { id: "read",  label: "read",  position: "above" },
+    { id: "write", label: "write", position: "below" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    { name: "Canonical: a2b2c3",  data: { chars: ["a","a","b","b","c","c","c"] },                                               desc: "Two a's, two b's, three c's compress to 'a2b2c3' — length 6." },
+    { name: "All singles: abc",   data: { chars: ["a","b","c"] },                                                               desc: "Every character is unique — no count digits, array unchanged." },
+    { name: "Single run: a5",     data: { chars: ["a","a","a","a","a"] },                                                       desc: "One long run compresses to 'a5' — length 2." },
+    { name: "Mixed: ab3",         data: { chars: ["a","b","b","b"] },                                                           desc: "Singleton 'a' then three b's — only b gets a count." },
+    { name: "Multi-digit: ab12",  data: { chars: ["a","b","b","b","b","b","b","b","b","b","b","b","b"] }, mobileDefault: true,   desc: "12 b's produce digits '1','2' — each in its own cell." },
+    { name: "Repeated runs: a3b2a2", data: { chars: ["a","a","a","b","b","a","a"] },                                            desc: "Same character can appear in separate runs — each counted independently." },
+    { name: "Single char: z",     data: { chars: ["z"] },                                                                       desc: "One character, one run, length 1 — minimal case." },
+    { name: "Two chars: a2",      data: { chars: ["a","a"] },                                                                   desc: "Two identical characters compress to 'a2' — length 2." }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var chars = preset.chars || preset.data.chars;
+    var arr = chars.slice();
+    var steps = [];
+    var order = [];
+    var readIndex = 0;
+    var writeIndex = 0;
+    var n = arr.length;
+
+    while (readIndex < n) {
+        var currentChar = arr[readIndex];
+        var groupStart = readIndex;
+
+        /* Scan: advance readIndex through identical characters */
+        while (readIndex < n && arr[readIndex] === currentChar) {
+            steps.push({
+                type: "scan",
+                readIndex: readIndex,
+                writeIndex: writeIndex,
+                char: currentChar,
+                runStart: groupStart,
+                runLength: readIndex - groupStart + 1,
+                chars: arr.slice(),
+                groupChar: currentChar,
+                groupLength: 0,
+                compressed: arr.slice(0, writeIndex).join("")
+            });
+            readIndex++;
+        }
+
+        var groupLength = readIndex - groupStart;
+
+        /* Write: the character */
+        arr[writeIndex] = currentChar;
+        writeIndex++;
+        steps.push({
+            type: "write",
+            writeIndex: writeIndex - 1,
+            readIndex: readIndex,
+            writtenChar: currentChar,
+            chars: arr.slice(),
+            groupChar: currentChar,
+            groupLength: groupLength,
+            compressed: arr.slice(0, writeIndex).join(""),
+            isDigit: false
+        });
+
+        /* Write: count digits if > 1 */
+        if (groupLength > 1) {
+            var digits = String(groupLength);
+            for (var d = 0; d < digits.length; d++) {
+                arr[writeIndex] = digits[d];
+                writeIndex++;
+                steps.push({
+                    type: "write",
+                    writeIndex: writeIndex - 1,
+                    readIndex: readIndex,
+                    writtenChar: digits[d],
+                    chars: arr.slice(),
+                    groupChar: currentChar,
+                    groupLength: groupLength,
+                    compressed: arr.slice(0, writeIndex).join(""),
+                    isDigit: true
+                });
+            }
+        }
+
+        /* Order entry for this group */
+        if (groupLength === 1) {
+            order.push("'" + currentChar + "' \u00D7 1 \u2192 " + currentChar);
+        } else {
+            order.push("'" + currentChar + "' \u00D7 " + groupLength + " \u2192 " + currentChar + groupLength);
+        }
+    }
+
+    return {
+        steps: steps,
+        order: order,
+        original: chars.slice(),
+        desc: preset.desc,
+        finalLength: writeIndex,
+        finalCompressed: arr.slice(0, writeIndex).join("")
+    };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var displayChars = step ? step.chars : trace.original;
+    var n = displayChars.length;
+
+    /* Determine write frontier and read range for highlighting */
+    var wIdx = step ? (step.type === "write" ? step.writeIndex + 1 : step.writeIndex) : 0;
+    var readRange = null;
+    if (step && step.type === "scan") {
+        readRange = { start: step.runStart, end: step.readIndex };
+    }
+
+    /* Collect all written positions up to current step */
+    var writtenSet = {};
+    for (var s = 0; s <= engine.position && s < trace.steps.length; s++) {
+        if (trace.steps[s].type === "write") {
+            writtenSet[trace.steps[s].writeIndex] = true;
+        }
+    }
+
+    /* Build highlights map */
+    var highlights = new Map();
+    for (var i = 0; i < n; i++) {
+        if (readRange && i >= readRange.start && i <= readRange.end) {
+            highlights.set(i, "reading");
+        } else if (writtenSet[i]) {
+            highlights.set(i, "written");
+        } else if (step && i >= wIdx && !readRange) {
+            highlights.set(i, "stale");
+        }
+    }
+
+    /* Mark stale cells beyond the compressed prefix when writing */
+    if (step && step.type === "write") {
+        for (var j = wIdx; j < n; j++) {
+            if (!highlights.has(j)) {
+                highlights.set(j, "stale");
+            }
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: displayChars,
+        highlights: highlights
+    });
+
+    /* Status bar */
+    if (!step) {
+        refs.status.read.textContent    = "0";
+        refs.status.write.textContent   = "0";
+        refs.status.action.textContent  = "\u2014";
+        refs.status.runInfo.textContent = "\u2014";
+    } else {
+        refs.status.read.textContent = String(step.readIndex);
+        if (step.type === "write") {
+            refs.status.write.textContent = String(step.writeIndex);
+        } else {
+            refs.status.write.textContent = String(step.writeIndex);
+        }
+        if (step.type === "scan") {
+            refs.status.action.textContent  = "Scanning '" + step.char + "'";
+            refs.status.runInfo.textContent = "'" + step.char + "' \u00D7 " + step.runLength;
+        } else if (step.isDigit) {
+            refs.status.action.textContent  = "Write digit '" + step.writtenChar + "'";
+            refs.status.runInfo.textContent = "'" + step.groupChar + "' \u00D7 " + step.groupLength;
+        } else {
+            refs.status.action.textContent  = "Write '" + step.writtenChar + "'";
+            refs.status.runInfo.textContent = "'" + step.groupChar + "' \u00D7 " + step.groupLength;
+        }
+    }
+
+    /* Values bar */
+    refs.values.compressed.textContent = step ? step.compressed : "\u2014";
+    refs.values.compLen.textContent    = step ? String(step.compressed.length) : "0";
+
+    /* Note */
+    refs.note.textContent = describeStep(engine);
+
+    /* Position pointers */
+    requestAnimationFrame(function() {
+        var ptrs = {};
+        if (!step) {
+            ptrs.read  = { index: 0 };
+            ptrs.write = { index: 0 };
+        } else if (step.type === "scan") {
+            ptrs.read  = { index: step.readIndex };
+            ptrs.write = { index: step.writeIndex };
+        } else {
+            ptrs.read  = { index: Math.min(step.readIndex, n - 1) };
+            ptrs.write = { index: step.writeIndex };
+        }
+
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: ptrs,
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    if (!step) return engine.trace.desc + " Press Play or Next to begin.";
+
+    if (step.type === "scan") {
+        return "Reading index " + step.readIndex + ": '" + step.char + "' matches current run (length " + step.runLength + ").";
+    }
+    if (step.isDigit) {
+        return "Write count digit '" + step.writtenChar + "' at position " + step.writeIndex + ".";
+    }
+    return "Write '" + step.writtenChar + "' at position " + step.writeIndex + ".";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 500
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>

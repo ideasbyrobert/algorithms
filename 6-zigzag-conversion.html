@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zigzag Conversion — Row-Bouncing Simulation</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.zigzag-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+}
+.zigzag-row {
+    display: flex;
+    gap: 3px;
+}
+.zigzag-cell {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 500 15px/1 'Menlo', 'SF Mono', monospace;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+.zigzag-cell.empty {
+    background: transparent;
+}
+.zigzag-cell.placed {
+    background: #F5F5F7;
+    border: 1.5px solid #C7C7CC;
+    color: #1D1D1F;
+}
+.zigzag-cell.current {
+    background: #1D1D1F;
+    color: #FFF;
+    border: 2px solid #000;
+}
+.zigzag-cell.in-read {
+    background: #1D1D1F;
+    color: #FFF;
+}
+@media (max-width: 640px) {
+    .zigzag-cell {
+        width: 30px;
+        height: 30px;
+        font-size: 13px;
+    }
+}
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 6 Zigzag Conversion — Row-Bouncing Simulation.">
+<meta property="og:title" content="6 Zigzag Conversion — Row-Bouncing Simulation">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/6-zigzag-conversion.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/6-zigzag-conversion.html">
+</head>
+<body>
+<main class="page">
+
+    <section class="hero hero-full">
+        <span class="label">Zigzag Conversion · Optimal Solution</span>
+        <h1>Bounce between rows, read left to right.</h1>
+        <p class="hero-text">
+            Imagine writing text diagonally downward, bouncing off the bottom row,
+            rising back to the top, and repeating — like a ball in a zigzag pinball machine.
+            Once every character is placed, read each row from left to right and concatenate.
+            No matrix needed: <code>numRows</code> string buckets and a direction flag
+            capture the full pattern in O(n) time.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the zigzag form</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Three ideas behind the bounce</h2>
+        <p class="section-intro">
+            The zigzag pattern emerges from a simple row counter that oscillates
+            between 0 and numRows − 1. No coordinates, no modular arithmetic — just a direction flag.
+        </p>
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>row buckets</h3>
+                <p>Create <code>numRows</code> empty strings. Each character is appended to the bucket matching its current row. At the end, concatenate all buckets top-to-bottom for the answer.</p>
+            </article>
+            <article class="concept-card">
+                <h3>direction toggle</h3>
+                <p>A boolean <code>movingDown</code> controls the bounce. When the pointer hits row 0 it flips to <em>down</em>; when it hits the last row it flips to <em>up</em>. The pointer then advances by +1 or −1.</p>
+            </article>
+            <article class="concept-card">
+                <h3>linear scan</h3>
+                <p>Each character is visited exactly once and appended in O(1). The entire string is processed in a single pass — no extra matrix, no index formulas, just a bouncing pointer.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Place, bounce, read</h2>
+        <ol class="steps">
+            <li>
+                <h4>Guard: single row</h4>
+                <p>If <code>numRows == 1</code>, the zigzag is flat — return the input unchanged.</p>
+            </li>
+            <li>
+                <h4>Walk and bounce</h4>
+                <p>Start at row 0, direction down. For each character: append it to <code>rowBuckets[currentRow]</code>. If <code>currentRow</code> reaches the top or bottom, reverse direction. Then advance the row pointer.</p>
+            </li>
+            <li>
+                <h4>Concatenate rows</h4>
+                <p>Join all row buckets from row 0 through row <code>numRows − 1</code>. The result is the zigzag-encoded string.</p>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>When the zigzag simplifies</h2>
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>numRows == 1</h3>
+                <p>No bouncing occurs — every character lands in the same row. The output equals the input. The algorithm short-circuits before allocating any buckets.</p>
+            </article>
+            <article class="guard-card">
+                <h3>numRows ≥ text length</h3>
+                <p>The pointer descends but never bounces back. Each character occupies its own row, producing a straight vertical line. The output equals the input read top-to-bottom.</p>
+            </article>
+            <article class="guard-card">
+                <h3>numRows == 2</h3>
+                <p>The zigzag degenerates to alternating rows: even-indexed characters in row 0, odd-indexed in row 1. The period is just 2, the simplest non-trivial case.</p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [{ dot: true, label: "current placement" }],
+    gridClass: "zigzag-grid",
+    status: [
+        { id: "charIdx", label: "Character" },
+        { id: "row",     label: "Row" },
+        { id: "direction", label: "Direction" }
+    ],
+    values: [
+        { id: "rows",   label: "Row Contents" },
+        { id: "result", label: "Reading Order" }
+    ],
+    orderTitle: "Placement Log"
+});
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "Canonical \u2014 \"PAYPALISHIRING\", 4 rows",
+        text: "PAYPALISHIRING",
+        numRows: 4,
+        expected: "PINALSIGYAHRPI"
+    },
+    {
+        name: "3 rows \u2014 \"PAYPALISHIRING\"",
+        text: "PAYPALISHIRING",
+        numRows: 3,
+        expected: "PAHNAPLSIIGYIR"
+    },
+    {
+        name: "2 rows \u2014 \"ABCDEF\"",
+        text: "ABCDEF",
+        numRows: 2,
+        expected: "ACEBDF"
+    },
+    {
+        name: "1 row \u2014 \"AB\" (no bounce)",
+        text: "AB",
+        numRows: 1,
+        expected: "AB"
+    },
+    {
+        name: "Short \u2014 \"ABC\", 3 rows (down only)",
+        text: "ABC",
+        numRows: 3,
+        expected: "ABC"
+    },
+    {
+        name: "Long \u2014 \"THEQUICKBROWNFOX\", 5 rows",
+        text: "THEQUICKBROWNFOX",
+        numRows: 5,
+        expected: "TBHKRXECOOQIWFUN",
+        mobileDefault: true
+    },
+    {
+        name: "Equal to length \u2014 \"ABCD\", 4 rows",
+        text: "ABCD",
+        numRows: 4,
+        expected: "ABCD"
+    },
+    {
+        name: "5 rows \u2014 \"ABCDEFGHIJKLMNO\"",
+        text: "ABCDEFGHIJKLMNO",
+        numRows: 5,
+        expected: "AIBHJCGKODFLNEM"
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var text = preset.text;
+    var numRows = preset.numRows;
+    var steps = [];
+    var order = [];
+
+    if (numRows === 1) {
+        var rowContents = [text];
+        for (var i = 0; i < text.length; i++) {
+            var partial = text.slice(0, i + 1);
+            steps.push({
+                type: "place",
+                charIndex: i,
+                char: text[i],
+                row: 0,
+                column: i,
+                movingDown: true,
+                rowContents: [partial],
+                placedSoFar: i + 1
+            });
+            order.push(text[i]);
+        }
+        steps.push({
+            type: "read",
+            readRow: 0,
+            readIndex: 0,
+            resultSoFar: text,
+            rowContents: [text],
+            readComplete: true
+        });
+        order.push("\u25B8 done");
+        return { steps: steps, order: order, text: text, numRows: numRows, placements: buildPlacements(steps) };
+    }
+
+    var rowBuckets = [];
+    for (var r = 0; r < numRows; r++) rowBuckets.push("");
+
+    var currentRow = 0;
+    var movingDown = true;
+    var placements = [];
+    var colCounters = [];
+    for (var r = 0; r < numRows; r++) colCounters.push(0);
+
+    for (var i = 0; i < text.length; i++) {
+        var ch = text[i];
+        var col = colCounters[currentRow];
+        colCounters[currentRow]++;
+        rowBuckets[currentRow] += ch;
+
+        var snapshot = [];
+        for (var r = 0; r < numRows; r++) snapshot.push(rowBuckets[r]);
+
+        placements.push({ row: currentRow, col: col, char: ch });
+
+        steps.push({
+            type: "place",
+            charIndex: i,
+            char: ch,
+            row: currentRow,
+            column: col,
+            movingDown: movingDown,
+            rowContents: snapshot,
+            placedSoFar: i + 1
+        });
+        order.push(ch);
+
+        if (currentRow === numRows - 1) movingDown = false;
+        if (currentRow === 0) movingDown = true;
+        currentRow += movingDown ? 1 : -1;
+    }
+
+    /* Read phase — row by row */
+    var resultSoFar = "";
+    for (var r = 0; r < numRows; r++) {
+        if (rowBuckets[r].length > 0) {
+            resultSoFar += rowBuckets[r];
+            steps.push({
+                type: "read",
+                readRow: r,
+                readIndex: r,
+                resultSoFar: resultSoFar,
+                rowContents: snapshot,
+                readComplete: r === numRows - 1
+            });
+            order.push("\u25B8 row " + r);
+        }
+    }
+
+    return { steps: steps, order: order, text: text, numRows: numRows, placements: placements };
+}
+
+function buildPlacements(steps) {
+    var out = [];
+    for (var i = 0; i < steps.length; i++) {
+        if (steps[i].type === "place") {
+            out.push({ row: steps[i].row, col: steps[i].column, char: steps[i].char });
+        }
+    }
+    return out;
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    var numRows = trace.numRows;
+    var placements = trace.placements;
+
+    /* Determine how many columns each row needs */
+    var maxCols = [];
+    for (var r = 0; r < numRows; r++) maxCols.push(0);
+    for (var i = 0; i < placements.length; i++) {
+        var p = placements[i];
+        if (p.col + 1 > maxCols[p.row]) maxCols[p.row] = p.col + 1;
+    }
+    var totalCols = 0;
+    for (var r = 0; r < numRows; r++) {
+        if (maxCols[r] > totalCols) totalCols = maxCols[r];
+    }
+    if (totalCols === 0) totalCols = 1;
+
+    /* Count how many placement steps have completed */
+    var placedCount = 0;
+    if (step) {
+        if (step.type === "place") {
+            placedCount = step.placedSoFar;
+        } else {
+            /* During read phase, all placements are done */
+            for (var i = 0; i < trace.steps.length; i++) {
+                if (trace.steps[i].type === "place") placedCount++;
+                else break;
+            }
+        }
+    }
+
+    /* Build a map of placed cells: "row-col" → {char, index} */
+    var placedMap = {};
+    for (var i = 0; i < placedCount && i < placements.length; i++) {
+        var p = placements[i];
+        placedMap[p.row + "-" + p.col] = { char: p.char, index: i };
+    }
+
+    /* Determine current cell and read-highlight rows */
+    var currentKey = null;
+    var readHighlightRow = -1;
+    var readCompletedRows = -1;
+
+    if (step) {
+        if (step.type === "place") {
+            currentKey = step.row + "-" + step.column;
+        } else if (step.type === "read") {
+            readHighlightRow = step.readRow;
+            /* Find how many read steps have occurred up to current position */
+            readCompletedRows = step.readRow;
+        }
+    }
+
+    /* Build grid DOM */
+    var html = "";
+    for (var r = 0; r < numRows; r++) {
+        html += '<div class="zigzag-row">';
+        for (var c = 0; c < totalCols; c++) {
+            var key = r + "-" + c;
+            var cell = placedMap[key];
+            if (cell) {
+                var cls = "zigzag-cell";
+                if (key === currentKey) {
+                    cls += " current";
+                } else if (step && step.type === "read" && r <= readHighlightRow) {
+                    cls += " in-read";
+                } else {
+                    cls += " placed";
+                }
+                html += '<div class="' + cls + '">' + cell.char + '</div>';
+            } else {
+                html += '<div class="zigzag-cell empty"></div>';
+            }
+        }
+        html += '</div>';
+    }
+    refs.grid.innerHTML = html;
+
+    /* Status bar */
+    if (step) {
+        if (step.type === "place") {
+            refs.status.charIdx.textContent = "\u201C" + step.char + "\u201D [" + step.charIndex + "]";
+            refs.status.row.textContent = String(step.row);
+            refs.status.direction.textContent = step.movingDown ? "\u2193 down" : "\u2191 up";
+        } else {
+            refs.status.charIdx.textContent = "reading";
+            refs.status.row.textContent = String(step.readRow);
+            refs.status.direction.textContent = "\u2192 left-to-right";
+        }
+    } else {
+        refs.status.charIdx.textContent = "\u2014";
+        refs.status.row.textContent = "\u2014";
+        refs.status.direction.textContent = "\u2014";
+    }
+
+    /* Values bar */
+    if (step) {
+        if (step.type === "place") {
+            var rowDisplay = [];
+            for (var r = 0; r < step.rowContents.length; r++) {
+                rowDisplay.push("[" + step.rowContents[r] + "]");
+            }
+            refs.values.rows.textContent = rowDisplay.join(" ");
+            refs.values.result.textContent = "\u2014";
+        } else {
+            var finalContents = [];
+            for (var r = 0; r < step.rowContents.length; r++) {
+                finalContents.push("[" + step.rowContents[r] + "]");
+            }
+            refs.values.rows.textContent = finalContents.join(" ");
+            refs.values.result.textContent = "\u201C" + step.resultSoFar + "\u201D";
+        }
+    } else {
+        refs.values.rows.textContent = "\u2014";
+        refs.values.result.textContent = "\u2014";
+    }
+
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    var trace = engine.trace;
+
+    if (!step) {
+        return "Text: \u201C" + trace.text + "\u201D, numRows = " + trace.numRows +
+            ". Press Play or Next to begin.";
+    }
+
+    if (step.type === "place") {
+        var dir = step.movingDown ? "down" : "up";
+        return "Place \u201C" + step.char + "\u201D in row " + step.row +
+            ". Direction: " + dir + ".";
+    }
+
+    var rowContent = step.rowContents[step.readRow];
+    return "Read row " + step.readRow + ": \u201C" + rowContent +
+        "\u201D. Result so far: \u201C" + step.resultSoFar + "\u201D.";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 400
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
