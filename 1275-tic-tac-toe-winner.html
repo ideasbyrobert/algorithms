@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Winner on a Tic-Tac-Toe Game — Signed Counters | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 1275 Tic-Tac-Toe. Watch signed row, column, and diagonal counters track each move to determine the winner.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="tic tac toe winner, leetcode 1275, signed counters, algorithm visualization">
+<meta property="og:title" content="Find Winner on a Tic-Tac-Toe Game — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 1275. Watch signed counters detect the winner in real time.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Find Winner on a Tic-Tac-Toe Game — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 1275. Watch signed counters detect the winner in real time.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Find Winner on a Tic-Tac-Toe Game — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 1275 Tic-Tac-Toe.","url":"https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+#interactiveMount .cell.current { }
+
+/* ── Board ────────────────────────────────────────────── */
+
+.board-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.ttt-board {
+    display: grid;
+    grid-template-columns: repeat(3, 72px);
+    grid-template-rows: repeat(3, 72px);
+    gap: 0;
+    border: 2px solid #1D1D1F;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ttt-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 600 26px/1 'Menlo', monospace;
+    color: #1D1D1F;
+    background: #FFFFFF;
+    transition: background 0.2s ease, color 0.2s ease;
+    border-right: 1.5px solid #C7C7CC;
+    border-bottom: 1.5px solid #C7C7CC;
+    position: relative;
+}
+
+.ttt-cell:nth-child(3n) { border-right: none; }
+.ttt-cell:nth-child(n+7) { border-bottom: none; }
+
+.ttt-cell.just-placed {
+    background: #1D1D1F;
+    color: #FFFFFF;
+}
+
+.ttt-cell.winning-line {
+    background: #F5F5F7;
+    border-color: #1D1D1F;
+}
+
+.ttt-cell.winning-line.just-placed {
+    background: #1D1D1F;
+    color: #FFFFFF;
+}
+
+.ttt-cell .cell-mark {
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.ttt-cell .cell-mark.visible { opacity: 1; }
+
+/* Player A: filled mark. Player B: outlined mark */
+.ttt-cell .mark-b { color: #636366; }
+
+/* ── Scoreboard ───────────────────────────────────────── */
+
+.scoreboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    width: 100%;
+    max-width: 360px;
+}
+
+.score-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 4px;
+    border-radius: 8px;
+    border: 1px solid #C7C7CC;
+    background: #FFFFFF;
+    transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.score-item.active {
+    border-color: #1D1D1F;
+    background: #F5F5F7;
+}
+
+.score-item.winner {
+    border-color: #1D1D1F;
+    background: #1D1D1F;
+}
+
+.score-item.winner .score-val,
+.score-item.winner .score-lbl { color: #FFFFFF; }
+
+.score-lbl {
+    font: 500 9px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #8E8E93;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.score-val {
+    font: 600 16px/1 'Menlo', monospace;
+    color: #1D1D1F;
+    transition: color 0.2s ease;
+}
+
+/* ── Outcome badge ────────────────────────────────────── */
+
+.outcome-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font: 600 12px/1 'SF Pro Text', -apple-system, sans-serif;
+    letter-spacing: 0.02em;
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.outcome-badge.visible { opacity: 1; }
+.outcome-badge.win { background: #1D1D1F; color: #FFFFFF; }
+.outcome-badge.draw { background: #F5F5F7; color: #636366; border: 1px solid #C7C7CC; }
+.outcome-badge.pending { background: #F5F5F7; color: #8E8E93; border: 1px solid #C7C7CC; }
+
+/* ── Mobile ───────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .ttt-board {
+        grid-template-columns: repeat(3, 60px);
+        grid-template-rows: repeat(3, 60px);
+    }
+    .ttt-cell { font-size: 22px; }
+    .scoreboard { grid-template-columns: repeat(4, 1fr); gap: 4px; }
+    .score-val { font-size: 14px; }
+    .score-lbl { font-size: 8px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ─── Section 1: Intro ──────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Find Winner on a Tic-Tac-Toe Game</h1>
+    <p class="viz-subtitle">LeetCode 1275 · Signed Counter Tracking</p>
+    <p class="viz-body">
+        Given a sequence of moves on a 3×3 board, determine the
+        outcome: A wins, B wins, Draw, or Pending. Player A moves on
+        odd turns, B on even. Rather than scanning the whole board
+        after each move, we track running signed counters.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 2: Insight ────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Signed Counters</h2>
+    <p class="viz-body">
+        Maintain a score for each row, each column, and both
+        diagonals. A's moves add +1; B's moves add −1. If any counter
+        reaches +3 or −3, that player has completed a line and wins.
+    </p>
+    <p class="viz-body" style="margin-top:8px;">
+        A move at <span style="font-family:Menlo,monospace;">(r, c)</span>
+        updates row[r] and col[c]. If
+        <span style="font-family:Menlo,monospace;">r == c</span>, it also
+        updates the main diagonal. If
+        <span style="font-family:Menlo,monospace;">r + c == 2</span>,
+        it updates the anti-diagonal. The center cell (1,1) sits on
+        both diagonals.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Algorithm</h2>
+    <div class="viz-code-block">
+<pre><code>rows[3] = cols[3] = mainDiag = antiDiag = 0
+
+for turn 0..n-1:
+    score = +1 if even turn (A), -1 if odd (B)
+    rows[r] += score
+    cols[c] += score
+    if r == c:     mainDiag += score
+    if r + c == 2: antiDiag += score
+
+    if |any counter| == 3: that player wins
+
+if 9 moves played: "Draw"
+else: "Pending"</code></pre>
+    </div>
+</div>
+</section>
+
+<!-- ─── Section 4: Interactive ────────────────────────── -->
+
+<div id="interactiveMount"></div>
+
+<!-- ─── Section 5: Edge Cases ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Edge Patterns</h2>
+    <p class="viz-body">
+        <strong>Diagonal wins</strong> — The main diagonal (0,0)→(1,1)→(2,2)
+        and anti-diagonal (0,2)→(1,1)→(2,0) each have their own counter.
+        The center cell contributes to both.<br><br>
+        <strong>Draw vs Pending</strong> — A full board (9 moves) with no
+        ±3 counter is a Draw. Fewer than 9 moves is Pending.<br><br>
+        <strong>Early termination</strong> — The game ends as soon as any
+        counter reaches ±3. Remaining moves are never processed.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 6: Complexity ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(n) — at most 9 moves, each updating O(1) counters.<br>
+        <strong>Space:</strong> O(1) — six counters (3 rows + 3 columns + 2 diagonals).
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current move" }
+    ],
+    gridClass: "",
+    status: [
+        { id: "turn",   label: "Turn" },
+        { id: "player", label: "Player" },
+        { id: "cell",   label: "Cell" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* ── Board + scoreboard (injected into grid area) ─────── */
+
+refs.grid.innerHTML =
+    '<div class="board-wrap">' +
+    '<div class="ttt-board" id="tttBoard"></div>' +
+    '<div class="scoreboard" id="scoreBoard"></div>' +
+    '<span class="outcome-badge" id="outcome"></span>' +
+    '</div>';
+
+var boardEl = document.getElementById("tttBoard");
+var scoreEl = document.getElementById("scoreBoard");
+var outcomeEl = document.getElementById("outcome");
+
+/* Build 9 cells */
+for (var ci = 0; ci < 9; ci++) {
+    var cell = document.createElement("div");
+    cell.className = "ttt-cell";
+    cell.innerHTML = '<span class="cell-mark"></span>';
+    cell.dataset.idx = ci;
+    boardEl.appendChild(cell);
+}
+
+/* Build scoreboard: r0 r1 r2 | c0 c1 c2 | main anti */
+var scoreLabels = ["Row 0","Row 1","Row 2","Col 0","Col 1","Col 2","Main ╲","Anti ╱"];
+for (var si = 0; si < 8; si++) {
+    var item = document.createElement("div");
+    item.className = "score-item";
+    item.id = "sc" + si;
+    item.innerHTML = '<span class="score-lbl">' + scoreLabels[si] + '</span><span class="score-val">0</span>';
+    scoreEl.appendChild(item);
+}
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "A Wins Top Row",
+        data: [[0,0],[1,0],[0,1],[1,1],[0,2]]
+    },
+    {
+        name: "A Wins Diagonal",
+        mobileDefault: true,
+        data: [[0,0],[0,1],[1,1],[0,2],[2,2]]
+    },
+    {
+        name: "B Wins Column",
+        data: [[0,0],[0,1],[1,0],[1,1],[2,2],[2,1]]
+    },
+    {
+        name: "Anti-Diagonal Win",
+        data: [[0,2],[0,0],[1,1],[1,0],[2,0]]
+    },
+    {
+        name: "Full Draw",
+        data: [[0,0],[0,1],[0,2],[1,2],[1,0],[2,0],[1,1],[2,2],[2,1]]
+    },
+    {
+        name: "Pending (3 Moves)",
+        data: [[0,0],[1,1],[0,1]]
+    }
+];
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var moves = preset.data;
+    var steps = [];
+    var rows = [0,0,0];
+    var cols = [0,0,0];
+    var mainD = 0, antiD = 0;
+    var board = [[null,null,null],[null,null,null],[null,null,null]];
+    var winner = null;
+
+    for (var i = 0; i < moves.length; i++) {
+        var r = moves[i][0], c = moves[i][1];
+        var player = i % 2 === 0 ? "A" : "B";
+        var score = i % 2 === 0 ? 1 : -1;
+
+        board[r][c] = player;
+        rows[r] += score;
+        cols[c] += score;
+        if (r === c) mainD += score;
+        if (r + c === 2) antiD += score;
+
+        var line = "";
+        if (Math.abs(rows[r]) === 3) line = "row";
+        else if (Math.abs(cols[c]) === 3) line = "col";
+        else if (Math.abs(mainD) === 3) line = "main";
+        else if (Math.abs(antiD) === 3) line = "anti";
+
+        /* Snapshot board */
+        var snap = board.map(function(row) { return row.slice(); });
+
+        /* Which score items are "active" (just changed) */
+        var activeScores = [r]; /* row index */
+        activeScores.push(3 + c); /* col index */
+        if (r === c) activeScores.push(6);
+        if (r + c === 2) activeScores.push(7);
+
+        steps.push({
+            turn: i,
+            player: player,
+            r: r,
+            c: c,
+            board: snap,
+            rows: rows.slice(),
+            cols: cols.slice(),
+            mainD: mainD,
+            antiD: antiD,
+            activeScores: activeScores,
+            lineCompleted: line
+        });
+
+        if (line) { winner = player; break; }
+    }
+
+    var outcome = winner ? winner : (moves.length === 9 ? "Draw" : "Pending");
+
+    /* Final verdict step */
+    steps.push({
+        type: "verdict",
+        outcome: outcome,
+        winner: winner,
+        board: steps[steps.length - 1].board,
+        rows: steps[steps.length - 1].rows,
+        cols: steps[steps.length - 1].cols,
+        mainD: steps[steps.length - 1].mainD,
+        antiD: steps[steps.length - 1].antiD,
+        lineCompleted: steps[steps.length - 1].lineCompleted || "",
+        activeScores: []
+    });
+
+    return { steps: steps, moves: moves, outcome: outcome };
+}
+
+/* ── Winning cells helper ─────────────────────────────── */
+
+function getWinningCells(line, lastStep) {
+    if (!line) return [];
+    if (line === "row") {
+        var r = lastStep.r;
+        return [[r,0],[r,1],[r,2]];
+    }
+    if (line === "col") {
+        var c = lastStep.c;
+        return [[0,c],[1,c],[2,c]];
+    }
+    if (line === "main") return [[0,0],[1,1],[2,2]];
+    if (line === "anti") return [[0,2],[1,1],[2,0]];
+    return [];
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var pos = engine.position;
+    var steps = engine.trace.steps;
+    var step = pos >= 0 ? steps[pos] : null;
+    var isVerdict = step && step.type === "verdict";
+
+    var boardSnap = step ? step.board : [[null,null,null],[null,null,null],[null,null,null]];
+    var rowScores = step ? step.rows : [0,0,0];
+    var colScores = step ? step.cols : [0,0,0];
+    var mainScore = step ? step.mainD : 0;
+    var antiScore = step ? step.antiD : 0;
+
+    /* Find winning line cells */
+    var winLine = "";
+    var winStep = null;
+    if (isVerdict) {
+        /* Find the last move step to get line info */
+        for (var w = pos - 1; w >= 0; w--) {
+            if (steps[w].lineCompleted) { winStep = steps[w]; winLine = steps[w].lineCompleted; break; }
+        }
+    } else if (step && step.lineCompleted) {
+        winLine = step.lineCompleted;
+        winStep = step;
+    }
+
+    var winCells = getWinningCells(winLine, winStep);
+    var winSet = {};
+    for (var wc = 0; wc < winCells.length; wc++) {
+        winSet[winCells[wc][0] + "," + winCells[wc][1]] = true;
+    }
+
+    /* Render board cells */
+    var cells = boardEl.children;
+    for (var i = 0; i < 9; i++) {
+        var r = Math.floor(i / 3), c = i % 3;
+        var val = boardSnap[r][c];
+        var markSpan = cells[i].querySelector(".cell-mark");
+
+        markSpan.textContent = val || "";
+        markSpan.className = "cell-mark" + (val ? " visible" : "") + (val === "B" ? " mark-b" : "");
+
+        var isJustPlaced = step && !isVerdict && step.r === r && step.c === c;
+        var isWin = winSet[r + "," + c];
+
+        cells[i].className = "ttt-cell" +
+            (isJustPlaced ? " just-placed" : "") +
+            (isWin ? " winning-line" : "");
+    }
+
+    /* Render scoreboard */
+    var allScores = [rowScores[0], rowScores[1], rowScores[2], colScores[0], colScores[1], colScores[2], mainScore, antiScore];
+    var activeSet = {};
+    if (step && !isVerdict && step.activeScores) {
+        for (var a = 0; a < step.activeScores.length; a++) activeSet[step.activeScores[a]] = true;
+    }
+
+    /* Determine winning score index */
+    var winScoreIdx = -1;
+    if (winLine === "row" && winStep) winScoreIdx = winStep.r;
+    else if (winLine === "col" && winStep) winScoreIdx = 3 + winStep.c;
+    else if (winLine === "main") winScoreIdx = 6;
+    else if (winLine === "anti") winScoreIdx = 7;
+
+    for (var s = 0; s < 8; s++) {
+        var item = document.getElementById("sc" + s);
+        var valEl = item.querySelector(".score-val");
+        valEl.textContent = allScores[s];
+        item.className = "score-item" +
+            (activeSet[s] ? " active" : "") +
+            (s === winScoreIdx ? " winner" : "");
+    }
+
+    /* Outcome badge */
+    if (isVerdict) {
+        var oc = step.outcome;
+        outcomeEl.textContent = oc === "A" ? "A Wins" : oc === "B" ? "B Wins" : oc;
+        outcomeEl.className = "outcome-badge visible " +
+            (oc === "Draw" ? "draw" : oc === "Pending" ? "pending" : "win");
+    } else {
+        outcomeEl.className = "outcome-badge";
+    }
+
+    /* Status */
+    if (step && !isVerdict) {
+        refs.status.turn.textContent = step.turn + 1;
+        refs.status.player.textContent = step.player;
+        refs.status.cell.textContent = "(" + step.r + ", " + step.c + ")";
+    } else if (isVerdict) {
+        refs.status.turn.textContent = "\u2014";
+        refs.status.player.textContent = "\u2014";
+        refs.status.cell.textContent = step.outcome;
+    } else {
+        refs.status.turn.textContent = "\u2014";
+        refs.status.player.textContent = "\u2014";
+        refs.status.cell.textContent = "\u2014";
+    }
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var step = engine.currentStep();
+    if (step.type === "verdict") {
+        if (step.outcome === "Draw") return "All 9 cells filled, no ±3 counter \u2192 Draw";
+        if (step.outcome === "Pending") return "Board not full, no winner yet \u2192 Pending";
+        return step.outcome + " wins via " + step.lineCompleted.replace("-"," ") + " (counter = " +
+            (step.outcome === "A" ? "+3" : "\u22123") + ")";
+    }
+    var desc = step.player + " plays (" + step.r + "," + step.c + ") \u2192 row[" + step.r + "]=" + step.rows[step.r] + ", col[" + step.c + "]=" + step.cols[step.c];
+    if (step.r === step.c) desc += ", main\u2092=" + step.mainD;
+    if (step.r + step.c === 2) desc += ", anti\u2092=" + step.antiD;
+    if (step.lineCompleted) desc += " \u2192 " + step.player + " wins!";
+    return desc;
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
