@@ -83,53 +83,7 @@
       margin: 0;
     }
 
-    /* ── Filter Bar ── */
-
-    .filter-bar {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 40px;
-      padding: 2px 0;
-    }
-
-    .pill {
-      appearance: none;
-      -webkit-appearance: none;
-      border: 1px solid var(--chrome);
-      border-radius: 10px;
-      width: 38px;
-      height: 38px;
-      display: grid;
-      place-items: center;
-      background: transparent;
-      cursor: pointer;
-      transition: all 200ms ease;
-      padding: 0;
-    }
-
-    .pill svg {
-      width: 16px;
-      height: 16px;
-      fill: none;
-      stroke: var(--ink-quaternary);
-      stroke-width: 1.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .pill:hover { background: var(--fill); }
-
-    .pill.active {
-      background: var(--ink);
-      border-color: var(--ink);
-    }
-
-    .pill.active svg { stroke: var(--surface); }
-
-    .pill:focus-visible {
-      outline: 2px solid var(--ink);
-      outline-offset: 2px;
-    }
+    /* ── (filter bar removed) ── */
 
     /* ── Category Sections ── */
 
@@ -137,10 +91,7 @@
       display: flex;
       flex-direction: column;
       gap: 40px;
-      transition: opacity 200ms ease;
     }
-
-    .category.hidden { display: none; }
 
     .cat-header {
       display: flex;
@@ -148,7 +99,12 @@
       gap: 6px;
       margin-bottom: 10px;
       padding: 0 4px;
+      cursor: pointer;
+      -webkit-user-select: none;
+      user-select: none;
     }
+
+    .cat-header:hover h2 { color: var(--ink); }
 
     .cat-header h2 {
       font-family: var(--ui);
@@ -158,6 +114,7 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
       margin: 0;
+      transition: color 200ms ease;
     }
 
     .cat-count {
@@ -167,10 +124,61 @@
       color: var(--ink-faint);
     }
 
+    .cat-header::after {
+      content: '−';
+      font-family: var(--ui);
+      font-size: 18px;
+      font-weight: 200;
+      color: var(--ink-faint);
+      margin-left: auto;
+      line-height: 1;
+    }
+
+    .compact .cat-header::after { content: '+'; }
+
     /* ── Grouped Table ── */
 
     .cat-card {
       border-top: 1px solid var(--rule);
+      transition: opacity 150ms ease;
+    }
+
+    /* ── Compact Mode ── */
+
+    .compact .cat-card {
+      border-top: none;
+      line-height: 2;
+      padding: 2px 0 6px;
+    }
+
+    .compact .problem-row {
+      display: inline;
+      padding: 0;
+      border-bottom: none;
+    }
+
+    .compact .problem-row:hover { opacity: 0.55; }
+
+    .compact .problem-num { display: none; }
+    .compact .problem-info { display: inline; }
+    .compact .problem-technique { display: none; }
+
+    .compact .problem-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-secondary);
+      letter-spacing: 0;
+    }
+
+    .compact .problem-name::after {
+      content: '  ·  ';
+      color: var(--chrome);
+      font-weight: 300;
+      font-size: 11px;
+    }
+
+    .compact .problem-row:last-child .problem-name::after {
+      content: '';
     }
 
     .problem-row {
@@ -229,10 +237,7 @@
       margin-top: 48px;
       padding-top: 44px;
       border-top: 1px solid var(--rule);
-      transition: opacity 200ms ease;
     }
-
-    .proofs-section.hidden { display: none; }
 
     /* ── Mobile ── */
 
@@ -248,8 +253,6 @@
         padding: 24px 20px 40px;
       }
 
-      .filter-bar { justify-content: center; }
-
       .categories { gap: 32px; }
       .problem-num { width: 36px; padding-right: 10px; }
       .problem-name { font-size: 14px; }
@@ -263,17 +266,6 @@
       <p class="eyebrow">The Mechanics of Problem-Solving</p>
       <h1>Algorithms</h1>
     </header>
-
-    <nav class="filter-bar" role="tablist" aria-label="Filter by topic">
-      <button class="pill active" data-filter="all" role="tab" aria-selected="true" title="All"><svg viewBox="0 0 16 16"><rect x="2" y="2" width="4.5" height="4.5" rx="1"/><rect x="9.5" y="2" width="4.5" height="4.5" rx="1"/><rect x="2" y="9.5" width="4.5" height="4.5" rx="1"/><rect x="9.5" y="9.5" width="4.5" height="4.5" rx="1"/></svg></button>
-      <button class="pill" data-filter="array" role="tab" aria-selected="false" title="Array"><svg viewBox="0 0 16 16"><line x1="2" y1="4" x2="14" y2="4"/><line x1="2" y1="8" x2="14" y2="8"/><line x1="2" y1="12" x2="14" y2="12"/></svg></button>
-      <button class="pill" data-filter="string" role="tab" aria-selected="false" title="String"><svg viewBox="0 0 16 16"><line x1="3" y1="3" x2="13" y2="3"/><line x1="8" y1="3" x2="8" y2="13"/></svg></button>
-      <button class="pill" data-filter="matrix" role="tab" aria-selected="false" title="Matrix"><svg viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="13" height="13" rx="1.5"/><line x1="1.5" y1="8" x2="14.5" y2="8"/><line x1="8" y1="1.5" x2="8" y2="14.5"/></svg></button>
-      <button class="pill" data-filter="math" role="tab" aria-selected="false" title="Math"><svg viewBox="0 0 16 16"><line x1="8" y1="2" x2="8" y2="9"/><line x1="4.5" y1="5.5" x2="11.5" y2="5.5"/><line x1="4.5" y1="13" x2="11.5" y2="13"/></svg></button>
-      <button class="pill" data-filter="hashing" role="tab" aria-selected="false" title="Hashing"><svg viewBox="0 0 16 16"><line x1="6.5" y1="1.5" x2="5.5" y2="14.5"/><line x1="10.5" y1="1.5" x2="9.5" y2="14.5"/><line x1="2.5" y1="5.5" x2="13.5" y2="5.5"/><line x1="2.5" y1="10.5" x2="13.5" y2="10.5"/></svg></button>
-      <button class="pill" data-filter="search" role="tab" aria-selected="false" title="Search"><svg viewBox="0 0 16 16"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/></svg></button>
-      <button class="pill" data-filter="linked-list" role="tab" aria-selected="false" title="Linked List"><svg viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="2.5"/><circle cx="12.5" cy="8" r="2.5"/><line x1="6" y1="8" x2="10" y2="8"/><polyline points="8.5,6 10,8 8.5,10"/></svg></button>
-    </nav>
 
     <div class="categories">
 
@@ -534,34 +526,20 @@
 
   <script>
   (function () {
-    var pills = document.querySelectorAll('.pill');
-    var categories = document.querySelectorAll('.category');
-    var proofs = document.querySelector('.proofs-section');
-    var wrap = document.querySelector('.categories');
+    var headers = document.querySelectorAll('.cat-header');
 
-    pills.forEach(function (pill) {
-      pill.addEventListener('click', function () {
-        var filter = this.dataset.filter;
+    headers.forEach(function (header) {
+      header.addEventListener('click', function () {
+        var section = this.closest('.category') || this.closest('.proofs-section');
+        if (!section) return;
+        var card = section.querySelector('.cat-card');
+        if (!card) return;
 
-        pills.forEach(function (p) {
-          p.classList.remove('active');
-          p.setAttribute('aria-selected', 'false');
-        });
-        this.classList.add('active');
-        this.setAttribute('aria-selected', 'true');
-
-        wrap.style.opacity = '0';
-        if (proofs) proofs.style.opacity = '0';
-
+        card.style.opacity = '0';
         setTimeout(function () {
-          categories.forEach(function (cat) {
-            cat.classList.toggle('hidden', filter !== 'all' && cat.dataset.cat !== filter);
-          });
-          if (proofs) proofs.classList.toggle('hidden', filter !== 'all');
-
-          wrap.style.opacity = '1';
-          if (proofs) proofs.style.opacity = '1';
-        }, 200);
+          section.classList.toggle('compact');
+          card.style.opacity = '1';
+        }, 150);
       });
     });
   })();
