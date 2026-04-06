@@ -1,101 +1,487 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Formal Proof of the Merge Sorted Array Algorithm</title>
-  <meta name="description" content="Formal proof and correctness analysis for the merge sorted array algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithm Proofs" />
-  <meta property="og:title" content="Formal Proof of the Merge Sorted Array Algorithm" />
-  <meta property="og:description" content="Formal proof and correctness analysis for the merge sorted array algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Formal Proof of the Merge Sorted Array Algorithm" />
-  <meta name="twitter:description" content="Formal proof and correctness analysis for the merge sorted array algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Formal Proof of the Merge Sorted Array Algorithm","description":"Formal proof and correctness analysis for the merge sorted array algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms.","url":"https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html","inLanguage":"en","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"formal proof, algorithm correctness, LeetCode, interview algorithms, Merge Sorted Array"}</script>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png" />
-  <link rel="stylesheet" href="assets/styles/document-page.css" />
-  <script src="assets/scripts/mathjax-config.js"></script>
-  <script src="assets/scripts/load-mathjax.js" data-cdn-source="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" data-local-source="assets/vendor/mathjax/tex-mml-chtml.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merge Sorted Array — Backward Fill | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 88 Merge Sorted Array. Watch the backward fill strategy avoid overwriting unread elements.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="merge sorted array, leetcode 88, backward fill, two pointer merge, algorithm visualization">
+<meta property="og:title" content="Merge Sorted Array — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 88. Watch backward fill merge two sorted arrays in-place.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Merge Sorted Array — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 88. Watch backward fill merge two sorted arrays in-place.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Merge Sorted Array — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 88 Merge Sorted Array.","url":"https://ideasbyrobert.github.io/algorithms/88-merge-sorted-array.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+#interactiveMount .cell.current { }
+
+/* ── Dual-array layout ────────────────────────────────── */
+
+.merge-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+
+.arr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.arr-label {
+    font: 500 11px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #8E8E93;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.arr-row {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    position: relative;
+}
+
+.m-cell {
+    width: 52px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 600 15px/1 'Menlo', monospace;
+    color: #1D1D1F;
+    background: #FFFFFF;
+    border: 1.5px solid #C7C7CC;
+    border-radius: 6px;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    position: relative;
+}
+
+.m-cell.placeholder {
+    color: #AEAEB2;
+    border-style: dashed;
+}
+
+.m-cell.write-target {
+    background: #1D1D1F;
+    border-color: #1D1D1F;
+    color: #FFFFFF;
+}
+
+.m-cell.read-ptr {
+    border-color: #1D1D1F;
+    border-width: 2px;
+    background: #F5F5F7;
+}
+
+.m-cell.source-pick {
+    background: #1D1D1F;
+    border-color: #1D1D1F;
+    color: #FFFFFF;
+}
+
+.m-cell.filled {
+    background: #F5F5F7;
+    border-color: #8E8E93;
+}
+
+.m-cell.exhausted {
+    color: #C7C7CC;
+    border-color: #C7C7CC;
+}
+
+/* ── Index labels ─────────────────────────────────────── */
+
+.idx-row {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+
+.idx-label {
+    width: 52px;
+    text-align: center;
+    font: 400 10px/1 'Menlo', monospace;
+    color: #AEAEB2;
+}
+
+/* ── Pointer labels ───────────────────────────────────── */
+
+.ptr-row {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    height: 22px;
+}
+
+.ptr-label {
+    width: 52px;
+    text-align: center;
+    font: 600 10px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #636366;
+    letter-spacing: 0.02em;
+}
+
+.ptr-label.active { color: #1D1D1F; }
+
+/* ── Mobile ───────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .m-cell { width: 42px; height: 36px; font-size: 13px; }
+    .idx-label { width: 42px; font-size: 9px; }
+    .ptr-label { width: 42px; font-size: 9px; }
+}
+
+</style>
 </head>
 <body>
-  <main>
-    <article><h1>Formal Proof of the Merge Sorted Array Algorithm</h1>
-<p>To establish the correctness of the Merge Sorted Array algorithm, we must rigorously prove three properties: that the backward fill never overwrites unread primary data, that the cross-source gate always selects the maximum remaining element, and that the descending sweep produces the complete sorted merge. We will dismantle the problem into a pointer-linkage identity (§2), a maximum-selection lemma (§3), and a descending merge invariant (§4).</p>
-<h2>1. First Principles &amp; System Definitions</h2>
-<p><strong>Problem objects.</strong> Let <span class="inline-math">$A = (a_0, a_1, \ldots, a_{m-1})$</span> be a finite sequence of <span class="inline-math">$m$</span> integers (the <em>primary data</em>), and let <span class="inline-math">$B = (b_0, b_1, \ldots, b_{n-1})$</span> be a finite sequence of <span class="inline-math">$n$</span> integers (the <em>secondary data</em>). Define the <em>combined multiset</em>:</p>
-<div class="equation">$$M = \{\!\{a_0, \ldots, a_{m-1}\}\!\} \cup \{\!\{b_0, \ldots, b_{n-1}\}\!\}$$</div>
-<p>The <em>sorted merge</em> is the unique non-decreasing sequence of length <span class="inline-math">$m + n$</span> whose underlying multiset equals <span class="inline-math">$M$</span>.</p>
-<p><strong>Preconditions and contract assumptions.</strong></p>
-<ul><li><p><em>Sortedness:</em> <span class="inline-math">$a_i \le a_{i+1}$</span> for all <span class="inline-math">$0 \le i &lt; m - 1$</span>, and <span class="inline-math">$b_j \le b_{j+1}$</span> for all <span class="inline-math">$0 \le j &lt; n - 1$</span>.</p></li><li><p><em>Storage layout:</em> The physical array has <span class="inline-math">$m + n$</span> cells. The first <span class="inline-math">$m$</span> cells hold the primary data; the remaining <span class="inline-math">$n$</span> cells are padding (their values are irrelevant).</p></li><li><p><em>Non-empty merge:</em> <span class="inline-math">$m + n \ge 1$</span>.</p></li><li><p><em>Mutation permitted:</em> In-place overwriting of the physical array is allowed.</p></li></ul>
-<p><strong>Postcondition.</strong></p>
-<div class="equation">$$A^{(f)}[0..m+n-1] \text{ is the non-decreasing rearrangement of } M.$$</div>
-<p><strong>State variables.</strong></p>
-<ul><li><p><span class="inline-math">$p_1 \in \{-1, 0, 1, \ldots, m-1\}$</span> — primary read pointer; scans <span class="inline-math">$A$</span> from right to left.</p></li><li><p><span class="inline-math">$p_2 \in \{-1, 0, 1, \ldots, n-1\}$</span> — secondary read pointer; scans <span class="inline-math">$B$</span> from right to left.</p></li><li><p><span class="inline-math">$w \in \{-1, 0, 1, \ldots, m+n-1\}$</span> — write pointer; fills the physical array from right to left.</p></li></ul>
-<p><strong>Initialization.</strong></p>
-<div class="equation">$$p_1 = m - 1, \quad p_2 = n - 1, \quad w = m + n - 1$$</div>
-<p><strong>Mutation model.</strong> <span class="inline-math">$A^{(0)}$</span> is the input state (first <span class="inline-math">$m$</span> cells = primary data, last <span class="inline-math">$n$</span> cells = padding). <span class="inline-math">$A^{(t)}$</span> is the state after step <span class="inline-math">$t$</span>. Each step sets <span class="inline-math">$A^{(t+1)}[w] \gets x$</span>, where <span class="inline-math">$x$</span> is the element selected by the gate. <span class="inline-math">$A^{(f)}$</span> is the final state after the loop terminates.</p>
-<h2>2. The Non-Collision Invariant (Safety)</h2>
-<p><strong>Theorem 1: The pointer-linkage identity.</strong></p>
-<div class="equation">$$w = p_1 + p_2 + 1 \quad \text{at the start of every iteration.}$$</div>
-<p><em>Proof:</em></p>
-<ol><li><p><em>Base case.</em> At initialization:</p>
-<div class="equation">$$w = m + n - 1 = (m - 1) + (n - 1) + 1 = p_1 + p_2 + 1$$</div></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$w = p_1 + p_2 + 1$</span> at the start of the current iteration. During the iteration, <span class="inline-math">$w$</span> decreases by 1 and exactly one of <span class="inline-math">$p_1$</span> or <span class="inline-math">$p_2$</span> decreases by 1.</p>
-<p><em>Case 1 — pick from <span class="inline-math">$A$</span>:</em> <span class="inline-math">$p_1' = p_1 - 1$</span>, <span class="inline-math">$p_2' = p_2$</span>, <span class="inline-math">$w' = w - 1$</span>.</p>
-<div class="equation">$$p_1' + p_2' + 1 = (p_1 - 1) + p_2 + 1 = p_1 + p_2 = w - 1 = w'$$</div>
-<p><em>Case 2 — pick from <span class="inline-math">$B$</span>:</em> <span class="inline-math">$p_1' = p_1$</span>, <span class="inline-math">$p_2' = p_2 - 1$</span>, <span class="inline-math">$w' = w - 1$</span>.</p>
-<div class="equation">$$p_1' + p_2' + 1 = p_1 + (p_2 - 1) + 1 = p_1 + p_2 = w - 1 = w'$$</div></li><li><p>By induction, the identity holds at every iteration. <span class="inline-math">$\blacksquare$</span></p></li></ol>
-<p><strong>Corollary 1.1: The write pointer never reaches unread primary data.</strong></p>
-<p>The loop executes while <span class="inline-math">$p_2 \ge 0$</span>. By Theorem 1:</p>
-<div class="equation">$$w = p_1 + p_2 + 1 \ge p_1 + 0 + 1 = p_1 + 1$$</div>
-<p>Hence <span class="inline-math">$w &gt; p_1$</span> at every iteration. The write position is strictly above all unread primary positions <span class="inline-math">$0, 1, \ldots, p_1$</span>.</p>
-<p><strong>Corollary 1.2: Every primary read returns the original value.</strong></p>
-<p>Since all writes target positions <span class="inline-math">$&gt; p_1$</span>, positions <span class="inline-math">$0$</span> through <span class="inline-math">$p_1$</span> are never overwritten. Therefore <span class="inline-math">$A^{(t)}[p_1] = A^{(0)}[p_1]$</span> at every iteration.</p>
-<h2>3. Algorithm Mapping: The Cross-Source Gate</h2>
-<p>The gate condition governing each step is:</p>
-<div class="equation">$$p_1 \ge 0 \quad \text{and} \quad A^{(t)}[p_1] &gt; B[p_2]$$</div>
-<p>This is a <em>cross-source gate</em>: a comparison between the heads of two sorted streams scanned in descending order.</p>
-<p><strong>Lemma 1: The gate selects the maximum of all remaining elements.</strong></p>
-<p><em>Proof:</em></p>
-<p>Define the remaining multiset at the start of an iteration:</p>
-<div class="equation">$$R = \{\!\{A^{(0)}[0], \ldots, A^{(0)}[p_1]\}\!\} \cup \{\!\{B[0], \ldots, B[p_2]\}\!\}$$</div>
-<p>Since <span class="inline-math">$A^{(0)}[0..p_1]$</span> is non-decreasing, <span class="inline-math">$\max\bigl(A^{(0)}[0..p_1]\bigr) = A^{(0)}[p_1]$</span>. Since <span class="inline-math">$B[0..p_2]$</span> is non-decreasing, <span class="inline-math">$\max\bigl(B[0..p_2]\bigr) = B[p_2]$</span>. Therefore:</p>
-<div class="equation">$$\max(R) = \max\bigl(A^{(0)}[p_1],\; B[p_2]\bigr)$$</div>
-<p>By Corollary 1.2, <span class="inline-math">$A^{(t)}[p_1] = A^{(0)}[p_1]$</span>.</p>
-<p><em>Case 1 — gate passes (<span class="inline-math">$p_1 \ge 0$</span> and <span class="inline-math">$A^{(0)}[p_1] &gt; B[p_2]$</span>):</em> The algorithm places <span class="inline-math">$A^{(0)}[p_1] = \max(R)$</span>.</p>
-<p><em>Case 2 — gate fails (<span class="inline-math">$p_1 &lt; 0$</span> or <span class="inline-math">$A^{(0)}[p_1] \le B[p_2]$</span>):</em> The algorithm places <span class="inline-math">$B[p_2]$</span>.</p>
-<ul><li><p>If <span class="inline-math">$p_1 &lt; 0$</span>: all primary elements are exhausted and <span class="inline-math">$B[p_2] = \max(R)$</span>.</p></li><li><p>If <span class="inline-math">$A^{(0)}[p_1] \le B[p_2]$</span>: <span class="inline-math">$B[p_2] \ge A^{(0)}[p_1]$</span>, so <span class="inline-math">$B[p_2] = \max(R)$</span>.</p></li></ul>
-<p>In every case, the placed element is <span class="inline-math">$\max(R)$</span>. <span class="inline-math">$\blacksquare$</span></p>
-<h2>4. Proof of Correctness: The Descending Merge Invariant</h2>
-<p><strong>Theorem 2: Upon termination, <span class="inline-math">$A^{(f)}[0..m+n-1]$</span> is the non-decreasing rearrangement of <span class="inline-math">$M$</span>.</strong></p>
-<p><em>Proof:</em></p>
-<p>Define the loop invariant at the start of each iteration:</p>
-<div class="equation">$$\text{INV}: \quad A^{(t)}[w+1..m+n-1] \text{ contains the } (m+n-1-w) \text{ largest elements of } M, \text{ in non-decreasing order.}$$</div>
-<ol><li><p><em>Base case.</em> Before the first iteration, <span class="inline-math">$w = m + n - 1$</span>. The region <span class="inline-math">$A^{(0)}[m+n..m+n-1]$</span> is empty. An empty sequence vacuously contains the 0 largest elements in sorted order. <span class="inline-math">$\text{INV}$</span> holds.</p></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$\text{INV}$</span> holds. By Lemma 1, the element <span class="inline-math">$x$</span> placed at position <span class="inline-math">$w$</span> satisfies <span class="inline-math">$x = \max(R)$</span>.</p>
-<p><em>Ordering:</em> If at least one element was previously placed (<span class="inline-math">$w + 1 \le m + n - 1$</span>), the element <span class="inline-math">$A^{(t)}[w + 1]$</span> was placed at the immediately preceding step and was the maximum of a larger remaining set that contained <span class="inline-math">$x$</span>. Therefore <span class="inline-math">$A^{(t)}[w + 1] \ge x$</span>.</p>
-<p><em>Extension:</em> After writing <span class="inline-math">$x$</span> at position <span class="inline-math">$w$</span>, the region <span class="inline-math">$A^{(t+1)}[w..m+n-1]$</span> begins with <span class="inline-math">$x$</span> and continues with the previously sorted tail. Since <span class="inline-math">$x \le A^{(t+1)}[w + 1]$</span> (or this is the first element placed), the extended sequence is non-decreasing. It now contains the <span class="inline-math">$(m + n - w)$</span> largest elements of <span class="inline-math">$M$</span>.</p>
-<p>After <span class="inline-math">$w$</span> decreases to <span class="inline-math">$w - 1$</span>, <span class="inline-math">$\text{INV}$</span> holds for the next iteration.</p></li><li><p><em>Termination.</em> The loop exits when <span class="inline-math">$p_2 = -1$</span>. By Theorem 1, <span class="inline-math">$w = p_1$</span>.</p>
-<p>The placed region <span class="inline-math">$A^{(f)}[p_1 + 1..m + n - 1]$</span> contains the <span class="inline-math">$(m + n - 1 - p_1)$</span> largest elements of <span class="inline-math">$M$</span>, sorted (by <span class="inline-math">$\text{INV}$</span>).</p>
-<p>If <span class="inline-math">$p_1 = -1$</span>, the placed region is <span class="inline-math">$A^{(f)}[0..m + n - 1]$</span> — the entire array. The sorted merge is complete.</p>
-<p>If <span class="inline-math">$p_1 \ge 0$</span>, positions <span class="inline-math">$0$</span> through <span class="inline-math">$p_1$</span> retain their original values: every write targeted position <span class="inline-math">$w = p_1 + p_2 + 1 \ge p_{1,\text{final}} + 1$</span> (since <span class="inline-math">$p_1$</span> only decreases and <span class="inline-math">$p_2 \ge 0$</span> throughout the loop). These <span class="inline-math">$(p_1 + 1)$</span> elements are the smallest in <span class="inline-math">$M$</span>, already sorted by the original sortedness of <span class="inline-math">$A$</span>. Since every placed element <span class="inline-math">$\ge$</span> every remaining element, <span class="inline-math">$A^{(f)}[p_1] \le A^{(f)}[p_1 + 1]$</span>, and <span class="inline-math">$A^{(f)}[0..m + n - 1]$</span> is the complete sorted merge. <span class="inline-math">$\blacksquare$</span></p></li></ol>
-<p><strong>Corollary 2.1:</strong> If <span class="inline-math">$n = 0$</span> (<span class="inline-math">$B$</span> is empty), <span class="inline-math">$p_2 = -1$</span> at initialization and the loop never executes. <span class="inline-math">$A$</span> is already the correct result.</p>
-<p><strong>Corollary 2.2:</strong> If <span class="inline-math">$m = 0$</span> (<span class="inline-math">$A$</span> is empty, all padding), <span class="inline-math">$p_1 = -1$</span> at initialization. Every iteration picks from <span class="inline-math">$B$</span>, copying <span class="inline-math">$B$</span> right-to-left into positions <span class="inline-math">$n - 1, n - 2, \ldots, 0$</span>.</p>
-<p><strong>Corollary 2.3:</strong> If <span class="inline-math">$m = 1$</span> and <span class="inline-math">$n = 1$</span>, a single comparison places the larger value at position 1; the smaller either remains at position 0 (if from <span class="inline-math">$A$</span>) or is copied there (if from <span class="inline-math">$B$</span>).</p>
-<hr />
-<h2>5. Mechanical Execution (System Trace)</h2>
-<p><strong>Input System.</strong> <span class="inline-math">$A^{(0)} = (4, 5, 6, 0, 0, 0)$</span>, <span class="inline-math">$m = 3$</span>, <span class="inline-math">$B = (1, 2, 3)$</span>, <span class="inline-math">$n = 3$</span>.</p>
-<div class="table-wrap"><table><thead><tr><th>Step</th><th><span class="inline-math">$p_1$</span></th><th><span class="inline-math">$p_2$</span></th><th><span class="inline-math">$w$</span></th><th><span class="inline-math">$w - p_1$</span></th><th>Comparison</th><th>Gate</th><th>Action</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$5$</span></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$6 &gt; 3$</span></td><td>pass</td><td><span class="inline-math">$A[5] \gets 6$</span>; <span class="inline-math">$p_1 \to 1$</span></td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$4$</span></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$5 &gt; 3$</span></td><td>pass</td><td><span class="inline-math">$A[4] \gets 5$</span>; <span class="inline-math">$p_1 \to 0$</span></td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$4 &gt; 3$</span></td><td>pass</td><td><span class="inline-math">$A[3] \gets 4$</span>; <span class="inline-math">$p_1 \to {-1}$</span></td></tr><tr><td><strong>4</strong></td><td><span class="inline-math">$-1$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$p_1 &lt; 0$</span></td><td>fail</td><td><span class="inline-math">$A[2] \gets 3$</span>; <span class="inline-math">$p_2 \to 1$</span></td></tr><tr><td><strong>5</strong></td><td><span class="inline-math">$-1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$p_1 &lt; 0$</span></td><td>fail</td><td><span class="inline-math">$A[1] \gets 2$</span>; <span class="inline-math">$p_2 \to 0$</span></td></tr><tr><td><strong>6</strong></td><td><span class="inline-math">$-1$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$p_1 &lt; 0$</span></td><td>fail</td><td><span class="inline-math">$A[0] \gets 1$</span>; <span class="inline-math">$p_2 \to {-1}$</span></td></tr></tbody></table></div>
-<p><strong>Result:</strong> <span class="inline-math">$w = -1$</span>, <span class="inline-math">$A^{(f)} = (1, 2, 3, 4, 5, 6)$</span>.</p>
-<p><em>Note on Step 4: Here <span class="inline-math">$w = 2$</span>, a position that originally held primary data (<span class="inline-math">$A^{(0)}[2] = 6$</span>). The algorithm writes <span class="inline-math">$B[2] = 3$</span> to this position, overwriting the original value. This is safe because <span class="inline-math">$A^{(0)}[2]$</span> was already consumed in Step 1 and relocated to position 5. Theorem 1's pointer-linkage identity guaranteed that <span class="inline-math">$p_1$</span> had moved past position 2 (to <span class="inline-math">$-1$</span>) before <span class="inline-math">$w$</span> descended to it — the write pointer cannot reach a position still carrying unread primary data. The <span class="inline-math">$w - p_1$</span> column confirms <span class="inline-math">$w = p_1 + p_2 + 1$</span> at every step.</em></p>
-<p>The theoretical guarantees translate into the mechanical result: Theorem 1 ensured the backward fill never corrupted unread data, Lemma 1 confirmed each step placed the maximum remaining element, and Theorem 2's invariant accumulated the six elements into the sorted merge.</p></article>
-  </main>
+
+<!-- ─── Section 1: Intro ──────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Merge Sorted Array</h1>
+    <p class="viz-subtitle">LeetCode 88 · Backward Fill</p>
+    <p class="viz-body">
+        Given two sorted arrays where the first has enough trailing space
+        to hold both, merge them in-place into one sorted array. The key
+        insight: fill from the tail to avoid overwriting unread elements.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 2: Why backward ───────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Why Backward?</h2>
+    <p class="viz-body">
+        Forward merging would write into positions that the primary read
+        pointer hasn't reached yet — corrupting data. By starting at the
+        last position and placing the <em>largest</em> remaining value
+        each step, the write pointer always lands in empty trailing space.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Algorithm</h2>
+    <div class="viz-code-block">
+<pre><code>p ← m - 1,  s ← n - 1,  w ← m + n - 1
+
+while s ≥ 0:
+    if p ≥ 0 and primary[p] > secondary[s]:
+        primary[w] = primary[p]
+        p -= 1
+    else:
+        primary[w] = secondary[s]
+        s -= 1
+    w -= 1</code></pre>
+    </div>
+</div>
+</section>
+
+<!-- ─── Section 4: Interactive ────────────────────────── -->
+
+<div id="interactiveMount"></div>
+
+<!-- ─── Section 5: Edge Cases ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Edge Patterns</h2>
+    <p class="viz-body">
+        <strong>Secondary exhausted first</strong> — remaining primary
+        elements are already sorted in place. No further work needed.<br><br>
+        <strong>Primary exhausted first</strong> — remaining secondary
+        elements fill the front positions without comparison.<br><br>
+        <strong>All elements from one side</strong> — one pointer sweeps
+        while the other stays put. Still O(m+n) total steps.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 6: Complexity ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(m + n) — each element placed exactly once.<br>
+        <strong>Space:</strong> O(1) — merge happens in-place in the primary array.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "write target" }
+    ],
+    gridClass: "",
+    status: [
+        { id: "action", label: "Action" },
+        { id: "ptrs",   label: "Pointers" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* ── Custom dual-array layout ─────────────────────────── */
+
+refs.grid.innerHTML =
+    '<div class="merge-wrap">' +
+    '<div class="arr-section"><span class="arr-label">Secondary</span>' +
+    '<div class="arr-row" id="secRow"></div><div class="ptr-row" id="secPtrs"></div></div>' +
+    '<div class="arr-section"><span class="arr-label">Primary (in-place result)</span>' +
+    '<div class="ptr-row" id="priPtrsTop"></div><div class="arr-row" id="priRow"></div>' +
+    '<div class="idx-row" id="priIdx"></div></div>' +
+    '</div>';
+
+var secRow = document.getElementById("secRow");
+var secPtrs = document.getElementById("secPtrs");
+var priPtrsTop = document.getElementById("priPtrsTop");
+var priRow = document.getElementById("priRow");
+var priIdx = document.getElementById("priIdx");
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "[2,4,6,_,_,_] + [1,3,5]",
+        data: { primary: [2,4,6], secondary: [1,3,5] }
+    },
+    {
+        name: "[4,_,_] + [1,3]",
+        mobileDefault: true,
+        data: { primary: [4], secondary: [1,3] }
+    },
+    {
+        name: "[4,5,6,_,_,_] + [1,2,3]",
+        data: { primary: [4,5,6], secondary: [1,2,3] }
+    },
+    {
+        name: "[1,2,3,_,_,_] + [4,5,6]",
+        data: { primary: [1,2,3], secondary: [4,5,6] }
+    },
+    {
+        name: "[1,_] + [2]",
+        data: { primary: [1], secondary: [2] }
+    },
+    {
+        name: "[_,_,_] + [1,2,3]",
+        data: { primary: [], secondary: [1,2,3] }
+    }
+];
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var d = preset.data;
+    var m = d.primary.length;
+    var n = d.secondary.length;
+    var pri = d.primary.slice();
+    for (var z = 0; z < n; z++) pri.push(0);
+    var sec = d.secondary.slice();
+
+    var p = m - 1, s = n - 1, w = m + n - 1;
+    var steps = [];
+
+    while (s >= 0) {
+        var fromPrimary = p >= 0 && pri[p] > sec[s];
+        var placed;
+        if (fromPrimary) {
+            placed = pri[p];
+            pri[w] = pri[p];
+            if (w !== p) pri[p] = 0;
+            p--;
+        } else {
+            placed = sec[s];
+            pri[w] = sec[s];
+            s--;
+        }
+
+        steps.push({
+            primary: pri.slice(),
+            secondary: sec.slice(),
+            writeIdx: w,
+            pIdx: p,
+            sIdx: s,
+            placed: placed,
+            fromPrimary: fromPrimary,
+            m: m,
+            n: n
+        });
+
+        w--;
+    }
+
+    return { steps: steps, m: m, n: n, initPrimary: d.primary.slice(), secondary: sec };
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var step = pos >= 0 ? trace.steps[pos] : null;
+
+    var m = trace.m, n = trace.n;
+    var total = m + n;
+
+    /* Initial state */
+    var pri, sec;
+    if (step) {
+        pri = step.primary;
+        sec = step.secondary;
+    } else {
+        pri = trace.initPrimary.slice();
+        for (var z = 0; z < n; z++) pri.push(0);
+        sec = trace.secondary.slice();
+    }
+
+    /* Figure out which positions have been filled (write positions from steps up to pos) */
+    var filledSet = {};
+    for (var i = 0; i <= pos && i < trace.steps.length; i++) {
+        filledSet[trace.steps[i].writeIdx] = true;
+    }
+
+    /* Primary row */
+    priRow.innerHTML = "";
+    priIdx.innerHTML = "";
+    priPtrsTop.innerHTML = "";
+    for (var j = 0; j < total; j++) {
+        var cell = document.createElement("div");
+        cell.className = "m-cell";
+        var val = pri[j];
+        var isPlaceholder = !filledSet[j] && j >= m && pos < 0;
+        var isWrite = step && step.writeIdx === j;
+        var isReadP = step && step.pIdx === j;
+
+        if (isWrite) cell.className += " write-target";
+        else if (isReadP && !step.fromPrimary) cell.className += " read-ptr";
+        else if (step && step.fromPrimary && step.pIdx + 1 === j && j < m) cell.className += " source-pick";
+        else if (filledSet[j]) cell.className += " filled";
+        else if (j >= m && !filledSet[j]) cell.className += " placeholder";
+
+        /* Show read pointer source highlight */
+        if (step && step.fromPrimary && j === step.writeIdx) {
+            /* already write-target */
+        }
+
+        cell.textContent = (isPlaceholder || (val === 0 && j >= m && !filledSet[j])) ? "\u2013" : val;
+        priRow.appendChild(cell);
+
+        var idx = document.createElement("span");
+        idx.className = "idx-label";
+        idx.textContent = j;
+        priIdx.appendChild(idx);
+
+        /* Pointer labels */
+        var ptr = document.createElement("span");
+        ptr.className = "ptr-label";
+        if (step) {
+            var labels = [];
+            if (j === step.pIdx + (step.fromPrimary ? 0 : 1) && step.pIdx >= 0) {
+                /* Show p at current read position */
+            }
+            if (j === step.writeIdx) labels.push("w");
+            if (step.pIdx >= 0 && j === step.pIdx) labels.push("p");
+            if (labels.length > 0) { ptr.textContent = labels.join(" "); ptr.className += " active"; }
+        } else {
+            if (j === m - 1 && m > 0) { ptr.textContent = "p"; ptr.className += " active"; }
+            if (j === total - 1) { ptr.textContent = (j === m - 1 && m > 0 ? "p w" : "w"); ptr.className += " active"; }
+        }
+        priPtrsTop.appendChild(ptr);
+    }
+
+    /* Secondary row */
+    secRow.innerHTML = "";
+    secPtrs.innerHTML = "";
+    for (var k = 0; k < n; k++) {
+        var scell = document.createElement("div");
+        scell.className = "m-cell";
+        var isReadS = step && step.sIdx === k;
+        var isExhausted = step && k > step.sIdx;
+        var isPick = step && !step.fromPrimary && step.sIdx + 1 === k;
+
+        if (isPick) scell.className += " source-pick";
+        else if (isReadS) scell.className += " read-ptr";
+        else if (isExhausted) scell.className += " exhausted";
+
+        scell.textContent = sec[k];
+        secRow.appendChild(scell);
+
+        var sptr = document.createElement("span");
+        sptr.className = "ptr-label";
+        if (step) {
+            if (step.sIdx >= 0 && k === step.sIdx) { sptr.textContent = "s"; sptr.className += " active"; }
+        } else {
+            if (k === n - 1) { sptr.textContent = "s"; sptr.className += " active"; }
+        }
+        secPtrs.appendChild(sptr);
+    }
+
+    /* Status */
+    if (step) {
+        var src = step.fromPrimary ? "primary[" + (step.pIdx + 1) + "]" : "secondary[" + (step.sIdx + 1) + "]";
+        refs.status.action.textContent = "Place " + step.placed + " at [" + step.writeIdx + "] from " + src;
+        refs.status.ptrs.textContent = "p=" + step.pIdx + "  s=" + step.sIdx + "  w=" + (step.writeIdx - 1);
+    } else {
+        refs.status.action.textContent = "\u2014";
+        refs.status.ptrs.textContent = "p=" + (m - 1) + "  s=" + (n - 1) + "  w=" + (total - 1);
+    }
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var step = engine.currentStep();
+    var src = step.fromPrimary ? "primary" : "secondary";
+    return "Place " + step.placed + " at position " + step.writeIdx + " (from " + src + ")";
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 500
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
 </body>
 </html>
