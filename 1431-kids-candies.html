@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kids With the Greatest Number of Candies — Fixed Threshold</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.cell.pass {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border-color: #1D1D1F;
+}
+.cell.fail {
+    opacity: 0.4;
+}
+.cell.scanning {
+    border-color: #1D1D1F;
+    border-width: 2px;
+}
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 1431 Kids With the Greatest Number of Candies. Step through finding the max threshold and evaluating each kid.">
+<meta property="og:title" content="Kids With the Greatest Number of Candies — Algorithm Visualization">
+<meta property="og:description" content="Watch the fixed-threshold evaluation unfold step by step.">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Kids With the Greatest Number of Candies · Optimal Solution</span>
+        <h1>One threshold. Every kid measured against it.</h1>
+        <p class="hero-text">
+            Picture an award ceremony where every child holding at least as many candies as the
+            current leader qualifies for a prize. The host finds the top count once, then walks
+            down the line asking a single question: "If I hand you extra candies, do you reach the
+            leader?" Each answer is independent — one kid's outcome never changes another's. Find
+            the maximum, sweep the array, compare each boosted total. <code>O(n)</code> time.
+            <code>O(n)</code> space for the result.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch each kid reach — or fall short</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>A fixed bar, not a moving target</h2>
+        <p class="section-intro">
+            The algorithm hinges on a single pre-computed threshold. Every evaluation is a
+            self-contained arithmetic check — no kid's result depends on any other kid's.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>fixed threshold</h3>
+                <p>Scan the array once to find its maximum. This value becomes the bar every kid must meet. It never changes — one pass, one number, done.</p>
+            </article>
+            <article class="concept-card">
+                <h3>hypothetical independence</h3>
+                <p>Each kid is evaluated as if <em>only they</em> received the extra candies. The question is hypothetical and isolated — kid 0's answer has no bearing on kid 3's.</p>
+            </article>
+            <article class="concept-card">
+                <h3>the &ge; check</h3>
+                <p>The comparison is <code>candies[i] + extra &ge; threshold</code>, not strictly greater. A kid who ties the leader after the bonus still qualifies — equality counts.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Find the max, then sweep</h2>
+        <p class="section-intro">
+            Two passes over the array — one to establish the bar, one to evaluate every kid against it.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Find the maximum</h4>
+                    <p>Scan the entire array to compute <code>threshold = candies.Max()</code>. This is the highest candy count any kid currently holds.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Allocate the result array</h4>
+                    <p>Create a boolean array of the same length: <code>result = new bool[candies.Length]</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Evaluate each kid</h4>
+                    <p>For each index, compute <code>candies[i] + extraCandies</code> and compare against the threshold. Store <code>true</code> if the sum meets or exceeds it, <code>false</code> otherwise.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Return the result</h4>
+                    <p>The boolean array is the answer. No sorting, no second pass needed — each slot was decided in constant time.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where every kid wins — or only the leader</h2>
+        <p class="section-intro">
+            The threshold and the extra candy count together determine who qualifies. A few
+            boundary scenarios are worth reasoning through.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>All equal elements</h3>
+                <p>
+                    When every kid holds the same number of candies, the threshold equals that
+                    value. Adding any positive extra guarantees every kid qualifies — the result
+                    is all <code>true</code>.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Single kid</h3>
+                <p>
+                    With only one child, the threshold is their own count. Adding extra candies
+                    can only increase it — always <code>true</code>. No comparison needed, but
+                    the algorithm handles it naturally.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Leader-only qualification</h3>
+                <p>
+                    When the extra amount is too small to close the gap for trailing kids, only
+                    the current leader(s) qualify. The further behind a kid is, the more extra
+                    candies they'd need.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Exact tie after bonus</h3>
+                <p>
+                    A kid whose boosted total exactly equals the threshold still qualifies — the
+                    check is <code>&ge;</code>, not <code>&gt;</code>. Missing this subtlety
+                    flips answers from <code>true</code> to <code>false</code>.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current kid" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "index",   label: "Index" },
+        { id: "boosted", label: "Boosted" },
+        { id: "compare", label: "Compare" },
+        { id: "verdict", label: "Verdict" }
+    ],
+    values: [
+        { id: "threshold", label: "Threshold (max)" },
+        { id: "extra",     label: "Extra Candies" }
+    ],
+    orderTitle: "Result Array"
+});
+
+var ptrElements = VizArray.createPointers(refs.container, [
+    { id: "i", label: "i", position: "above" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "Canonical [2,3,5,1,3] extra=3",
+        data: { candies: [2, 3, 5, 1, 3], extra: 3 },
+        desc: "The classic example — threshold is 5. Most kids reach it with 3 extra, but kid 3 (value 1) falls short at 4."
+    },
+    {
+        name: "All qualify [4,2,1,1,2] extra=3",
+        data: { candies: [4, 2, 1, 1, 2], extra: 3 },
+        desc: "Threshold is 4. Every kid's boosted total meets or exceeds it — all true."
+    },
+    {
+        name: "Leader only [5,1,2] extra=2",
+        data: { candies: [5, 1, 2], extra: 2 },
+        desc: "Threshold is 5. Only the leader can still reach 5 after the bonus. The rest fall short."
+    },
+    {
+        name: "All equal [3,3,3] extra=2",
+        data: { candies: [3, 3, 3], extra: 2 },
+        desc: "Identical values — threshold equals everyone's count. Any positive extra guarantees all true."
+    },
+    {
+        name: "Exact tie [1,4,4] extra=3",
+        data: { candies: [1, 4, 4], extra: 3 },
+        desc: "Kid 0 has only 1, but 1 + 3 = 4 exactly ties the threshold. The >= check makes this true."
+    },
+    {
+        name: "Larger mixed [6,4,3,5] extra=2",
+        data: { candies: [6, 4, 3, 5], extra: 2 },
+        desc: "Threshold is 6. Kid 2 (value 3) reaches only 5 — the lone failure in the group.",
+        mobileDefault: true
+    },
+    {
+        name: "Only top [12,1,12] extra=1",
+        data: { candies: [12, 1, 12], extra: 1 },
+        desc: "Threshold is 12. With only 1 extra candy, kid 1 reaches just 2 — nowhere close."
+    },
+    {
+        name: "Single kid [7] extra=5",
+        data: { candies: [7], extra: 5 },
+        desc: "One child — threshold is their own count. Trivially true."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var candies = preset.data.candies;
+    var extra = preset.data.extra;
+    var steps = [];
+    var runningMax = -Infinity;
+
+    // Phase 1: scan to find the maximum
+    for (var i = 0; i < candies.length; i++) {
+        if (candies[i] > runningMax) runningMax = candies[i];
+        steps.push({
+            phase: "scan",
+            index: i,
+            value: candies[i],
+            runningMax: runningMax
+        });
+    }
+
+    var threshold = runningMax;
+    var results = [];
+
+    // Phase 2: evaluate each kid
+    for (var j = 0; j < candies.length; j++) {
+        var boosted = candies[j] + extra;
+        var qualifies = boosted >= threshold;
+        results.push(qualifies);
+        steps.push({
+            phase: "evaluate",
+            index: j,
+            value: candies[j],
+            boosted: boosted,
+            threshold: threshold,
+            extra: extra,
+            qualifies: qualifies
+        });
+    }
+
+    var order = results.map(function(q) { return q ? "T" : "F"; });
+
+    return {
+        steps: steps,
+        order: order,
+        candies: candies,
+        extra: extra,
+        threshold: threshold,
+        results: results,
+        desc: preset.desc
+    };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    var currentIdx = null;
+    var highlights = new Map();
+
+    // Build highlight state from all steps up to current position
+    if (step) {
+        currentIdx = step.index;
+
+        if (step.phase === "scan") {
+            // During scanning, mark previously scanned cells
+            for (var s = 0; s < pos; s++) {
+                if (trace.steps[s].phase === "scan") {
+                    highlights.set(trace.steps[s].index, "scanning");
+                }
+            }
+        } else if (step.phase === "evaluate") {
+            // During evaluation, show results for already-evaluated kids
+            for (var e = trace.candies.length; e < pos; e++) {
+                var prev = trace.steps[e];
+                if (prev.phase === "evaluate") {
+                    highlights.set(prev.index, prev.qualifies ? "pass" : "fail");
+                }
+            }
+            // Current evaluation step
+            highlights.set(step.index, step.qualifies ? "pass" : "fail");
+        }
+    } else if (pos === -1 && trace.steps.length > 0) {
+        // Initial state — no highlights
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: trace.candies,
+        current: currentIdx,
+        highlights: highlights
+    });
+
+    // Status bar
+    if (step) {
+        refs.status.index.textContent = String(step.index);
+
+        if (step.phase === "scan") {
+            refs.status.boosted.textContent = "\u2014";
+            refs.status.compare.textContent = "Scanning for max\u2026";
+            refs.status.verdict.textContent = "Phase 1";
+        } else {
+            refs.status.boosted.textContent = step.value + " + " + trace.extra + " = " + step.boosted;
+            refs.status.compare.textContent = step.boosted + (step.qualifies ? " \u2265 " : " < ") + step.threshold;
+            refs.status.verdict.textContent = step.qualifies ? "\u2713 true" : "\u2717 false";
+        }
+    } else {
+        refs.status.index.textContent = "\u2014";
+        refs.status.boosted.textContent = "\u2014";
+        refs.status.compare.textContent = "\u2014";
+        refs.status.verdict.textContent = "\u2014";
+    }
+
+    // Values bar
+    if (step && step.phase === "evaluate") {
+        refs.values.threshold.textContent = String(step.threshold);
+    } else if (step && step.phase === "scan") {
+        refs.values.threshold.textContent = step.runningMax + " (scanning\u2026)";
+    } else {
+        refs.values.threshold.textContent = "\u2014";
+    }
+    refs.values.extra.textContent = String(trace.extra);
+
+    // Note
+    refs.note.textContent = describeStep(engine);
+
+    // Pointer
+    requestAnimationFrame(function() {
+        var ptrs = {};
+        if (step) {
+            ptrs.i = { index: step.index };
+        } else {
+            ptrs.i = { index: 0 };
+        }
+
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: ptrs,
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    var trace = engine.trace;
+
+    if (!step) {
+        if (trace.steps.length === 0)
+            return "Empty array \u2014 nothing to evaluate.";
+        return trace.desc + " Press Play or Next to begin.";
+    }
+
+    if (step.phase === "scan") {
+        return "Scanning index " + step.index + ": value " + step.value + ". Running maximum is now " + step.runningMax + ".";
+    }
+
+    var op = step.qualifies ? "\u2265" : "<";
+    return "Kid " + step.index + " has " + step.value + " candies. With " + trace.extra + " extra \u2192 " + step.boosted + ". Threshold is " + step.threshold + ". " + step.boosted + " " + op + " " + step.threshold + " \u2192 " + step.qualifies + ".";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 800
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
