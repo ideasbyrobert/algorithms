@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game of Life — Transitional State Encoding</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Life grid ────────────────────────────────────────── */
+
+.life-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 0;
+}
+
+.life-row {
+    display: flex;
+    gap: 4px;
+}
+
+.life-cell {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 500 14px/1 'Menlo', monospace;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+/* State-based styling — monochrome only */
+.life-cell.dead {
+    background: #FAFAFA;
+    border: 1.5px solid #C7C7CC;
+    color: #C7C7CC;
+}
+
+.life-cell.alive {
+    background: #1D1D1F;
+    border: 1.5px solid #1D1D1F;
+    color: #FFFFFF;
+}
+
+.life-cell.dying {
+    background: #FFFFFF;
+    border: 2px dashed #48484A;
+    color: #48484A;
+}
+
+.life-cell.born {
+    background: #636366;
+    border: 2px solid #636366;
+    color: #FFFFFF;
+}
+
+.life-cell.current {
+    box-shadow: 0 0 0 3px #1D1D1F;
+}
+
+.life-cell.neighbor {
+    box-shadow: 0 0 0 2px #AEAEB2;
+}
+
+/* ── Mobile ───────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .life-cell {
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+    }
+}
+
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 289 Game of Life — Transitional State Encoding.">
+<meta property="og:title" content="289 Game of Life — Transitional State Encoding">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/289-game-of-life.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/289-game-of-life.html">
+</head>
+<body>
+
+<main class="page">
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Game of Life · Optimal Solution</span>
+        <h1>Encode transitions in-place, then decode.</h1>
+        <p class="hero-text">
+            Conway's Game of Life applies four rules simultaneously to every cell
+        in a matrix to produce the next generation.
+        <strong>Underpopulation:</strong> a live cell with fewer than 2 live
+        neighbors dies.
+        <strong>Survival:</strong> a live cell with 2 or 3 neighbors lives on.
+        <strong>Overcrowding:</strong> a live cell with more than 3 neighbors dies.
+        <strong>Reproduction:</strong> a dead cell with exactly 3 live neighbors
+        becomes alive.
+        The challenge: compute the next state <em>in place</em>, without an
+        extra copy of the board.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>The Simultaneous Update Problem</h2>
+        <p class="section-intro">
+        If you update each cell immediately, later cells see a mix of old and
+        new states when counting neighbors. A cell that should survive might
+        die because its neighbor was already killed, or a dead cell might
+        incorrectly spring to life because a neighbor was just born. Every
+        cell must see the <strong>original</strong> generation, not the
+        partially-updated board. We need a way to record decisions without
+        destroying the information that remaining cells still need to read.
+    </p>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Transitional Encoding</h2>
+        <div class="viz-code-block">
+<pre><code> 0 → dead (stays dead)
+ 1 → alive (stays alive)
+-1 → was alive, now dying
+ 2 → was dead, now born</code></pre>
+    </div>
+        <p class="section-intro">
+        Instead of flipping cells immediately, we write intermediate codes
+        that capture <em>both</em> the original state and the decision.
+        A dying cell is marked <code>-1</code> rather than overwritten to 0,
+        and a newborn cell is marked <code>2</code> rather than overwritten
+        to 1. After every cell has been encoded, a single cleanup pass
+        converts positive values to 1 and everything else to 0.
+    </p>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Why Abs(value) == 1?</h2>
+        <p class="section-intro">
+        During the encoding pass, earlier cells may already hold <code>-1</code>
+        or <code>2</code>. When counting neighbors, we need the
+        <em>original</em> liveness. The key insight:
+        <code>abs(-1) = 1</code>, so a dying cell still registers as
+        originally alive. And <code>abs(2) = 2 ≠ 1</code>, so a newborn
+        cell still registers as originally dead. By testing
+        <code>abs(value) == 1</code> instead of <code>value == 1</code>,
+        every cell correctly reads the original generation even after
+        its neighbors have been encoded.
+    </p>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Complexity</span>
+        <h2>Complexity</h2>
+        <p class="section-intro">
+        <strong>Time:</strong> O(m × n) — two passes over the matrix.<br>
+        <strong>Space:</strong> O(1) — encodings stored in-place.
+    </p>
+    </section>
+
+    <footer class="page-footer">
+        <p>Part of the pattern/core algorithm curriculum.</p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    gridClass: "life-grid-wrap",
+    status: [
+        { id: "phase",  label: "Phase" },
+        { id: "cell",   label: "Cell" },
+        { id: "action", label: "Action" }
+    ],
+    values: [
+        { id: "neighbors", label: "Live Neighbors" }
+    ],
+    showOrder: false
+});
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "LeetCode Example",
+        board: [[0,1,0],[0,0,1],[1,1,1],[0,0,0]]
+    },
+    {
+        name: "Blinker (period-2 oscillator)",
+        mobileDefault: true,
+        board: [[0,0,0,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,0,0,0]]
+    },
+    {
+        name: "Block (still life)",
+        board: [[0,0,0,0],[0,1,1,0],[0,1,1,0],[0,0,0,0]]
+    },
+    {
+        name: "Glider",
+        board: [[0,1,0,0],[0,0,1,0],[1,1,1,0],[0,0,0,0]]
+    },
+    {
+        name: "Toad (period-2)",
+        board: [[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,1,1,1,0],[0,1,1,1,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]
+    },
+    {
+        name: "Beehive (still life)",
+        board: [[0,0,0,0,0,0],[0,0,1,1,0,0],[0,1,0,0,1,0],[0,0,1,1,0,0],[0,0,0,0,0,0]]
+    },
+    {
+        name: "All Alive 3\u00d73",
+        board: [[1,1,1],[1,1,1],[1,1,1]]
+    },
+    {
+        name: "All Dead 3\u00d73",
+        board: [[0,0,0],[0,0,0],[0,0,0]]
+    }
+];
+
+/* ── Helpers ─────────────────────────────────────────── */
+
+function cloneBoard(b) {
+    return b.map(function(r) { return r.slice(); });
+}
+
+function getNeighborCoords(board, row, col) {
+    var coords = [];
+    var rows = board.length;
+    var cols = board[0].length;
+    for (var dr = -1; dr <= 1; dr++) {
+        for (var dc = -1; dc <= 1; dc++) {
+            if (dr === 0 && dc === 0) continue;
+            var nr = row + dr;
+            var nc = col + dc;
+            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                coords.push({ r: nr, c: nc });
+            }
+        }
+    }
+    return coords;
+}
+
+function countOriginallyLive(board, row, col) {
+    var neighbors = getNeighborCoords(board, row, col);
+    var count = 0;
+    for (var i = 0; i < neighbors.length; i++) {
+        if (Math.abs(board[neighbors[i].r][neighbors[i].c]) === 1) {
+            count++;
+        }
+    }
+    return count;
+}
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var board = cloneBoard(preset.board);
+    var rows = board.length;
+    var cols = board[0].length;
+    var steps = [];
+
+    /* Encode phase */
+    for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+            var state = board[r][c];
+            var neighbors = getNeighborCoords(board, r, c);
+            var liveNeighbors = countOriginallyLive(board, r, c);
+            var encodedState = state;
+
+            if (state === 1 && (liveNeighbors < 2 || liveNeighbors > 3)) {
+                encodedState = -1;
+            } else if (state === 0 && liveNeighbors === 3) {
+                encodedState = 2;
+            }
+
+            board[r][c] = encodedState;
+
+            steps.push({
+                type: "encode",
+                row: r,
+                col: c,
+                originalState: state,
+                liveNeighbors: liveNeighbors,
+                encodedState: encodedState,
+                neighbors: neighbors,
+                board: cloneBoard(board)
+            });
+        }
+    }
+
+    /* Cleanup phase */
+    for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+            var encodedValue = board[r][c];
+            var finalValue = board[r][c] > 0 ? 1 : 0;
+            board[r][c] = finalValue;
+
+            steps.push({
+                type: "cleanup",
+                row: r,
+                col: c,
+                encodedValue: encodedValue,
+                finalValue: finalValue,
+                board: cloneBoard(board)
+            });
+        }
+    }
+
+    return {
+        steps: steps,
+        originalBoard: preset.board,
+        finalBoard: cloneBoard(board)
+    };
+}
+
+/* ── Cell class from encoded value ───────────────────── */
+
+function cellClass(value) {
+    if (value === -1) return "dying";
+    if (value === 2) return "born";
+    if (value === 1) return "alive";
+    return "dead";
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var steps = trace.steps;
+    var step = pos >= 0 ? steps[pos] : null;
+
+    var displayBoard = step ? step.board : trace.originalBoard;
+    var rows = displayBoard.length;
+    var cols = displayBoard[0].length;
+
+    /* Determine neighbor highlight set */
+    var neighborSet = {};
+    var curR = -1;
+    var curC = -1;
+
+    if (step) {
+        curR = step.row;
+        curC = step.col;
+        if (step.type === "encode" && step.neighbors) {
+            for (var i = 0; i < step.neighbors.length; i++) {
+                var n = step.neighbors[i];
+                neighborSet[n.r + "," + n.c] = true;
+            }
+        }
+    }
+
+    /* Build grid HTML */
+    var h = '<div class="life-layout">';
+
+    for (var r = 0; r < rows; r++) {
+        h += '<div class="life-row">';
+        for (var c = 0; c < cols; c++) {
+            var val = displayBoard[r][c];
+            var cls = "life-cell";
+
+            /* During encode phase, show transitional states */
+            if (!step || step.type === "encode") {
+                cls += " " + cellClass(val);
+            } else {
+                /* During cleanup: cells up to current have final values,
+                   cells after still have encoded values */
+                var cleanupIdx = (rows * cols);
+                var thisCellCleanupIdx = r * cols + c;
+                var curCellCleanupIdx = curR * cols + curC;
+
+                if (thisCellCleanupIdx <= curCellCleanupIdx) {
+                    cls += val === 1 ? " alive" : " dead";
+                } else {
+                    cls += " " + cellClass(val);
+                }
+            }
+
+            if (r === curR && c === curC) {
+                cls += " current";
+            } else if (neighborSet[r + "," + c]) {
+                cls += " neighbor";
+            }
+
+            /* Display value: show encoded integers during encode, final during cleanup */
+            var displayVal = val;
+
+            h += '<div class="' + cls + '">' + displayVal + '</div>';
+        }
+        h += '</div>';
+    }
+
+    h += '</div>';
+    refs.grid.innerHTML = h;
+
+    /* Status bar */
+    if (step) {
+        refs.status.phase.textContent = step.type === "encode" ? "Encode" : "Cleanup";
+        refs.status.cell.textContent = "[" + step.row + "][" + step.col + "]";
+
+        if (step.type === "encode") {
+            var orig = step.originalState;
+            var enc = step.encodedState;
+            var ln = step.liveNeighbors;
+            var actionText;
+
+            if (orig === 1 && enc === -1) {
+                actionText = "alive + " + ln + " neighbor" + (ln !== 1 ? "s" : "") + " \u2192 dying (-1)";
+            } else if (orig === 0 && enc === 2) {
+                actionText = "dead + " + ln + " neighbors \u2192 born (2)";
+            } else if (orig === 1) {
+                actionText = "alive + " + ln + " neighbor" + (ln !== 1 ? "s" : "") + " \u2192 survives (1)";
+            } else {
+                actionText = "dead + " + ln + " neighbor" + (ln !== 1 ? "s" : "") + " \u2192 stays dead (0)";
+            }
+            refs.status.action.textContent = actionText;
+        } else {
+            refs.status.action.textContent = "encoded " + step.encodedValue +
+                (step.encodedValue > 0 ? " > 0" : " \u2264 0") +
+                " \u2192 " + (step.finalValue === 1 ? "alive (1)" : "dead (0)");
+        }
+    } else {
+        refs.status.phase.textContent = "\u2014";
+        refs.status.cell.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+    }
+
+    /* Values bar */
+    if (step && step.type === "encode") {
+        refs.values.neighbors.textContent = String(step.liveNeighbors);
+    } else {
+        refs.values.neighbors.textContent = "\u2014";
+    }
+
+    /* Note */
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next to begin.";
+    var step = engine.currentStep();
+
+    if (step.type === "encode") {
+        var orig = step.originalState === 1 ? "alive" : "dead";
+        var ln = step.liveNeighbors;
+        var ns = ln === 1 ? "neighbor" : "neighbors";
+
+        if (step.originalState === 1 && step.encodedState === -1) {
+            return "Encode [" + step.row + "][" + step.col + "]: alive with " + ln + " " + ns + " \u2192 dying (-1)";
+        }
+        if (step.originalState === 0 && step.encodedState === 2) {
+            return "Encode [" + step.row + "][" + step.col + "]: dead with " + ln + " " + ns + " \u2192 born (2)";
+        }
+        if (step.originalState === 1) {
+            return "Encode [" + step.row + "][" + step.col + "]: alive with " + ln + " " + ns + " \u2192 survives (1)";
+        }
+        return "Encode [" + step.row + "][" + step.col + "]: dead with " + ln + " " + ns + " \u2192 stays dead (0)";
+    }
+
+    return "Cleanup [" + step.row + "][" + step.col + "]: encoded " + step.encodedValue +
+        (step.encodedValue > 0 ? " > 0" : " \u2264 0") +
+        " \u2192 " + (step.finalValue === 1 ? "alive (1)" : "dead (0)");
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 400
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>

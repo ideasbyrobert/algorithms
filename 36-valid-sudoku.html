@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valid Sudoku — Row, Column, and Box Validation</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Sudoku grid ─────────────────────────────────────── */
+
+.sudoku-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 16px 0;
+}
+
+.sudoku-row {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 2px;
+}
+
+.sudoku-row.box-row-gap {
+    margin-top: 6px;
+}
+
+.sudoku-cell {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 400 15px/1 'Menlo', monospace;
+    color: #1D1D1F;
+    background: #FFFFFF;
+    border: 1px solid #C7C7CC;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.sudoku-cell.box-col-gap {
+    margin-left: 6px;
+}
+
+.sudoku-cell.empty-cell {
+    background: #FAFAFA;
+    color: #C7C7CC;
+}
+
+.sudoku-cell.current {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border: 2px solid #1D1D1F;
+}
+
+.sudoku-cell.accepted {
+    background: #F5F5F7;
+    border: 1.5px solid #AEAEB2;
+}
+
+.sudoku-cell.conflict {
+    background: #F5F5F7;
+    border: 2.5px dashed #1D1D1F;
+}
+
+.sudoku-cell.row-highlight {
+    border-color: #636366;
+}
+
+.sudoku-cell.col-highlight {
+    border-color: #636366;
+}
+
+.sudoku-cell.box-highlight {
+    border-color: #8E8E93;
+    border-style: dashed;
+}
+
+/* ── Hash-set displays ───────────────────────────────── */
+
+.sets-panel {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 16px;
+}
+
+.set-group {
+    text-align: center;
+}
+
+.set-label {
+    font: 500 11px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #8E8E93;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.set-digits {
+    font: 400 13px/1.4 'Menlo', monospace;
+    color: #48484A;
+    min-height: 18px;
+}
+
+/* ── Mobile ──────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .sudoku-cell {
+        width: 36px;
+        height: 36px;
+        font-size: 12px;
+        border-radius: 5px;
+    }
+    .sudoku-row { gap: 1px; margin-bottom: 1px; }
+    .sudoku-row.box-row-gap { margin-top: 4px; }
+    .sudoku-cell.box-col-gap { margin-left: 4px; }
+    .sets-panel { gap: 14px; }
+    .set-label { font-size: 10px; }
+    .set-digits { font-size: 11px; }
+}
+
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 36 Valid Sudoku — Row, Column, and Box Validation.">
+<meta property="og:title" content="36 Valid Sudoku — Row, Column, and Box Validation">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/36-valid-sudoku.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/36-valid-sudoku.html">
+</head>
+<body>
+
+<main class="page">
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Valid Sudoku · Optimal Solution</span>
+        <h1>Three dimensions, three hash sets, one linear pass.</h1>
+        <p class="hero-text">
+            Determine whether a 9×9 Sudoku board is valid. Only the
+        <strong>filled cells</strong> need to be validated — each row,
+        each column, and each of the nine 3×3 sub-boxes must contain
+        the digits 1–9 without repetition. Empty cells (marked
+        <code>'.'</code>) are placeholders and are ignored entirely.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Three HashSets per Dimension</h2>
+        <p class="section-intro">
+        We maintain three arrays of hash sets — <strong>rowDigits[9]</strong>,
+        <strong>columnDigits[9]</strong>, and <strong>boxDigits[9]</strong> —
+        27 sets in total. As we scan each filled cell, we check whether
+        its digit already exists in the corresponding row set, column set,
+        or box set. If any of the three contains it, we have found a
+        duplicate and the board is invalid. Otherwise we add the digit
+        to all three sets and move on.
+    </p>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Box Index Formula</h2>
+        <div class="viz-code-block">
+<pre><code>boxIndex = (row / 3) * 3 + (col / 3)</code></pre>
+    </div>
+        <p class="section-intro">
+        Integer division <code>row / 3</code> yields the box row (0, 1,
+        or 2) and <code>col / 3</code> yields the box column. Multiplying
+        the box row by 3 and adding the box column maps every cell to one
+        of nine box indices 0–8, laid out left-to-right, top-to-bottom —
+        exactly mirroring the 3×3 grid of sub-boxes.
+    </p>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Why Empty Cells Are Skipped</h2>
+        <p class="section-intro">
+        Empty cells are placeholders for digits not yet placed — they
+        carry no value that could conflict with anything, so including
+        them would be meaningless. We also <strong>stop at the first
+        conflict</strong>: a single duplicate is enough to declare the
+        board invalid, so there is no reason to continue scanning the
+        remaining cells once a violation is found.
+    </p>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Complexity</span>
+        <h2>Complexity</h2>
+        <p class="section-intro">
+        <strong>Time:</strong> O(1) — the board is always 9×9, so we
+        visit at most 81 cells regardless of input.<br>
+        <strong>Space:</strong> O(1) — 27 hash sets each holding at
+        most 9 digits, bounded by a constant.
+    </p>
+    </section>
+
+    <footer class="page-footer">
+        <p>Part of the pattern/core algorithm curriculum.</p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    gridClass: "sudoku-grid-wrap",
+    status: [
+        { id: "cell",   label: "Cell" },
+        { id: "digit",  label: "Digit" },
+        { id: "action", label: "Action" }
+    ],
+    values: [
+        { id: "box", label: "Box" }
+    ],
+    showOrder: false
+});
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "LeetCode Example 1 (Valid)",
+        board: [
+            "53..7....",
+            "6..195...",
+            ".98....6.",
+            "8...6...3",
+            "4..8.3..1",
+            "7...2...6",
+            ".6....28.",
+            "...419..5",
+            "....8..79"
+        ]
+    },
+    {
+        name: "Invalid — Row Duplicate",
+        board: [
+            "53..75...",
+            "6..195...",
+            ".98....6.",
+            "8...6...3",
+            "4..8.3..1",
+            "7...2...6",
+            ".6....28.",
+            "...419..5",
+            "....8..79"
+        ]
+    },
+    {
+        name: "Invalid — Column Duplicate",
+        board: [
+            "53..7....",
+            "6..195...",
+            ".98....6.",
+            "8...6...3",
+            "4..8.3..1",
+            "7...2...6",
+            ".6....28.",
+            "5..419..5",
+            "....8..79"
+        ]
+    },
+    {
+        name: "Invalid — Box Duplicate",
+        board: [
+            "53..7....",
+            "6..195...",
+            ".58....6.",
+            "8...6...3",
+            "4..8.3..1",
+            "7...2...6",
+            ".6....28.",
+            "...419..5",
+            "....8..79"
+        ]
+    },
+    {
+        name: "Nearly Empty (Valid)",
+        mobileDefault: true,
+        board: [
+            ".........",
+            "..1......",
+            ".........",
+            ".........",
+            "....5....",
+            ".........",
+            ".........",
+            "......7..",
+            "........9"
+        ]
+    },
+    {
+        name: "Full Valid Board",
+        board: [
+            "534678912",
+            "672195348",
+            "198342567",
+            "859761423",
+            "426853791",
+            "713924856",
+            "961537284",
+            "287419635",
+            "345286179"
+        ]
+    },
+    {
+        name: "Single Digit",
+        board: [
+            ".........",
+            ".........",
+            ".........",
+            ".........",
+            "....3....",
+            ".........",
+            ".........",
+            ".........",
+            "........."
+        ]
+    },
+    {
+        name: "Diagonal Only",
+        board: [
+            "1........",
+            ".2.......",
+            "..3......",
+            "...4.....",
+            "....5....",
+            ".....6...",
+            "......7..",
+            ".......8.",
+            "........9"
+        ]
+    }
+];
+
+/* ── Parse board ─────────────────────────────────────── */
+
+function parseBoard(boardStrings) {
+    var result = [];
+    for (var r = 0; r < 9; r++) {
+        var row = [];
+        for (var c = 0; c < 9; c++) {
+            row.push(boardStrings[r].charAt(c));
+        }
+        result.push(row);
+    }
+    return result;
+}
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var board = parseBoard(preset.board);
+    var rowDigits = [];
+    var colDigits = [];
+    var boxDigits = [];
+    for (var i = 0; i < 9; i++) {
+        rowDigits.push({});
+        colDigits.push({});
+        boxDigits.push({});
+    }
+
+    var steps = [];
+    var isValid = true;
+
+    for (var row = 0; row < 9; row++) {
+        for (var col = 0; col < 9; col++) {
+            var digit = board[row][col];
+            if (digit === ".") continue;
+
+            var boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
+            var rowConflict = digit in rowDigits[row];
+            var colConflict = digit in colDigits[col];
+            var boxConflict = digit in boxDigits[boxIndex];
+            var accepted = !(rowConflict || colConflict || boxConflict);
+
+            /* Snapshot current state of the three sets */
+            var seenRows = [];
+            var seenCols = [];
+            var seenBoxes = [];
+            for (var k = 0; k < 9; k++) {
+                seenRows.push(Object.keys(rowDigits[k]).sort().join(""));
+                seenCols.push(Object.keys(colDigits[k]).sort().join(""));
+                seenBoxes.push(Object.keys(boxDigits[k]).sort().join(""));
+            }
+
+            steps.push({
+                row: row,
+                col: col,
+                digit: digit,
+                boxIndex: boxIndex,
+                rowConflict: rowConflict,
+                colConflict: colConflict,
+                boxConflict: boxConflict,
+                accepted: accepted,
+                seenRows: seenRows,
+                seenCols: seenCols,
+                seenBoxes: seenBoxes
+            });
+
+            if (!accepted) {
+                isValid = false;
+                break;
+            }
+
+            rowDigits[row][digit] = true;
+            colDigits[col][digit] = true;
+            boxDigits[boxIndex][digit] = true;
+        }
+        if (!isValid) break;
+    }
+
+    return { steps: steps, board: board, isValid: isValid };
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var pos = engine.position;
+    var board = trace.board;
+    var steps = trace.steps;
+
+    /* Build set of accepted cell keys up to pos-1 */
+    var acceptedCells = {};
+    var curStep = null;
+    for (var i = 0; i < steps.length && i <= pos; i++) {
+        var s = steps[i];
+        if (i < pos && s.accepted) {
+            acceptedCells[s.row + "," + s.col] = true;
+        }
+        if (i === pos) curStep = s;
+    }
+
+    /* Determine highlight sets for current step */
+    var rowHL = {};
+    var colHL = {};
+    var boxHL = {};
+    var curBox = -1;
+    if (curStep) {
+        curBox = curStep.boxIndex;
+        for (var c = 0; c < 9; c++) {
+            rowHL[curStep.row + "," + c] = true;
+        }
+        for (var r = 0; r < 9; r++) {
+            colHL[r + "," + curStep.col] = true;
+        }
+        var boxRowStart = Math.floor(curStep.row / 3) * 3;
+        var boxColStart = Math.floor(curStep.col / 3) * 3;
+        for (var br = boxRowStart; br < boxRowStart + 3; br++) {
+            for (var bc = boxColStart; bc < boxColStart + 3; bc++) {
+                boxHL[br + "," + bc] = true;
+            }
+        }
+    }
+
+    /* Build grid HTML */
+    var h = '<div class="sudoku-layout">';
+
+    for (var r = 0; r < 9; r++) {
+        var rowClass = "sudoku-row";
+        if (r === 3 || r === 6) rowClass += " box-row-gap";
+        h += '<div class="' + rowClass + '">';
+
+        for (var c = 0; c < 9; c++) {
+            var key = r + "," + c;
+            var ch = board[r][c];
+            var cls = "sudoku-cell";
+
+            if (c === 3 || c === 6) cls += " box-col-gap";
+
+            if (ch === ".") {
+                cls += " empty-cell";
+            }
+
+            /* Apply state classes */
+            if (curStep && r === curStep.row && c === curStep.col) {
+                if (!curStep.accepted) {
+                    cls += " conflict";
+                } else {
+                    cls += " current";
+                }
+            } else if (key in acceptedCells) {
+                cls += " accepted";
+            }
+
+            /* Row / col / box highlights (only for non-current, non-accepted) */
+            if (curStep && !(r === curStep.row && c === curStep.col)) {
+                if (key in boxHL && ch !== ".") cls += " box-highlight";
+                if (key in rowHL && ch !== ".") cls += " row-highlight";
+                if (key in colHL && ch !== ".") cls += " col-highlight";
+            }
+
+            var display = ch === "." ? "" : ch;
+            h += '<div class="' + cls + '">' + display + '</div>';
+        }
+        h += '</div>';
+    }
+    h += '</div>';
+
+    /* Hash-set panel */
+    if (curStep) {
+        h += '<div class="sets-panel">';
+        h += '<div class="set-group"><div class="set-label">Row ' + curStep.row + '</div>';
+        h += '<div class="set-digits">{' + (curStep.seenRows[curStep.row] || "\u2014") + '}</div></div>';
+        h += '<div class="set-group"><div class="set-label">Col ' + curStep.col + '</div>';
+        h += '<div class="set-digits">{' + (curStep.seenCols[curStep.col] || "\u2014") + '}</div></div>';
+        h += '<div class="set-group"><div class="set-label">Box ' + curStep.boxIndex + '</div>';
+        h += '<div class="set-digits">{' + (curStep.seenBoxes[curStep.boxIndex] || "\u2014") + '}</div></div>';
+        h += '</div>';
+    }
+
+    refs.grid.innerHTML = h;
+
+    /* Update status bar */
+    if (curStep) {
+        refs.status.cell.textContent = "[" + curStep.row + "][" + curStep.col + "]";
+        refs.status.digit.textContent = curStep.digit;
+        if (curStep.accepted) {
+            refs.status.action.textContent = "accepted";
+        } else if (curStep.rowConflict) {
+            refs.status.action.textContent = "row-duplicate!";
+        } else if (curStep.colConflict) {
+            refs.status.action.textContent = "col-duplicate!";
+        } else {
+            refs.status.action.textContent = "box-duplicate!";
+        }
+        refs.values.box.textContent = curStep.boxIndex;
+    } else {
+        refs.status.cell.textContent = "\u2014";
+        refs.status.digit.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+        refs.values.box.textContent = "\u2014";
+    }
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var s = engine.currentStep();
+    var prefix = "Check [" + s.row + "][" + s.col + "] = \u2018" + s.digit + "\u2019: ";
+    if (s.accepted) {
+        return prefix + "new to row " + s.row + ", col " + s.col + ", box " + s.boxIndex + " \u2192 accepted";
+    }
+    if (s.rowConflict) {
+        return prefix + "already in row " + s.row + " \u2192 row-duplicate!";
+    }
+    if (s.colConflict) {
+        return prefix + "already in col " + s.col + " \u2192 col-duplicate!";
+    }
+    return prefix + "already in box " + s.boxIndex + " \u2192 box-duplicate!";
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 400
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rotate Image — Transpose + Reverse</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Matrix grid ──────────────────────────────────────── */
+
+.matrix-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+}
+
+.matrix-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.matrix-row.header-row { margin-bottom: 10px; }
+
+.row-label {
+    width: 24px;
+    font: 500 11px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #AEAEB2;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.col-header {
+    width: 64px;
+    font: 500 10px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #AEAEB2;
+    text-align: center;
+    letter-spacing: 0.4px;
+}
+
+.m-cell {
+    width: 64px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 400 15px/1 'Menlo', monospace;
+    color: #1D1D1F;
+    background: #FFFFFF;
+    border: 1.5px solid #C7C7CC;
+    border-radius: 10px;
+    transition: background 0.25s ease, border-color 0.25s ease,
+                color 0.25s ease;
+}
+
+.m-cell.current {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border: 2px solid #1D1D1F;
+}
+
+.m-cell.scanning {
+    background: #F5F5F7;
+    border: 2px solid #636366;
+}
+
+.m-cell.swap-pair {
+    background: #F5F5F7;
+    border: 2px dashed #1D1D1F;
+}
+
+.m-cell.just-changed {
+    background: #F5F5F7;
+    border: 2px solid #48484A;
+}
+
+/* ── Mobile ───────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .row-label { width: 18px; font-size: 10px; }
+    .col-header { width: 48px; font-size: 9px; }
+    .m-cell { width: 48px; height: 36px; font-size: 13px; border-radius: 8px; }
+}
+
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 48 Rotate Image — Transpose + Reverse.">
+<meta property="og:title" content="48 Rotate Image — Transpose + Reverse">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/48-rotate-image.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/48-rotate-image.html">
+</head>
+<body>
+
+<main class="page">
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Rotate Image · Optimal Solution</span>
+        <h1>In-place 90° rotation through transpose and reverse.</h1>
+        <p class="hero-text">
+            Given an n&nbsp;×&nbsp;n matrix, rotate it 90&nbsp;degrees clockwise
+        <strong>in place</strong>. The key insight: a 90° clockwise rotation
+        decomposes into two simple operations — <em>transpose</em> the matrix
+        (reflect across the main diagonal), then <em>reverse each row</em>.
+        No extra space is needed beyond a single swap variable.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Transpose + Reverse = 90° Rotation</h2>
+        <p class="section-intro">
+        <strong>Transpose</strong> reflects the matrix across its main
+        diagonal: every cell&nbsp;[r][c] swaps with&nbsp;[c][r]. Rows become
+        columns and columns become rows.
+    </p>
+        <p>
+        <strong>Reverse each row</strong> then mirrors every row horizontally
+        — a two-pointer sweep from the edges inward. Composing these two
+        reflections produces exactly a 90° clockwise rotation.
+    </p>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Two Phases</h2>
+        <div class="viz-code-block">
+<pre><code>Phase 1 — Transpose:
+  for row = 0 … n-1
+    for col = row+1 … n-1
+      swap matrix[row][col] ↔ matrix[col][row]
+
+Phase 2 — Reverse each row:
+  for each row
+    left = 0, right = n-1
+    while left &lt; right
+      swap matrix[row][left] ↔ matrix[row][right]
+      left++, right--</code></pre>
+    </div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Edge Cases &amp; Observations</h2>
+        <p class="section-intro">
+        <strong>Odd-sized matrices</strong> — the center element sits on the
+        main diagonal (r&nbsp;=&nbsp;c), so the transpose skips it. During
+        the row-reverse it sits at the midpoint, untouched by the two-pointer
+        sweep. It naturally stays in place.
+    </p>
+        <p>
+        <strong>1 × 1 matrix</strong> — both phases produce zero swap
+        iterations. The single element is already its own rotation.
+    </p>
+        <p>
+        <strong>Order matters</strong> — transpose then reverse produces a
+        clockwise rotation. Reversing first, then transposing, produces a
+        <em>counter-clockwise</em> rotation instead.
+    </p>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Complexity</span>
+        <h2>Complexity</h2>
+        <p class="section-intro">
+        <strong>Time:</strong> O(n²) — each cell is visited at most twice
+        (once during transpose, once during reverse).<br>
+        <strong>Space:</strong> O(1) — all swaps are performed in place.
+    </p>
+    </section>
+
+    <footer class="page-footer">
+        <p>Part of the pattern/core algorithm curriculum.</p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    gridClass: "matrix-grid-wrap",
+    status: [
+        { id: "phase",  label: "Phase" },
+        { id: "cell",   label: "Cell" },
+        { id: "action", label: "Action" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "3\u00d73 Default",
+        matrix: [[1,2,3],[4,5,6],[7,8,9]]
+    },
+    {
+        name: "4\u00d74 \u2014 LeetCode Ex 2",
+        matrix: [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]
+    },
+    {
+        name: "2\u00d72 Minimal",
+        mobileDefault: true,
+        matrix: [[1,2],[3,4]]
+    },
+    {
+        name: "3\u00d73 Already Rotated",
+        matrix: [[7,4,1],[8,5,2],[9,6,3]]
+    },
+    {
+        name: "5\u00d75 Sequential",
+        mobileDefault: false,
+        matrix: [[1,2,3,4,5],[6,7,8,9,10],[11,12,13,14,15],[16,17,18,19,20],[21,22,23,24,25]]
+    },
+    {
+        name: "3\u00d73 Symmetric",
+        matrix: [[1,2,1],[2,5,2],[1,2,1]]
+    },
+    {
+        name: "4\u00d74 Identity-like",
+        matrix: [[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]
+    },
+    {
+        name: "1\u00d71 Single Cell",
+        mobileDefault: true,
+        matrix: [[42]]
+    }
+];
+
+/* ── Deep clone helper ────────────────────────────────── */
+
+function cloneM(m) { return m.map(function(r) { return r.slice(); }); }
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var orig = preset.matrix;
+    var n = orig.length;
+    var matrix = cloneM(orig);
+    var steps = [];
+
+    /* Phase 1: Transpose — swap [row][col] with [col][row] for col > row */
+    for (var row = 0; row < n; row++) {
+        for (var col = row + 1; col < n; col++) {
+            var val1 = matrix[row][col];
+            var val2 = matrix[col][row];
+            var tmp = matrix[row][col];
+            matrix[row][col] = matrix[col][row];
+            matrix[col][row] = tmp;
+            steps.push({
+                type: "transpose",
+                row1: row, col1: col,
+                row2: col, col2: row,
+                val1: val1, val2: val2,
+                matrix: cloneM(matrix)
+            });
+        }
+    }
+
+    /* Phase 2: Reverse each row */
+    for (var row = 0; row < n; row++) {
+        var left = 0, right = n - 1;
+        while (left < right) {
+            var leftVal = matrix[row][left];
+            var rightVal = matrix[row][right];
+            var tmp = matrix[row][left];
+            matrix[row][left] = matrix[row][right];
+            matrix[row][right] = tmp;
+            steps.push({
+                type: "reverse",
+                row: row,
+                leftCol: left, rightCol: right,
+                leftVal: leftVal, rightVal: rightVal,
+                matrix: cloneM(matrix)
+            });
+            left++;
+            right--;
+        }
+    }
+
+    return { steps: steps, originalMatrix: orig };
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var steps = trace.steps;
+    var orig = trace.originalMatrix;
+    var n = orig.length;
+
+    var curMatrix = pos >= 0 ? steps[pos].matrix : orig;
+    var prevMatrix = pos > 0 ? steps[pos - 1].matrix : orig;
+    var step = pos >= 0 ? steps[pos] : null;
+
+    /* Detect changed cells from previous step */
+    var changed = {};
+    if (pos >= 0) {
+        for (var r = 0; r < n; r++) {
+            for (var c = 0; c < n; c++) {
+                if (curMatrix[r][c] !== prevMatrix[r][c]) changed[r + "," + c] = true;
+            }
+        }
+    }
+
+    /* Build HTML */
+    var h = '<div class="matrix-layout">';
+
+    /* Column headers */
+    h += '<div class="matrix-row header-row">';
+    h += '<div class="row-label"></div>';
+    for (var c = 0; c < n; c++) {
+        h += '<div class="col-header">' + c + '</div>';
+    }
+    h += '</div>';
+
+    /* Data rows */
+    for (var r = 0; r < n; r++) {
+        h += '<div class="matrix-row">';
+        h += '<div class="row-label">' + r + '</div>';
+
+        for (var c = 0; c < n; c++) {
+            var key = r + "," + c;
+            var cls = "m-cell";
+
+            if (step) {
+                if (step.type === "transpose") {
+                    if (r === step.row1 && c === step.col1) {
+                        cls += " current";
+                    } else if (r === step.row2 && c === step.col2) {
+                        cls += " swap-pair";
+                    } else if (key in changed) {
+                        cls += " just-changed";
+                    }
+                } else if (step.type === "reverse") {
+                    if (r === step.row && c === step.leftCol) {
+                        cls += " current";
+                    } else if (r === step.row && c === step.rightCol) {
+                        cls += " swap-pair";
+                    } else if (key in changed) {
+                        cls += " just-changed";
+                    }
+                }
+            }
+
+            h += '<div class="' + cls + '">' + curMatrix[r][c] + '</div>';
+        }
+        h += '</div>';
+    }
+
+    h += '</div>';
+    refs.grid.innerHTML = h;
+
+    /* Status bar */
+    if (step) {
+        if (step.type === "transpose") {
+            refs.status.phase.textContent = "Transpose";
+            refs.status.cell.textContent = "[" + step.row1 + "][" + step.col1 + "] \u2194 [" + step.row2 + "][" + step.col2 + "]";
+            refs.status.action.textContent = "swap " + step.val1 + " \u2194 " + step.val2;
+        } else {
+            refs.status.phase.textContent = "Reverse Row " + step.row;
+            refs.status.cell.textContent = "[" + step.row + "][" + step.leftCol + "] \u2194 [" + step.row + "][" + step.rightCol + "]";
+            refs.status.action.textContent = "swap " + step.leftVal + " \u2194 " + step.rightVal;
+        }
+    } else {
+        refs.status.phase.textContent = "\u2014";
+        refs.status.cell.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+    }
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var step = engine.currentStep();
+    if (step.type === "transpose") {
+        return "Transpose: swap [" + step.row1 + "][" + step.col1 + "]=" + step.val1 +
+            " with [" + step.row2 + "][" + step.col2 + "]=" + step.val2;
+    }
+    return "Reverse row " + step.row + ": swap [" + step.row + "][" + step.leftCol + "]=" + step.leftVal +
+        " with [" + step.row + "][" + step.rightCol + "]=" + step.rightVal;
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
