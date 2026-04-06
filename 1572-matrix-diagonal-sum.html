@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matrix Diagonal Sum — Primary + Secondary | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 1572 Matrix Diagonal Sum. Watch primary and secondary diagonals accumulate with center overlap correction.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1572-matrix-diagonal-sum.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="matrix diagonal sum, leetcode 1572, primary diagonal, secondary diagonal, center overlap, algorithm visualization">
+<meta property="og:title" content="Matrix Diagonal Sum — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 1572. Watch both diagonals accumulate and the center correction.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1572-matrix-diagonal-sum.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Matrix Diagonal Sum — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 1572. Watch both diagonals accumulate and the center correction.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Matrix Diagonal Sum — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 1572 Matrix Diagonal Sum.","url":"https://ideasbyrobert.github.io/algorithms/1572-matrix-diagonal-sum.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Matrix grid ──────────────────────────────────────── */
+
+.matrix-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+}
+
+.sum-expr {
+    font: 500 14px/1.3 'Menlo', monospace;
+    color: #636366;
+    margin-bottom: 24px;
+    text-align: center;
+    min-height: 20px;
+    letter-spacing: -0.01em;
+}
+
+.matrix-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.matrix-row.header-row { margin-bottom: 12px; }
+
+.row-label {
+    width: 28px;
+    font: 500 11px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #AEAEB2;
+    text-align: right;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+}
+
+.col-header {
+    width: 64px;
+    font: 500 10px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #AEAEB2;
+    text-align: center;
+    letter-spacing: 0.4px;
+}
+
+.m-cell {
+    width: 64px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 400 15px/1 'Menlo', monospace;
+    color: #1D1D1F;
+    background: #FFFFFF;
+    border: 1.5px solid #C7C7CC;
+    border-radius: 10px;
+    transition: background 0.25s ease, border-color 0.25s ease,
+                color 0.25s ease, border-style 0.25s ease;
+}
+
+.m-cell.current {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border: 2px solid #1D1D1F;
+}
+
+.m-cell.primary-v {
+    background: #F5F5F7;
+    border: 2px solid #48484A;
+}
+
+.m-cell.secondary-v {
+    background: #F5F5F7;
+    border: 2px dashed #48484A;
+}
+
+.m-cell.overlap-v {
+    background: #F5F5F7;
+    border: 3px double #1D1D1F;
+}
+
+.m-cell.corrected {
+    background: #FAFAFA;
+    border: 2px dashed #C7C7CC;
+    color: #C7C7CC;
+}
+
+/* ── Legend line overrides ─────────────────────────────── */
+
+.legend-line.primary-line {
+    display: inline-block;
+    width: 18px;
+    height: 0;
+    border-bottom: 2px solid #48484A;
+    vertical-align: middle;
+}
+
+.legend-line.secondary-line {
+    display: inline-block;
+    width: 18px;
+    height: 0;
+    border-bottom: 2px dashed #48484A;
+    vertical-align: middle;
+}
+
+/* ── Mobile ───────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .sum-expr { font-size: 12px; margin-bottom: 16px; }
+    .row-label { width: 22px; font-size: 10px; }
+    .col-header { width: 48px; font-size: 9px; }
+    .m-cell { width: 48px; height: 36px; font-size: 13px; border-radius: 8px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ─── Section 1: Intro ──────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Matrix Diagonal Sum</h1>
+    <p class="viz-subtitle">LeetCode 1572 · Primary + Secondary Diagonals</p>
+    <p class="viz-body">
+        Given a square matrix, return the sum of both diagonals.
+        The <strong>primary diagonal</strong> runs top-left to bottom-right.
+        The <strong>secondary diagonal</strong> runs top-right to bottom-left.
+        When the matrix has odd size, the center cell sits on both
+        diagonals and must be counted only once.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 2: Two Diagonals ──────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Two Diagonals, One Overlap</h2>
+    <p class="viz-body">
+        The primary diagonal visits matrix[r][r] — the row and
+        column indices always match. The secondary diagonal visits
+        matrix[r][n − 1 − r] — the column counts down as the row
+        counts up. In an odd-sized matrix both diagonals cross at the
+        center cell matrix[n/2][n/2], which would be double-counted
+        if left uncorrected.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Sum Then Correct</h2>
+    <p class="viz-body">
+        Walk every row once. For each row, add the primary diagonal
+        cell and the secondary diagonal cell to a running sum. After
+        all rows, subtract the center value if the matrix is odd-sized.
+    </p>
+    <div class="viz-code-block">
+<pre><code>sum ← 0
+for r in 0 .. n-1:
+    sum ← sum + matrix[r][r]
+    sum ← sum + matrix[r][n-1-r]
+if n is odd:
+    sum ← sum − matrix[n/2][n/2]
+return sum</code></pre>
+    </div>
+</div>
+</section>
+
+<!-- ─── Section 4: Interactive ────────────────────────── -->
+
+<div id="interactiveMount"></div>
+
+<!-- ─── Section 5: Edge Patterns ──────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Edge Patterns</h2>
+    <p class="viz-body">
+        <strong>Even-sized matrix</strong> — the two diagonals never
+        share a cell, so no correction is needed.<br>
+        <strong>Single cell</strong> — both diagonals contain only
+        that cell; the correction removes the duplicate and the
+        answer is the cell value itself.<br>
+        <strong>Large center</strong> — when the center value is
+        large, failing to subtract it produces a visibly wrong answer,
+        making the guard condition easy to verify.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 6: Complexity ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(n) — one pass over the rows.<br>
+        <strong>Space:</strong> O(1) — only a running sum.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { className: "primary-line", label: "primary diagonal" },
+        { className: "secondary-line", label: "secondary diagonal" }
+    ],
+    gridClass: "matrix-grid-wrap",
+    status: [
+        { id: "phase", label: "Phase" },
+        { id: "cell",  label: "Cell" },
+        { id: "sum",   label: "Sum" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "3 × 3 — Odd (center overlap)",
+        matrix: [[1,2,3],[4,5,6],[7,8,9]]
+    },
+    {
+        name: "2 × 2 — Even (no overlap)",
+        mobileDefault: true,
+        matrix: [[1,2],[3,4]]
+    },
+    {
+        name: "4 × 4 — Even",
+        matrix: [[7,3,1,9],[3,4,6,9],[6,9,6,6],[9,5,8,5]]
+    },
+    {
+        name: "3 × 3 — Center Dominates",
+        matrix: [[1,0,1],[0,9,0],[1,0,1]]
+    },
+    {
+        name: "Single Cell",
+        matrix: [[5]]
+    },
+    {
+        name: "5 × 5 — Cross Pattern",
+        matrix: [[1,0,0,0,2],[0,3,0,4,0],[0,0,5,0,0],[0,6,0,7,0],[8,0,0,0,9]]
+    }
+];
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var matrix = preset.matrix;
+    var n = matrix.length;
+    var steps = [];
+    var sum = 0;
+
+    for (var r = 0; r < n; r++) {
+        sum += matrix[r][r];
+        steps.push({
+            type: "primary",
+            row: r, col: r,
+            value: matrix[r][r],
+            sum: sum
+        });
+    }
+
+    for (var r = 0; r < n; r++) {
+        var c = n - 1 - r;
+        sum += matrix[r][c];
+        steps.push({
+            type: "secondary",
+            row: r, col: c,
+            value: matrix[r][c],
+            sum: sum,
+            isOverlap: r === c
+        });
+    }
+
+    var hasCenter = n % 2 === 1;
+    if (hasCenter) {
+        var mid = Math.floor(n / 2);
+        var centerVal = matrix[mid][mid];
+        sum -= centerVal;
+        steps.push({
+            type: "correct",
+            row: mid, col: mid,
+            value: centerVal,
+            sum: sum
+        });
+    }
+
+    return { steps: steps, matrix: matrix, answer: sum, hasCenter: hasCenter };
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var pos = engine.position;
+    var matrix = trace.matrix;
+    var steps = trace.steps;
+    var n = matrix.length;
+
+    /* Derive visited cells up to current position */
+    var primaryVisited = {};
+    var secondaryVisited = {};
+    var isCorrected = false;
+    var currentKey = null;
+    var currentType = null;
+
+    for (var i = 0; i <= pos; i++) {
+        if (i < 0) continue;
+        var s = steps[i];
+        var key = s.row + "," + s.col;
+        if (s.type === "primary") primaryVisited[key] = true;
+        if (s.type === "secondary") secondaryVisited[key] = true;
+        if (s.type === "correct") isCorrected = true;
+    }
+
+    if (pos >= 0) {
+        var cur = steps[pos];
+        currentKey = cur.row + "," + cur.col;
+        currentType = cur.type;
+    }
+
+    /* Build sum expression */
+    var sumExpr = "";
+    if (pos >= 0) {
+        var cur = steps[pos];
+        if (cur.type === "primary") {
+            var parts = [];
+            for (var i = 0; i <= pos; i++) {
+                if (steps[i].type === "primary") parts.push(steps[i].value);
+            }
+            sumExpr = parts.join(" + ") + " = " + cur.sum;
+        } else if (cur.type === "secondary") {
+            var primarySum = 0;
+            for (var i = 0; i < steps.length; i++) {
+                if (steps[i].type === "primary") primarySum = steps[i].sum;
+                else break;
+            }
+            var secParts = [primarySum];
+            for (var i = 0; i <= pos; i++) {
+                if (steps[i].type === "secondary") secParts.push(steps[i].value);
+            }
+            sumExpr = secParts.join(" + ") + " = " + cur.sum;
+        } else {
+            sumExpr = (cur.sum + cur.value) + " \u2212 " + cur.value + " = " + cur.sum;
+        }
+    }
+
+    /* Build HTML */
+    var h = '<div class="matrix-layout">';
+    h += '<div class="sum-expr">' + (sumExpr || "\u2014") + '</div>';
+
+    /* Column headers */
+    h += '<div class="matrix-row header-row">';
+    h += '<div class="row-label"></div>';
+    for (var c = 0; c < n; c++) {
+        h += '<div class="col-header">c' + c + '</div>';
+    }
+    h += '</div>';
+
+    /* Data rows */
+    for (var r = 0; r < n; r++) {
+        h += '<div class="matrix-row">';
+        h += '<div class="row-label">r' + r + '</div>';
+
+        for (var c = 0; c < n; c++) {
+            var key = r + "," + c;
+            var inP = key in primaryVisited;
+            var inS = key in secondaryVisited;
+            var cls = "m-cell";
+
+            if (currentType === "correct" && key === currentKey) {
+                cls += " corrected";
+            } else if (key === currentKey) {
+                cls += " current";
+            } else if (inP && inS) {
+                cls += " overlap-v";
+            } else if (inP) {
+                cls += " primary-v";
+            } else if (inS) {
+                cls += " secondary-v";
+            }
+
+            h += '<div class="' + cls + '">' + matrix[r][c] + '</div>';
+        }
+        h += '</div>';
+    }
+
+    h += '</div>';
+    refs.grid.innerHTML = h;
+
+    /* Update status */
+    if (pos >= 0) {
+        var cur = steps[pos];
+        var phaseNames = { primary: "Primary \u2572", secondary: "Secondary \u2571", correct: "Correction" };
+        refs.status.phase.textContent = phaseNames[cur.type];
+        refs.status.cell.textContent = cur.type === "correct"
+            ? "\u2212 center[" + cur.row + "][" + cur.col + "]"
+            : "[" + cur.row + "][" + cur.col + "] = " + cur.value;
+        refs.status.sum.textContent = cur.sum;
+    } else {
+        refs.status.phase.textContent = "\u2014";
+        refs.status.cell.textContent = "\u2014";
+        refs.status.sum.textContent = "\u2014";
+    }
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var step = engine.currentStep();
+    if (step.type === "primary") {
+        return "Primary: matrix[" + step.row + "][" + step.col + "] = " + step.value + "  \u2192  sum = " + step.sum;
+    }
+    if (step.type === "secondary") {
+        var note = step.isOverlap ? "  (overlaps center)" : "";
+        return "Secondary: matrix[" + step.row + "][" + step.col + "] = " + step.value + note + "  \u2192  sum = " + step.sum;
+    }
+    return "Center correction: " + (step.sum + step.value) + " \u2212 " + step.value + " = " + step.sum;
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
