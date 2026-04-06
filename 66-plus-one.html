@@ -77,15 +77,31 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>The Algorithm</h2>
-        <div class="viz-code-block">
-        <pre><code>for i from last index down to 0:
-        if digits[i] < 9:
-        digits[i] += 1
-        return digits
-        digits[i] = 0
-        // all digits were 9
-        return [1, 0, 0, ..., 0]</code></pre>
-        </div>
+        <p class="section-intro">Walk the digit array from right to left. Most of the time only the last digit changes. The carry propagates only through consecutive nines.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Start from the last digit</h4>
+                    <p>Scan right to left. If the current digit is less than 9, increment it and return immediately.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Handle carry</h4>
+                    <p>If the digit is 9, set it to 0 and continue to the next digit to the left — the carry propagates.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Handle full carry-out</h4>
+                    <p>If every digit was 9, prepend a 1 to an array of all zeros. Example: <code>[9, 9, 9]</code> → <code>[1, 0, 0, 0]</code>.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -93,13 +109,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>The All-Nines Case</h2>
-        <p class="section-intro">
-        When every digit is&nbsp;9, every position carries.
-        The loop ends without returning, meaning the original number
-        was 10<sup>k</sup>&nbsp;−&nbsp;1. The result is 10<sup>k</sup>:
-        a new array one element longer, starting with&nbsp;1 and
-        filled with zeros.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>No carry</h3>
+                <p>The last digit is less than 9. A single increment finishes the operation — no propagation needed.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Full carry-out</h3>
+                <p>Every digit is 9. The carry propagates through all positions, creating a new leading 1. The result array is one element longer.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

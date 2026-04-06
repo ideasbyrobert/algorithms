@@ -73,14 +73,38 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Algorithm</h2>
-        <div class="viz-code-block">
-        <pre><code>write ← 0
-        for read in 0..n-1:
-        if nums[read] ≠ val:
-        nums[write] = nums[read]
-        write += 1
-        return write</code></pre>
-        </div>
+        <p class="section-intro">A single forward pass skips every occurrence of the target value. Non-target elements are compacted to the front of the array.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize write pointer</h4>
+                    <p>Set <code>write = 0</code>. Every non-target value will be compacted to the front starting here.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Scan each element</h4>
+                    <p>For each <code>read</code> from 0 to <code>n − 1</code>, compare <code>nums[read]</code> with <code>val</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Copy if not target</h4>
+                    <p>If <code>nums[read] ≠ val</code>, copy it to <code>nums[write]</code> and advance <code>write</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Return count</h4>
+                    <p>After the scan, <code>write</code> equals the number of elements that are not <code>val</code>.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -88,14 +112,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge Patterns</h2>
-        <p class="section-intro">
-        <strong>No matches</strong> — write tracks read exactly; every
-        element is copied to itself. The array is unchanged.<br><br>
-        <strong>All matches</strong> — write never advances; the result
-        length is 0.<br><br>
-        <strong>Write ≤ read invariant</strong> — the write pointer never
-        overtakes the read pointer, so no unread data is overwritten.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>No matches</h3>
+                <p>The target value does not appear. Every element is copied, and the write pointer reaches <code>n</code> — the array is unchanged.</p>
+            </article>
+            <article class="guard-card">
+                <h3>All matches</h3>
+                <p>Every element equals <code>val</code>. The write pointer never advances — the result length is 0.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

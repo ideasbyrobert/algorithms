@@ -136,20 +136,31 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Transitional Encoding</h2>
-        <div class="viz-code-block">
-<pre><code> 0 → dead (stays dead)
- 1 → alive (stays alive)
--1 → was alive, now dying
- 2 → was dead, now born</code></pre>
-    </div>
-        <p class="section-intro">
-        Instead of flipping cells immediately, we write intermediate codes
-        that capture <em>both</em> the original state and the decision.
-        A dying cell is marked <code>-1</code> rather than overwritten to 0,
-        and a newborn cell is marked <code>2</code> rather than overwritten
-        to 1. After every cell has been encoded, a single cleanup pass
-        converts positive values to 1 and everything else to 0.
-    </p>
+        <p class="section-intro">Transitional codes (<code>−1</code> for dying, <code>2</code> for born) let us record decisions without destroying information that remaining cells need to read.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Encode transitions</h4>
+                    <p>For each cell, count its live neighbors using <code>abs(value) == 1</code> to read original state. Mark dying cells as <code>−1</code> and newborn cells as <code>2</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Apply the rules</h4>
+                    <p>Live cells with fewer than 2 or more than 3 neighbors → <code>−1</code> (dying). Dead cells with exactly 3 neighbors → <code>2</code> (born). All others stay.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Cleanup pass</h4>
+                    <p>Sweep the entire board: convert positive values to 1, everything else to 0. The next generation is now in place.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -157,17 +168,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Why Abs(value) == 1?</h2>
-        <p class="section-intro">
-        During the encoding pass, earlier cells may already hold <code>-1</code>
-        or <code>2</code>. When counting neighbors, we need the
-        <em>original</em> liveness. The key insight:
-        <code>abs(-1) = 1</code>, so a dying cell still registers as
-        originally alive. And <code>abs(2) = 2 ≠ 1</code>, so a newborn
-        cell still registers as originally dead. By testing
-        <code>abs(value) == 1</code> instead of <code>value == 1</code>,
-        every cell correctly reads the original generation even after
-        its neighbors have been encoded.
-    </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Why abs(value) == 1?</h3>
+                <p>A dying cell holds <code>−1</code>, and <code>abs(−1) = 1</code> — it still registers as originally alive. A newborn cell holds <code>2</code>, and <code>abs(2) ≠ 1</code> — it still registers as originally dead.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Border cells</h3>
+                <p>Cells at the edges have fewer than 8 neighbors. The neighbor-counting loop must check array bounds — out-of-bounds neighbors simply don't exist.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

@@ -59,14 +59,38 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Algorithm</h2>
-        <div class="viz-code-block">
-        <pre><code>write ← 1
-        for read in 1..n-1:
-        if nums[read] ≠ nums[write - 1]:
-        nums[write] = nums[read]
-        write += 1
-        return write</code></pre>
-        </div>
+        <p class="section-intro">The array is sorted, so duplicates are always adjacent. A single forward pass with two pointers compacts unique values to the front.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize write pointer</h4>
+                    <p>Set <code>write = 1</code>. The first element is always unique, so we start scanning from index 1.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Scan with read pointer</h4>
+                    <p>For each <code>read</code> from 1 to <code>n − 1</code>, compare <code>nums[read]</code> with <code>nums[write − 1]</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Copy if unique</h4>
+                    <p>If <code>nums[read] ≠ nums[write − 1]</code>, copy it to <code>nums[write]</code> and advance <code>write</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Return count</h4>
+                    <p>After the scan, <code>write</code> equals the number of unique elements.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -74,14 +98,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge Patterns</h2>
-        <p class="section-intro">
-        <strong>All identical</strong> — write never advances past 1;
-        result length is 1.<br><br>
-        <strong>Already unique</strong> — write tracks read; every element
-        copies to itself.<br><br>
-        <strong>Runs of duplicates</strong> — the write pointer skips
-        entire runs, keeping only the first occurrence.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>All identical</h3>
+                <p>Every element is the same. The write pointer never advances past 1, producing a single-element result. The read pointer scans the entire array without copying.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Already unique</h3>
+                <p>No duplicates exist. Every comparison succeeds, and the write pointer tracks the read pointer exactly — the array is unchanged.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

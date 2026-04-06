@@ -176,12 +176,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Why Backward?</h2>
-        <p class="section-intro">
-        Forward merging would write into positions that the primary read
-        pointer hasn't reached yet — corrupting data. By starting at the
-        last position and placing the <em>largest</em> remaining value
-        each step, the write pointer always lands in empty trailing space.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Secondary is empty</h3>
+                <p><code>n = 0</code> means there is nothing to merge. The primary array is already the final result.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Primary is empty</h3>
+                <p><code>m = 0</code> means the primary buffer is all zeros. Every secondary element is copied in, largest first.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">
@@ -189,17 +195,31 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Algorithm</h2>
-        <div class="viz-code-block">
-        <pre><code>p ← m - 1,  s ← n - 1,  w ← m + n - 1
-        while s ≥ 0:
-        if p ≥ 0 and primary[p] > secondary[s]:
-        primary[w] = primary[p]
-        p -= 1
-        else:
-        primary[w] = secondary[s]
-        s -= 1
-        w -= 1</code></pre>
-        </div>
+        <p class="section-intro">Filling from the back guarantees no element is overwritten before it is read. The largest values land at the end first.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Set three pointers</h4>
+                    <p>Place <code>p</code> at the end of the valid primary elements (<code>m − 1</code>), <code>s</code> at the end of the secondary array (<code>n − 1</code>), and <code>w</code> at the very end of the primary array (<code>m + n − 1</code>).</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Compare and write</h4>
+                    <p>Compare <code>primary[p]</code> with <code>secondary[s]</code>. Write the larger value at <code>primary[w]</code>, then decrement the source pointer and <code>w</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Drain the secondary</h4>
+                    <p>Continue until <code>s &lt; 0</code>. If primary elements remain, they are already in place — no further work is needed.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">

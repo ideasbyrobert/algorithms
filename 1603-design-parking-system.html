@@ -192,14 +192,31 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Algorithm</h2>
-        <div class="viz-code-block">
-        <pre><code>remaining = [_, big, medium, small]
-        AddCar(type):
-        if remaining[type] == 0:
-        return false
-        remaining[type] -= 1
-        return true</code></pre>
-        </div>
+        <p class="section-intro">Three independent counters, each decremented on arrival. No search, no sorting — just an array lookup and a decrement.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize counters</h4>
+                    <p>Store three counters — <code>big</code>, <code>medium</code>, <code>small</code> — set to the capacity of each lot.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Receive a car</h4>
+                    <p>On each <code>addCar(type)</code> call, check the counter for the given type.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Accept or reject</h4>
+                    <p>If the counter is positive, decrement it and return <code>true</code>. Otherwise return <code>false</code>.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -207,14 +224,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge Patterns</h2>
-        <p class="section-intro">
-        <strong>Zero initial capacity</strong> — A type initialized to 0
-        rejects every car immediately. No decrement occurs.<br><br>
-        <strong>Exhaustion doesn't affect others</strong> — Filling all big
-        slots leaves medium and small unchanged.<br><br>
-        <strong>Repeated same-type</strong> — Each arrival decrements the
-        counter by one until it reaches zero.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Zero initial capacity</h3>
+                <p>A lot that starts at capacity 0 rejects every car of that type immediately.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Mixed availability</h3>
+                <p>One lot may be full while others have space. Each type is tracked independently.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

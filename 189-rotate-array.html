@@ -75,12 +75,38 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Algorithm</h2>
-        <div class="viz-code-block">
-        <pre><code>k ← k % n
-        reverse(0, n - 1)     // whole array
-        reverse(0, k - 1)     // front block
-        reverse(k, n - 1)     // back block</code></pre>
-        </div>
+        <p class="section-intro">Three reversals compose a rotation. Each reversal is an in-place two-pointer sweep — no extra array is needed.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Normalize k</h4>
+                    <p>Compute <code>k = k % n</code>. If <code>k</code> is zero or a multiple of <code>n</code>, the array is unchanged.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Reverse the whole array</h4>
+                    <p>Reverse all <code>n</code> elements. The last <code>k</code> elements are now at the front — but in the wrong order.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Reverse the front block</h4>
+                    <p>Reverse elements <code>0</code> through <code>k − 1</code>. They are now in the correct rotated order.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Reverse the back block</h4>
+                    <p>Reverse elements <code>k</code> through <code>n − 1</code>. The full rotation is complete.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -88,13 +114,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge Patterns</h2>
-        <p class="section-intro">
-        <strong>k ≥ n</strong> — normalize: k = k % n. Rotating by
-        the full length is a no-op.<br><br>
-        <strong>k = 0</strong> — array unchanged; skip all reversals.<br><br>
-        <strong>Each reversal</strong> is a two-pointer swap from
-        endpoints inward — O(segment length/2) swaps.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>k ≥ n</h3>
+                <p>When <code>k</code> equals or exceeds <code>n</code>, the modulo operation reduces it. A full rotation of <code>n</code> steps returns the array to its original position.</p>
+            </article>
+            <article class="guard-card">
+                <h3>k = 0</h3>
+                <p>No rotation is needed. All three reversals cancel out — the array is untouched.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

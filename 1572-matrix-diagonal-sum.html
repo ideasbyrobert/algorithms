@@ -182,20 +182,31 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Sum Then Correct</h2>
-        <p class="section-intro">
-        Walk every row once. For each row, add the primary diagonal
-        cell and the secondary diagonal cell to a running sum. After
-        all rows, subtract the center value if the matrix is odd-sized.
-        </p>
-        <div class="viz-code-block">
-        <pre><code>sum ← 0
-        for r in 0 .. n-1:
-        sum ← sum + matrix[r][r]
-        sum ← sum + matrix[r][n-1-r]
-        if n is odd:
-        sum ← sum − matrix[n/2][n/2]
-        return sum</code></pre>
-        </div>
+        <p class="section-intro">Both diagonals are walked in a single loop. The primary diagonal has <code>col = row</code>; the secondary has <code>col = n − 1 − row</code>.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Walk the primary diagonal</h4>
+                    <p>For each row <code>r</code>, add <code>matrix[r][r]</code> to the sum.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Walk the secondary diagonal</h4>
+                    <p>For each row <code>r</code>, add <code>matrix[r][n − 1 − r]</code> to the sum.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Subtract center if odd</h4>
+                    <p>When <code>n</code> is odd, the center element sits on both diagonals. Subtract it once to correct the double count.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -203,16 +214,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge Patterns</h2>
-        <p class="section-intro">
-        <strong>Even-sized matrix</strong> — the two diagonals never
-        share a cell, so no correction is needed.<br>
-        <strong>Single cell</strong> — both diagonals contain only
-        that cell; the correction removes the duplicate and the
-        answer is the cell value itself.<br>
-        <strong>Large center</strong> — when the center value is
-        large, failing to subtract it produces a visibly wrong answer,
-        making the guard condition easy to verify.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Even-sized matrix</h3>
+                <p>When <code>n</code> is even, no cell sits on both diagonals. The sum is simply the sum of both diagonals — no correction needed.</p>
+            </article>
+            <article class="guard-card">
+                <h3>1 × 1 matrix</h3>
+                <p>A single cell is both diagonals and the center. The answer is that single value.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

@@ -198,19 +198,38 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Four Phases</h2>
-        <div class="viz-code-block">
-        <pre><code>1. Flag: remember if first row / column
-        originally has a zero
-        2. Mark: for each interior cell == 0,
-        set matrix[row][0] = 0
-        set matrix[0][col] = 0
-        3. Zero interior: for each interior cell,
-        if matrix[row][0] == 0 or
-        matrix[0][col] == 0
-        then set cell to 0
-        4. Zero edges: if first-row flag, zero row 0
-        if first-col flag, zero col 0</code></pre>
-        </div>
+        <p class="section-intro">The matrix itself serves as the marker array. The first row and first column store which rows and columns must be zeroed — no extra space required.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Flag the edges</h4>
+                    <p>Scan the first row and first column separately. Record whether either originally contains a zero.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Mark using first row/column</h4>
+                    <p>For each interior cell that is zero, set <code>matrix[row][0] = 0</code> and <code>matrix[0][col] = 0</code> as markers.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Zero the interior</h4>
+                    <p>For each interior cell, if its row marker or column marker is zero, set the cell to zero.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Zero the edges</h4>
+                    <p>Using the flags from step 1, zero the first row and/or first column if they originally contained a zero.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -218,19 +237,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Why Save the Flags First?</h2>
-        <p class="section-intro">
-        <strong>Marker overwrite hazard</strong> — the marking phase writes 0
-        into the first row and first column. If those borders originally had
-        non-zero values, those values are now lost. The saved flags let the
-        final phase decide whether to zero the borders independently of the
-        markers.
-        </p>
-        <p>
-        <strong>Interior before edges</strong> — interior cells must be
-        zeroed first because they <em>read</em> the markers. If we zeroed
-        the first row or column early, every interior cell would see a
-        marker of zero and the entire matrix would collapse.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Marker overwrite hazard</h3>
+                <p>The first row and first column are used as markers, so we must flag their original state <em>before</em> writing markers. Processing interior cells first preserves correct flags.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Interior before edges</h3>
+                <p>Zeroing edges last prevents premature erasure of the markers that interior cells still need to read.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

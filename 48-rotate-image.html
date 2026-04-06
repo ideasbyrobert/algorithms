@@ -141,19 +141,24 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Two Phases</h2>
-        <div class="viz-code-block">
-<pre><code>Phase 1 — Transpose:
-  for row = 0 … n-1
-    for col = row+1 … n-1
-      swap matrix[row][col] ↔ matrix[col][row]
+        <p class="section-intro">A 90° clockwise rotation decomposes into two reflections: transpose (mirror across the diagonal), then reverse each row (mirror horizontally). No extra space beyond a single swap variable.</p>
 
-Phase 2 — Reverse each row:
-  for each row
-    left = 0, right = n-1
-    while left &lt; right
-      swap matrix[row][left] ↔ matrix[row][right]
-      left++, right--</code></pre>
-    </div>
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Transpose the matrix</h4>
+                    <p>Swap every cell <code>[r][c]</code> with <code>[c][r]</code> for all <code>c &gt; r</code>. This reflects the matrix across its main diagonal.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Reverse each row</h4>
+                    <p>For each row, use a two-pointer sweep from the edges inward, swapping <code>[row][left]</code> with <code>[row][right]</code>.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -161,21 +166,22 @@ Phase 2 — Reverse each row:
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge Cases &amp; Observations</h2>
-        <p class="section-intro">
-        <strong>Odd-sized matrices</strong> — the center element sits on the
-        main diagonal (r&nbsp;=&nbsp;c), so the transpose skips it. During
-        the row-reverse it sits at the midpoint, untouched by the two-pointer
-        sweep. It naturally stays in place.
-    </p>
-        <p>
-        <strong>1 × 1 matrix</strong> — both phases produce zero swap
-        iterations. The single element is already its own rotation.
-    </p>
-        <p>
-        <strong>Order matters</strong> — transpose then reverse produces a
-        clockwise rotation. Reversing first, then transposing, produces a
-        <em>counter-clockwise</em> rotation instead.
-    </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Odd-sized matrices</h3>
+                <p>The center element sits on the main diagonal. The transpose skips it (<code>r == c</code>), and the row-reverse places it at the midpoint — it stays put naturally.</p>
+            </article>
+            <article class="guard-card">
+                <h3>1 × 1 matrix</h3>
+                <p>Both phases produce zero iterations. The single element is already its own rotation.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Order matters</h3>
+                <p>Transpose then reverse → clockwise. Reverse then transpose → counter-clockwise. The order is not interchangeable.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

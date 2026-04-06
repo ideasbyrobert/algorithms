@@ -59,14 +59,38 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Algorithm</h2>
-        <div class="viz-code-block">
-        <pre><code>write ← 2
-        for read in 2..n-1:
-        if nums[read] ≠ nums[write - 2]:
-        nums[write] = nums[read]
-        write += 1
-        return write</code></pre>
-        </div>
+        <p class="section-intro">The look-back distance is 2 instead of 1. By comparing the current element with the one two positions behind the write pointer, we guarantee at most two copies of any value.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize write pointer</h4>
+                    <p>Set <code>write = 2</code>. The first two elements are always valid — at most two copies are allowed.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Scan with read pointer</h4>
+                    <p>For each <code>read</code> from 2 to <code>n − 1</code>, compare <code>nums[read]</code> with <code>nums[write − 2]</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Copy if allowed</h4>
+                    <p>If <code>nums[read] ≠ nums[write − 2]</code>, copy it to <code>nums[write]</code> and advance <code>write</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Return count</h4>
+                    <p>After the scan, <code>write</code> equals the count of elements in the valid prefix.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -74,12 +98,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge Patterns</h2>
-        <p class="section-intro">
-        <strong>Three or more copies</strong> — the lookback catches the
-        third and beyond; exactly two survive.<br><br>
-        <strong>All unique</strong> — write tracks read; array unchanged.<br><br>
-        <strong>Array ≤ 2</strong> — always valid; return as-is.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Three or more copies</h3>
+                <p>Three consecutive identical values: the third is skipped because it matches <code>nums[write − 2]</code>. Only two copies are kept.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Short array</h3>
+                <p>Arrays with fewer than 3 elements never trigger the scan — they are already valid by definition.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

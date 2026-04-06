@@ -179,16 +179,38 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Box Index Formula</h2>
-        <div class="viz-code-block">
-<pre><code>boxIndex = (row / 3) * 3 + (col / 3)</code></pre>
-    </div>
-        <p class="section-intro">
-        Integer division <code>row / 3</code> yields the box row (0, 1,
-        or 2) and <code>col / 3</code> yields the box column. Multiplying
-        the box row by 3 and adding the box column maps every cell to one
-        of nine box indices 0–8, laid out left-to-right, top-to-bottom —
-        exactly mirroring the 3×3 grid of sub-boxes.
-    </p>
+        <p class="section-intro">A single scan through all 81 cells, checking each filled digit against three hash sets — one per dimension. The box index is computed as <code>(row / 3) × 3 + (col / 3)</code>.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Create 27 hash sets</h4>
+                    <p>Initialize <code>rowDigits[9]</code>, <code>colDigits[9]</code>, and <code>boxDigits[9]</code> — one set per row, column, and 3×3 box.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Scan each filled cell</h4>
+                    <p>Skip empty cells (<code>'.'</code>). For each digit, compute its row, column, and box index.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Check for conflicts</h4>
+                    <p>If the digit already exists in any of the three corresponding sets, the board is invalid — stop immediately.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Insert into sets</h4>
+                    <p>If no conflict, add the digit to all three sets and continue to the next cell.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -196,14 +218,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Why Empty Cells Are Skipped</h2>
-        <p class="section-intro">
-        Empty cells are placeholders for digits not yet placed — they
-        carry no value that could conflict with anything, so including
-        them would be meaningless. We also <strong>stop at the first
-        conflict</strong>: a single duplicate is enough to declare the
-        board invalid, so there is no reason to continue scanning the
-        remaining cells once a violation is found.
-    </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Empty cells are skipped</h3>
+                <p>Empty cells carry no value that could conflict. Including them would be meaningless — we only validate filled digits.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Early termination</h3>
+                <p>A single duplicate is enough to declare the board invalid. There is no reason to continue scanning once a conflict is found.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

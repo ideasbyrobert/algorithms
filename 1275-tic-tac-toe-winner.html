@@ -216,18 +216,38 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Algorithm</h2>
-        <div class="viz-code-block">
-        <pre><code>rows[3] = cols[3] = mainDiag = antiDiag = 0
-        for turn 0..n-1:
-        score = +1 if even turn (A), -1 if odd (B)
-        rows[r] += score
-        cols[c] += score
-        if r == c:     mainDiag += score
-        if r + c == 2: antiDiag += score
-        if |any counter| == 3: that player wins
-        if 9 moves played: "Draw"
-        else: "Pending"</code></pre>
-        </div>
+        <p class="section-intro">Instead of scanning the board after each move, we maintain running sums for every row, column, and both diagonals. A sum of ±3 means a player owns an entire line.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize counters</h4>
+                    <p>Create <code>rows[3]</code>, <code>cols[3]</code>, <code>mainDiag</code>, and <code>antiDiag</code>, all initialized to zero.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Assign scores</h4>
+                    <p>Player A (even turns) scores <code>+1</code>. Player B (odd turns) scores <code>−1</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Update and check</h4>
+                    <p>For each move, add the score to the row, column, and diagonals (if applicable). If any counter reaches <code>+3</code> or <code>−3</code>, that player wins.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Determine outcome</h4>
+                    <p>After all moves: if no winner and 9 moves were played, it's a draw. Otherwise, it's pending.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -235,15 +255,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge Patterns</h2>
-        <p class="section-intro">
-        <strong>Diagonal wins</strong> — The main diagonal (0,0)→(1,1)→(2,2)
-        and anti-diagonal (0,2)→(1,1)→(2,0) each have their own counter.
-        The center cell contributes to both.<br><br>
-        <strong>Draw vs Pending</strong> — A full board (9 moves) with no
-        ±3 counter is a Draw. Fewer than 9 moves is Pending.<br><br>
-        <strong>Early termination</strong> — The game ends as soon as any
-        counter reaches ±3. Remaining moves are never processed.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Diagonal wins</h3>
+                <p>Diagonal sums are only updated when the move falls on the main diagonal (<code>r == c</code>) or anti-diagonal (<code>r + c == 2</code>). Corner cells affect both.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Draw vs pending</h3>
+                <p>A draw requires exactly 9 moves with no winner. If fewer moves have been played and no winner exists, the game is still pending.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

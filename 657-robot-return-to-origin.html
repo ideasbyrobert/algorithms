@@ -133,13 +133,31 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Count and Compare</h2>
-        <div class="viz-code-block">
-        <pre><code>h ← 0, v ← 0
-        for each move:
-        if L: h -= 1    if R: h += 1
-        if U: v += 1    if D: v -= 1
-        return h == 0 and v == 0</code></pre>
-        </div>
+        <p class="section-intro">Track net displacement along two independent axes. The robot returns to the origin only when both axes cancel to zero.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize displacement</h4>
+                    <p>Set <code>h = 0</code> (horizontal) and <code>v = 0</code> (vertical). The robot starts at the origin.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Accumulate each move</h4>
+                    <p>For each character: <code>L</code> decrements <code>h</code>, <code>R</code> increments <code>h</code>, <code>U</code> increments <code>v</code>, <code>D</code> decrements <code>v</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Check the origin</h4>
+                    <p>After all moves, return <code>true</code> if and only if <code>h == 0</code> and <code>v == 0</code>.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -147,14 +165,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge Patterns</h2>
-        <p class="section-intro">
-        <strong>One axis balanced, one not</strong> — "UDL" has
-        vertical = 0 but horizontal = −1, so the robot does not
-        return.<br>
-        <strong>Odd-length string</strong> — always fails, since an
-        odd total displacement on any axis cannot be zero.<br>
-        <strong>Empty string</strong> — trivially returns true.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>One axis balanced, one not</h3>
+                <p>The move string <code>"LRUD"</code> has balanced horizontals but unbalanced verticals. Both must cancel for a return.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Empty string</h3>
+                <p>No moves are made. The robot never leaves the origin — returns <code>true</code>.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

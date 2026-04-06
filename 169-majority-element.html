@@ -94,17 +94,38 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Algorithm</h2>
-        <div class="viz-code-block">
-        <pre><code>candidate ← null, balance ← 0
-        for each value:
-        if balance == 0:
-        candidate ← value, balance ← 1
-        else if value == candidate:
-        balance += 1
-        else:
-        balance -= 1
-        return candidate</code></pre>
-        </div>
+        <p class="section-intro">Boyer–Moore voting: every non-majority element cancels against a majority element. The majority survives because it has more copies than all others combined.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize candidate</h4>
+                    <p>Set <code>candidate = null</code> and <code>balance = 0</code>. No vote has been cast yet.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Vote or cancel</h4>
+                    <p>For each element: if <code>balance == 0</code>, adopt the current value as the new candidate and set <code>balance = 1</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Increment or decrement</h4>
+                    <p>If the current value matches the candidate, increment <code>balance</code>. Otherwise, decrement it — a cancellation.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Survivor wins</h4>
+                    <p>After the full scan, the candidate is the majority element. It survives because it appears more than <code>⌊n/2⌋</code> times.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -112,15 +133,18 @@
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge Patterns</h2>
-        <p class="section-intro">
-        <strong>Immediate restart</strong> — when balance drops to zero
-        mid-array, the next element becomes the new candidate.<br><br>
-        <strong>Uniform array</strong> — balance simply increments every
-        step; no cancellation occurs.<br><br>
-        <strong>Guarantee</strong> — Boyer-Moore only works when a majority
-        is guaranteed to exist. Without that guarantee, a verification
-        pass is needed.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Immediate restart</h3>
+                <p>The candidate changes whenever balance drops to zero. A new candidate is adopted from the very next element — the algorithm restarts seamlessly.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Single element</h3>
+                <p>An array with one element has a trivial majority. The candidate is set once and never challenged.</p>
+            </article>
+        </div>
     </section>
 
     <hr class="divider">

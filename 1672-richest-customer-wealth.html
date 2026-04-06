@@ -213,21 +213,31 @@
     <section>
         <span class="label">Algorithm</span>
         <h2>Two nested loops</h2>
-        <p class="section-intro">
-            The <strong>outer loop</strong> walks rows — one per customer.
-            The <strong>inner loop</strong> accumulates every bank balance
-            into a running row&nbsp;sum. After completing a row, compare the
-            sum to the running maximum. If it is larger, update the maximum.
-        </p>
-        <div class="viz-code-block">
-<pre><code>richest ← 0
-for each customer row in matrix:
-    rowSum ← 0
-    for each balance in row:
-        rowSum ← rowSum + balance
-    richest ← max(richest, rowSum)
-return richest</code></pre>
-        </div>
+        <p class="section-intro">A nested loop sums each customer's balances, keeping track of the running maximum. Every cell is visited exactly once.</p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize maximum</h4>
+                    <p>Set <code>richest = 0</code>. No customer has been evaluated yet.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Sum each row</h4>
+                    <p>For each customer (row), compute the sum of all bank balances in that row.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Track maximum</h4>
+                    <p>If the current row sum exceeds <code>richest</code>, update it. After all rows, <code>richest</code> holds the answer.</p>
+                </div>
+            </li>
+        </ol>
     </section>
 
     <hr class="divider">
@@ -237,18 +247,18 @@ return richest</code></pre>
     <section>
         <span class="label">Edge Cases</span>
         <h2>Edge patterns</h2>
-        <p class="section-intro">
-            <strong>Single customer</strong> — the only row sum is
-            automatically the answer.
-        </p>
-        <p>
-            <strong>Equal wealth</strong> — when multiple rows sum to the
-            same maximum, the shared value is still correct.
-        </p>
-        <p>
-            <strong>One bank per customer</strong> — the matrix is a column
-            vector; each cell <em>is</em> that customer's total wealth.
-        </p>
+        <p class="section-intro">Understanding boundary behavior is as important as the main algorithm path.</p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Single customer</h3>
+                <p>The matrix has one row. The sum of that row is the answer — no comparison needed.</p>
+            </article>
+            <article class="guard-card">
+                <h3>Single bank</h3>
+                <p>Each customer has one account. The problem reduces to finding the maximum element.</p>
+            </article>
+        </div>
     </section>
 
     <footer class="page-footer">
