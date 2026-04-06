@@ -339,6 +339,8 @@ select {
     background-repeat: no-repeat;
     background-position: right 14px center;
     transition: background 200ms var(--ease);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 select:hover { border-color: var(--black); }
@@ -354,6 +356,8 @@ button {
     color: var(--ink);
     cursor: pointer;
     transition: background 200ms var(--ease), transform 200ms var(--ease);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 button:hover  { background: var(--ink); color: var(--white); }
@@ -839,6 +843,8 @@ input[type="range"] {
     background: rgba(0, 0, 0, 0.08);
     border-radius: 1px;
     outline: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -1274,8 +1280,17 @@ input[type="range"]::-webkit-slider-thumb {
     }
 
     /* Larger touch targets on mobile */
-    button { padding: 12px 20px; min-height: 44px; }
-    select { padding: 12px 38px 12px 14px; min-height: 44px; }
+    button {
+        padding: 12px 20px;
+        min-height: 44px;
+        font-size: 16px;
+    }
+
+    select {
+        padding: 12px 38px 12px 14px;
+        min-height: 44px;
+        font-size: 16px;
+    }
 
     input[type="range"] { height: 4px; }
     input[type="range"]::-webkit-slider-thumb { width: 24px; height: 24px; }
