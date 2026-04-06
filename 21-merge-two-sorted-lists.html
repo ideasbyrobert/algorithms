@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain. O(n+m) explained visually.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="merge two sorted lists, LeetCode 21, dummy head, tail pointer, linked list merge, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Merge Layout ───────────────────────────────────────── */
+
+.merge-viz {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.viz-container:has(.merge-viz) {
+    padding-top: 56px;
+    padding-bottom: 56px;
+    overflow-x: auto;
+}
+
+.merge-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.merge-row-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-tertiary);
+    width: 56px;
+    text-align: right;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+}
+
+.merge-chain {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-height: 72px;
+}
+
+.merge-empty {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-quaternary);
+    font-style: italic;
+}
+
+.merge-flow-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+/* ── Linked List Nodes ──────────────────────────────────── */
+
+.ll-node {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: transparent;
+    flex-shrink: 0;
+    transition: opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                background 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-node .cell-value {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-node.current {
+    background: var(--ink);
+    transform: scale(1.06);
+    z-index: 3;
+}
+
+.ll-node.current .cell-value {
+    color: var(--white);
+}
+
+.ll-node.consumed {
+    opacity: 0.15;
+    transform: scale(0.92);
+}
+
+.ll-node.front-node {
+    box-shadow: 0 0 0 2.5px var(--ink);
+}
+
+/* ── Arrows ─────────────────────────────────────────────── */
+
+.ll-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 72px;
+    flex-shrink: 0;
+}
+
+.ll-arrow svg {
+    overflow: visible;
+}
+
+.ll-arrow .arrow-line {
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    fill: none;
+    transition: opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-arrow .arrow-head {
+    fill: var(--ink);
+    transition: opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-arrow.consumed-arrow .arrow-line,
+.ll-arrow.consumed-arrow .arrow-head {
+    opacity: 0.12;
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .merge-viz { gap: 18px; }
+    .merge-row { gap: 8px; }
+    .merge-row-label { width: 44px; font-size: 0.62rem; }
+    .merge-chain { min-height: 56px; }
+    .ll-node { width: 56px; height: 56px; }
+    .ll-node .cell-value { font-size: 0.95rem; }
+    .ll-arrow { width: 24px; height: 56px; }
+    .viz-container:has(.merge-viz) {
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+}
+
+</style>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">21 · Merge Two Sorted Lists</span>
+        <h1>Two sorted chains become one.</h1>
+        <p class="hero-text">
+            Given two linked lists, each already sorted, merge them into a single sorted list
+            by splicing the original nodes together. A dummy head eliminates the first-node
+            special case, a tail pointer tracks the growing result, and a simple front comparison
+            at each step decides which node to attach next. When one list runs out, the remaining
+            suffix is already sorted — it attaches in a single pointer operation.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch two lists merge, node by node</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Dummy head, tail pointer, front comparison</h2>
+        <p class="section-intro">
+            The algorithm maintains a single growing chain. A dummy sentinel node
+            at the head removes the need for a special case when attaching the first
+            real node. The tail pointer always sits at the end, ready to receive.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>Dummy head</h3>
+                <p>A temporary sentinel node created before the loop. Every selected node
+                is attached through <code>tail.Next</code> — including the very first one.
+                At the end, <code>dummyHead.Next</code> gives the real head of the merged list.</p>
+                <span class="guard-code">eliminates the first-node special case</span>
+            </article>
+            <article class="concept-card">
+                <h3>Tail pointer</h3>
+                <p>Always points to the last node in the merged chain. After attaching a new
+                node via <code>tail.Next = selectedNode</code>, the tail advances to that node.
+                The chain grows by one link each iteration.</p>
+                <span class="guard-code">tracks the growing end of the merged chain</span>
+            </article>
+            <article class="concept-card">
+                <h3>Front comparison</h3>
+                <p>At each step, compare the current front values of both input lists.
+                The smaller value wins. When values are equal, <code>list1.val ≤ list2.val</code>
+                takes from <code>list1</code> — preserving the relative order of equal elements.</p>
+                <span class="guard-code">always takes the smaller front node</span>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Compare, attach, advance — then append the remainder</h2>
+        <p class="section-intro">
+            The main loop runs while both lists have nodes. Each iteration compares
+            the two front values, attaches the winner to the merged chain, and advances
+            the winning list's pointer. When one list is exhausted, the other's entire
+            remaining suffix is attached directly.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize</h4>
+                    <p>Create a dummy head node. Set <code>tail = dummyHead</code>. Both input
+                    list pointers start at their respective heads.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Compare front values</h4>
+                    <p>While both <code>list1</code> and <code>list2</code> are non-null:
+                    compare <code>list1.val</code> and <code>list2.val</code>. Select the node
+                    with the smaller (or equal) value.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Attach and advance</h4>
+                    <p>Set <code>tail.Next = selectedNode</code>, then advance the selected
+                    list's pointer to its next node. Finally, move <code>tail</code> forward
+                    to the newly attached node.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Append remaining suffix</h4>
+                    <p>When one list is exhausted, set <code>tail.Next</code> to the other
+                    list's current node. The remaining suffix is already sorted, so no further
+                    comparisons are needed.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">5</span>
+                <div class="step-body">
+                    <h4>Return result</h4>
+                    <p>Return <code>dummyHead.Next</code> — the first real node of the merged
+                    list. The dummy head is discarded.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>When the merge is trivial</h2>
+        <p class="section-intro">
+            Three edge cases arise from degenerate inputs. The dummy-head pattern
+            handles all of them without special-case branches.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>One list is empty</h3>
+                <p>
+                    When <code>list1</code> or <code>list2</code> is <code>null</code>,
+                    the while-loop body never executes. <code>tail.Next</code> is set to the
+                    non-null list, and the entire input is returned unchanged. Zero comparisons
+                    needed — the sorted list is already the answer.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Equal front values</h3>
+                <p>
+                    When both front nodes have the same value, the <code>≤</code> comparison
+                    selects from <code>list1</code>. This is a deliberate choice — it preserves
+                    the relative order of equal elements, making the merge <em>stable</em>.
+                    Try the <strong>"all equal values"</strong> preset to see this in action.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Early exhaustion</h3>
+                <p>
+                    When one list is much shorter, it runs out before the other. The comparison
+                    loop ends early, and the longer list's entire remaining suffix is attached in
+                    a single <code>tail.Next</code> operation — no element-by-element copying.
+                    Try the <strong>"early exhaustion"</strong> preset.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { className: "solid", label: "front node (being compared)" },
+        { dot: true, label: "last attached node" }
+    ],
+    gridClass: "merge-viz",
+    status: [
+        { id: "l1Front",  label: "list\u2081 front" },
+        { id: "l2Front",  label: "list\u2082 front" },
+        { id: "compare",  label: "Compare" },
+        { id: "action",   label: "Action" }
+    ],
+    values: [
+        { id: "merged",    label: "merged" },
+        { id: "remaining", label: "remaining" }
+    ],
+    orderTitle: "Merged Order"
+});
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "[1,2,4] + [1,3,4] (canonical)",
+        list1: [1, 2, 4],
+        list2: [1, 3, 4],
+        desc: "The canonical LeetCode example. Interleaving with equal values demonstrates the stable merge behavior of the \u2264 comparison."
+    },
+    {
+        name: "[1,3,5] + [2,4,6] (perfect alternation)",
+        list1: [1, 3, 5],
+        list2: [2, 4, 6],
+        mobileDefault: true,
+        desc: "Every comparison switches which list provides the next node. A clean alternation pattern."
+    },
+    {
+        name: "[1,2] + [3,4,5] (early exhaustion)",
+        list1: [1, 2],
+        list2: [3, 4, 5],
+        desc: "All of list\u2081 is smaller than list\u2082. It exhausts after two comparisons, then the entire list\u2082 suffix appends directly."
+    },
+    {
+        name: "[10,20] + [5,15,25] (interleaved)",
+        list1: [10, 20],
+        list2: [5, 15, 25],
+        desc: "Larger values with true interleaving. list\u2082 starts smaller but list\u2081 provides nodes in between."
+    },
+    {
+        name: "[5] + [3] (minimal, two single nodes)",
+        list1: [5],
+        list2: [3],
+        desc: "The smallest non-trivial case. One comparison determines the order. The loser becomes the suffix."
+    },
+    {
+        name: "[1,1,1] + [1,1] (all equal values)",
+        list1: [1, 1, 1],
+        list2: [1, 1],
+        desc: "All values are equal. The \u2264 comparison always takes from list\u2081 first, demonstrating stable merge order."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var list1 = preset.list1.slice();
+    var list2 = preset.list2.slice();
+    var steps = [];
+    var merged = [];
+    var i1 = 0, i2 = 0;
+
+    while (i1 < list1.length && i2 < list2.length) {
+        var bl1 = list1[i1], bl2 = list2[i2];
+        var source, value, compStr;
+
+        if (bl1 <= bl2) {
+            source = "list1";
+            value = bl1;
+            compStr = bl1 + " \u2264 " + bl2;
+            i1++;
+        } else {
+            source = "list2";
+            value = bl2;
+            compStr = bl1 + " > " + bl2;
+            i2++;
+        }
+
+        merged.push(value);
+        steps.push({
+            source: source,
+            value: value,
+            list1Consumed: i1,
+            list2Consumed: i2,
+            merged: merged.slice(),
+            comparison: compStr,
+            beforeL1: bl1,
+            beforeL2: bl2,
+            isAppend: false
+        });
+    }
+
+    var remSource = i1 < list1.length ? "list1" : "list2";
+    var remArr = i1 < list1.length ? list1 : list2;
+    var remStart = i1 < list1.length ? i1 : i2;
+    var remTotal = remArr.length - remStart;
+
+    for (var r = remStart; r < remArr.length; r++) {
+        merged.push(remArr[r]);
+        if (remSource === "list1") i1++; else i2++;
+        steps.push({
+            source: remSource,
+            value: remArr[r],
+            list1Consumed: i1,
+            list2Consumed: i2,
+            merged: merged.slice(),
+            comparison: null,
+            beforeL1: null,
+            beforeL2: null,
+            isAppend: true,
+            appendIndex: r - remStart,
+            appendTotal: remTotal
+        });
+    }
+
+    var order = merged.map(String);
+    return {
+        steps: steps,
+        order: order,
+        list1: list1,
+        list2: list2,
+        merged: merged,
+        desc: preset.desc
+    };
+}
+
+/* ── Merge visualization renderer ──────────────────────── */
+
+function renderMergeViz(gridEl, trace, step, position) {
+    gridEl.innerHTML = "";
+
+    var list1 = trace.list1;
+    var list2 = trace.list2;
+    var l1Consumed = step ? step.list1Consumed : 0;
+    var l2Consumed = step ? step.list2Consumed : 0;
+    var mergedValues = step ? step.merged : [];
+    var showFronts = !step || !step.isAppend;
+    var l1Front = step ? step.list1Consumed : 0;
+    var l2Front = step ? step.list2Consumed : 0;
+
+    gridEl.appendChild(
+        buildChainRow("list\u2081", list1, l1Consumed, showFronts ? l1Front : -1));
+
+    gridEl.appendChild(
+        buildChainRow("list\u2082", list2, l2Consumed, showFronts ? l2Front : -1));
+
+    var divider = document.createElement("div");
+    divider.className = "merge-flow-divider";
+    gridEl.appendChild(divider);
+
+    gridEl.appendChild(buildMergedRow(mergedValues, position));
+}
+
+function buildChainRow(label, values, consumed, frontIdx) {
+    var row = document.createElement("div");
+    row.className = "merge-row";
+
+    var lbl = document.createElement("span");
+    lbl.className = "merge-row-label";
+    lbl.textContent = label;
+    row.appendChild(lbl);
+
+    var chain = document.createElement("div");
+    chain.className = "merge-chain";
+
+    if (values.length === 0) {
+        var empty = document.createElement("span");
+        empty.className = "merge-empty";
+        empty.textContent = "(empty)";
+        chain.appendChild(empty);
+    } else {
+        for (var i = 0; i < values.length; i++) {
+            var node = document.createElement("div");
+            node.className = "ll-node";
+
+            if (i < consumed) {
+                node.classList.add("consumed");
+            }
+            if (i === frontIdx && frontIdx < values.length) {
+                node.classList.add("front-node");
+            }
+
+            var val = document.createElement("span");
+            val.className = "cell-value";
+            val.textContent = values[i];
+            node.appendChild(val);
+
+            chain.appendChild(node);
+
+            if (i < values.length - 1) {
+                chain.appendChild(makeArrow(i < consumed));
+            }
+        }
+    }
+
+    row.appendChild(chain);
+    return row;
+}
+
+function buildMergedRow(mergedValues, position) {
+    var row = document.createElement("div");
+    row.className = "merge-row";
+
+    var lbl = document.createElement("span");
+    lbl.className = "merge-row-label";
+    lbl.textContent = "merged";
+    row.appendChild(lbl);
+
+    var chain = document.createElement("div");
+    chain.className = "merge-chain";
+
+    if (mergedValues.length === 0) {
+        var empty = document.createElement("span");
+        empty.className = "merge-empty";
+        empty.textContent = "waiting\u2026";
+        chain.appendChild(empty);
+    } else {
+        for (var i = 0; i < mergedValues.length; i++) {
+            var node = document.createElement("div");
+            node.className = "ll-node";
+
+            if (i === mergedValues.length - 1 && position >= 0) {
+                node.classList.add("current");
+            }
+
+            var val = document.createElement("span");
+            val.className = "cell-value";
+            val.textContent = mergedValues[i];
+            node.appendChild(val);
+
+            chain.appendChild(node);
+
+            if (i < mergedValues.length - 1) {
+                chain.appendChild(makeArrow(false));
+            }
+        }
+    }
+
+    row.appendChild(chain);
+    return row;
+}
+
+function makeArrow(isConsumed) {
+    var el = document.createElement("span");
+    el.className = "ll-arrow";
+    if (isConsumed) el.classList.add("consumed-arrow");
+
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "36");
+    svg.setAttribute("height", "12");
+    svg.setAttribute("viewBox", "0 0 36 12");
+
+    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("class", "arrow-line");
+    line.setAttribute("x1", "0");
+    line.setAttribute("y1", "6");
+    line.setAttribute("x2", "30");
+    line.setAttribute("y2", "6");
+
+    var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    head.setAttribute("class", "arrow-head");
+    head.setAttribute("points", "28,2 36,6 28,10");
+
+    svg.appendChild(line);
+    svg.appendChild(head);
+    el.appendChild(svg);
+    return el;
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    renderMergeViz(refs.grid, trace, step, pos);
+
+    /* Status bar */
+    if (!step) {
+        refs.status.l1Front.textContent = trace.list1.length > 0 ? String(trace.list1[0]) : "\u2205";
+        refs.status.l2Front.textContent = trace.list2.length > 0 ? String(trace.list2[0]) : "\u2205";
+        refs.status.compare.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+    } else if (step.isAppend) {
+        refs.status.l1Front.textContent = step.list1Consumed < trace.list1.length
+            ? String(trace.list1[step.list1Consumed]) : "\u2205";
+        refs.status.l2Front.textContent = step.list2Consumed < trace.list2.length
+            ? String(trace.list2[step.list2Consumed]) : "\u2205";
+        refs.status.compare.textContent = "\u2014";
+        refs.status.action.textContent = "append " + step.value;
+    } else {
+        refs.status.l1Front.textContent = String(step.beforeL1);
+        refs.status.l2Front.textContent = String(step.beforeL2);
+        refs.status.compare.textContent = step.comparison;
+        refs.status.action.textContent = step.source === "list1"
+            ? "take list\u2081" : "take list\u2082";
+    }
+
+    /* Values bar */
+    refs.values.merged.textContent = step
+        ? step.merged.length + " of " + trace.merged.length
+        : "0 of " + trace.merged.length;
+
+    refs.values.remaining.textContent = step
+        ? "list\u2081: " + (trace.list1.length - step.list1Consumed) +
+          ", list\u2082: " + (trace.list2.length - step.list2Consumed)
+        : "list\u2081: " + trace.list1.length +
+          ", list\u2082: " + trace.list2.length;
+
+    /* Note */
+    refs.note.textContent = describeStep(engine);
+
+    /* Auto-scroll for mobile */
+    requestAnimationFrame(function() {
+        var active = refs.container.querySelector(".merge-row:last-child .ll-node.current");
+        if (active) {
+            var cr = refs.container.getBoundingClientRect();
+            var nr = active.getBoundingClientRect();
+            var dx = (nr.left + nr.width / 2) - (cr.left + cr.width / 2);
+            if (Math.abs(dx) > cr.width * 0.35) {
+                refs.container.scrollBy({ left: dx, behavior: "smooth" });
+            }
+        }
+    });
+
+    if (pos < 0) refs.container.scrollLeft = 0;
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    var trace = engine.trace;
+
+    if (!step) {
+        if (trace.list1.length === 0 && trace.list2.length === 0)
+            return "Both lists are empty \u2014 nothing to merge.";
+        return trace.desc + " Press Play or Next to begin.";
+    }
+
+    var mergedStr = step.merged.join(" \u2192 ");
+    var isLast = engine.position === trace.steps.length - 1;
+
+    if (step.isAppend) {
+        var srcLabel = step.source === "list1" ? "list\u2081" : "list\u2082";
+        var otherLabel = step.source === "list1" ? "list\u2082" : "list\u2081";
+
+        if (step.appendIndex === 0) {
+            return otherLabel + " is exhausted. The remaining suffix of " + srcLabel +
+                " is already sorted \u2014 attach node " + step.value + " directly." +
+                (isLast
+                    ? " Merge complete: " + mergedStr + "."
+                    : " Merged so far: " + mergedStr + ".");
+        }
+
+        return "Continuing suffix: attach node " + step.value + " from " + srcLabel + "." +
+            (isLast
+                ? " Merge complete: " + mergedStr + "."
+                : " Merged so far: " + mergedStr + ".");
+    }
+
+    var srcLabel = step.source === "list1" ? "list\u2081" : "list\u2082";
+    return "Compare list\u2081 front (" + step.beforeL1 + ") with list\u2082 front (" +
+        step.beforeL2 + "). Since " + step.comparison + ", take node " + step.value +
+        " from " + srcLabel + " and attach it to the merged chain." +
+        (isLast
+            ? " Merge complete: " + mergedStr + "."
+            : " Merged so far: " + mergedStr + ".");
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 1200
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
