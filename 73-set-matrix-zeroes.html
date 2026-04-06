@@ -3,23 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Set Matrix Zeroes — In-Place Marker Propagation | Interactive Visualization</title>
-<meta name="description" content="Interactive step-by-step visualization of LeetCode 73 Set Matrix Zeroes. Watch markers propagate through four phases: flag, mark, zero interior, zero edges.">
-<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html">
-<meta name="robots" content="index, follow">
-<meta name="keywords" content="set matrix zeroes, leetcode 73, in-place markers, zero propagation, algorithm visualization">
-<meta property="og:title" content="Set Matrix Zeroes — Interactive Visualization">
-<meta property="og:description" content="Step-by-step visualization of LeetCode 73. Watch in-place markers propagate zeros through four phases.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html">
-<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Set Matrix Zeroes — Interactive Visualization">
-<meta name="twitter:description" content="Step-by-step visualization of LeetCode 73. Watch in-place markers propagate zeros through four phases.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Set Matrix Zeroes — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 73 Set Matrix Zeroes.","url":"https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
-</script>
+<title>Set Matrix Zeroes — In-Place Marker Propagation</title>
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
@@ -150,104 +134,122 @@
 }
 
 </style>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 73 Set Matrix Zeroes. Watch markers propagate through four phases: flag, mark, zero interior, zero edges.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="set matrix zeroes, leetcode 73, in-place markers, zero propagation, algorithm visualization">
+<meta property="og:title" content="Set Matrix Zeroes — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 73. Watch in-place markers propagate zeros through four phases.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/73-set-matrix-zeroes.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Set Matrix Zeroes — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 73. Watch in-place markers propagate zeros through four phases.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
 </head>
 <body>
+<main class="page">
 
-<!-- ─── Section 1: Intro ──────────────────────────────── -->
+    <!-- ── Hero ── -->
 
-<section class="viz-section">
-<div class="viz-container">
-    <h1 class="viz-title">Set Matrix Zeroes</h1>
-    <p class="viz-subtitle">LeetCode 73 · In-Place Marker Propagation</p>
-    <p class="viz-body">
-        Given an m × n matrix, if any cell is&nbsp;0, zero its entire row
+    <section class="hero hero-full">
+        <span class="label">Set Matrix Zeroes · Optimal Solution</span>
+        <h1>Use the matrix itself as a notebook.</h1>
+        <p class="hero-text">
+            Given an m × n matrix, if any cell is&nbsp;0, zero its entire row
         and column — in place, using O(1) extra space. The trick is to
         use the <strong>first row and first column</strong> of the matrix
         itself as marker storage.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 2: Marker Concept ─────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">First Row + Column as Markers</h2>
-    <p class="viz-body">
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>First Row + Column as Markers</h2>
+        <p class="section-intro">
         Zeroing cells immediately would create cascading false markers.
         Instead, for each interior zero at [r][c], we <em>defer</em> the
         work by writing 0 into the first-column cell [r][0] and the
         first-row cell [0][c]. These act as flags: "row r needs zeroing"
         and "column c needs zeroing."
-    </p>
-    <p class="viz-body">
+        </p>
+        <p>
         Because the markers overwrite the original first row and column,
         we must save whether those borders originally contained any zero
         <strong>before</strong> we start marking.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 3: Algorithm Phases ───────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Four Phases</h2>
-    <div class="viz-code-block">
-<pre><code>1. Flag: remember if first row / column
-         originally has a zero
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Four Phases</h2>
+        <div class="viz-code-block">
+        <pre><code>1. Flag: remember if first row / column
+        originally has a zero
+        2. Mark: for each interior cell == 0,
+        set matrix[row][0] = 0
+        set matrix[0][col] = 0
+        3. Zero interior: for each interior cell,
+        if matrix[row][0] == 0 or
+        matrix[0][col] == 0
+        then set cell to 0
+        4. Zero edges: if first-row flag, zero row 0
+        if first-col flag, zero col 0</code></pre>
+        </div>
+    </section>
 
-2. Mark: for each interior cell == 0,
-         set matrix[row][0] = 0
-         set matrix[0][col] = 0
+    <hr class="divider">
 
-3. Zero interior: for each interior cell,
-         if matrix[row][0] == 0 or
-            matrix[0][col] == 0
-         then set cell to 0
-
-4. Zero edges: if first-row flag, zero row 0
-               if first-col flag, zero col 0</code></pre>
-    </div>
-</div>
-</section>
-
-<!-- ─── Section 4: Interactive ────────────────────────── -->
-
-<div id="interactiveMount"></div>
-
-<!-- ─── Section 5: Guard Cases ────────────────────────── -->
-
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Why Save the Flags First?</h2>
-    <p class="viz-body">
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Why Save the Flags First?</h2>
+        <p class="section-intro">
         <strong>Marker overwrite hazard</strong> — the marking phase writes 0
         into the first row and first column. If those borders originally had
         non-zero values, those values are now lost. The saved flags let the
         final phase decide whether to zero the borders independently of the
         markers.
-    </p>
-    <p class="viz-body">
+        </p>
+        <p>
         <strong>Interior before edges</strong> — interior cells must be
         zeroed first because they <em>read</em> the markers. If we zeroed
         the first row or column early, every interior cell would see a
         marker of zero and the entire matrix would collapse.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 6: Complexity ─────────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Complexity</h2>
-    <p class="viz-body">
+    <section>
+        <span class="label">Complexity</span>
+        <h2>Complexity</h2>
+        <p class="section-intro">
         <strong>Time:</strong> O(m × n) — three passes over the matrix.<br>
         <strong>Space:</strong> O(1) — markers stored in the matrix itself.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
 
 <script src="shared/viz/viz-engine.js"></script>
 <script src="shared/viz/viz-array.js"></script>

@@ -3,18 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rotate Array — Three-Reversal Trick | Interactive Visualization</title>
-<meta name="description" content="Interactive visualization of LeetCode 189 Rotate Array. Watch the three-reversal trick rotate in-place.">
-<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/189-rotate-array.html">
-<meta name="robots" content="index, follow">
-<meta property="og:title" content="Rotate Array — Interactive Visualization">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/189-rotate-array.html">
-<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Rotate Array — Interactive Visualization","url":"https://ideasbyrobert.github.io/algorithms/189-rotate-array.html"}
-</script>
+<title>Rotate Array — Three-Reversal Trick</title>
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 .phase-badge {
@@ -31,25 +20,47 @@
 }
 .phase-badge.active { background: #1D1D1F; color: #FFFFFF; border-color: #1D1D1F; }
 </style>
+<meta name="description" content="Interactive visualization of LeetCode 189 Rotate Array. Watch the three-reversal trick rotate in-place.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/189-rotate-array.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Rotate Array — Interactive Visualization">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/189-rotate-array.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
 </head>
 <body>
+<main class="page">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h1 class="viz-title">Rotate Array</h1>
-    <p class="viz-subtitle">LeetCode 189 · Three-Reversal Trick</p>
-    <p class="viz-body">
-        Rotate an array to the right by k steps. Instead of shifting
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Rotate Array · Optimal Solution</span>
+        <h1>Three reversals compose a rotation.</h1>
+        <p class="hero-text">
+            Rotate an array to the right by k steps. Instead of shifting
         elements one at a time (O(n·k)), reverse three segments in
         O(n) total — the whole array, the front k, then the back n−k.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Three Reversals</h2>
-    <p class="viz-body">
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Three Reversals</h2>
+        <p class="section-intro">
         <strong>Step 1:</strong> Reverse the entire array — this puts
         the tail block (which should move to front) into position, but
         both blocks are backwards.<br>
@@ -57,46 +68,52 @@
         the front block.<br>
         <strong>Step 3:</strong> Reverse the remaining n−k elements —
         fixes the back block.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Algorithm</h2>
-    <div class="viz-code-block">
-<pre><code>k ← k % n
-reverse(0, n - 1)     // whole array
-reverse(0, k - 1)     // front block
-reverse(k, n - 1)     // back block</code></pre>
-    </div>
-</div>
-</section>
+    <hr class="divider">
 
-<div id="interactiveMount"></div>
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Algorithm</h2>
+        <div class="viz-code-block">
+        <pre><code>k ← k % n
+        reverse(0, n - 1)     // whole array
+        reverse(0, k - 1)     // front block
+        reverse(k, n - 1)     // back block</code></pre>
+        </div>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Edge Patterns</h2>
-    <p class="viz-body">
+    <hr class="divider">
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Edge Patterns</h2>
+        <p class="section-intro">
         <strong>k ≥ n</strong> — normalize: k = k % n. Rotating by
         the full length is a no-op.<br><br>
         <strong>k = 0</strong> — array unchanged; skip all reversals.<br><br>
         <strong>Each reversal</strong> is a two-pointer swap from
         endpoints inward — O(segment length/2) swaps.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Complexity</h2>
-    <p class="viz-body">
+    <hr class="divider">
+
+    <section>
+        <span class="label">Complexity</span>
+        <h2>Complexity</h2>
+        <p class="section-intro">
         <strong>Time:</strong> O(n) — each element touched at most twice.<br>
         <strong>Space:</strong> O(1) — in-place swaps.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
 
 <script src="shared/viz/viz-engine.js"></script>
 <script src="shared/viz/viz-array.js"></script>

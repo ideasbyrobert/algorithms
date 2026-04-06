@@ -3,23 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Robot Return to Origin — Axis Displacement | Interactive Visualization</title>
-<meta name="description" content="Interactive step-by-step visualization of LeetCode 657 Robot Return to Origin. Watch horizontal and vertical displacements track independently.">
-<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/657-robot-return-to-origin.html">
-<meta name="robots" content="index, follow">
-<meta name="keywords" content="robot return to origin, leetcode 657, axis displacement, algorithm visualization">
-<meta property="og:title" content="Robot Return to Origin — Interactive Visualization">
-<meta property="og:description" content="Step-by-step visualization of LeetCode 657. Watch axis displacements track independently.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/657-robot-return-to-origin.html">
-<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Robot Return to Origin — Interactive Visualization">
-<meta name="twitter:description" content="Step-by-step visualization of LeetCode 657. Watch axis displacements track independently.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Robot Return to Origin — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 657 Robot Return to Origin.","url":"https://ideasbyrobert.github.io/algorithms/657-robot-return-to-origin.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
-</script>
+<title>Robot Return to Origin — Axis Displacement</title>
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
@@ -92,83 +76,104 @@
 }
 
 </style>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 657 Robot Return to Origin. Watch horizontal and vertical displacements track independently.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/657-robot-return-to-origin.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="robot return to origin, leetcode 657, axis displacement, algorithm visualization">
+<meta property="og:title" content="Robot Return to Origin — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 657. Watch axis displacements track independently.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/657-robot-return-to-origin.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Robot Return to Origin — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 657. Watch axis displacements track independently.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
 </head>
 <body>
+<main class="page">
 
-<!-- ─── Section 1: Intro ──────────────────────────────── -->
+    <!-- ── Hero ── -->
 
-<section class="viz-section">
-<div class="viz-container">
-    <h1 class="viz-title">Robot Return to Origin</h1>
-    <p class="viz-subtitle">LeetCode 657 · Axis Displacement Tracking</p>
-    <p class="viz-body">
-        A robot starts at the origin on a 2D plane. Given a string of
+    <section class="hero hero-full">
+        <span class="label">Robot Return to Origin · Optimal Solution</span>
+        <h1>Track displacement. Return means zero.</h1>
+        <p class="hero-text">
+            A robot starts at the origin on a 2D plane. Given a string of
         moves — U, D, L, R — determine whether the robot returns to
         the starting point. Each move shifts one axis by&nbsp;±1.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 2: Two-Axis Insight ───────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Independent Axes</h2>
-    <p class="viz-body">
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Independent Axes</h2>
+        <p class="section-intro">
         The horizontal and vertical axes are independent.
         L/R change only the horizontal position; U/D change only the
         vertical position. The robot returns to the origin if and only
         if <strong>both</strong> final coordinates are zero.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Count and Compare</h2>
-    <div class="viz-code-block">
-<pre><code>h ← 0, v ← 0
-for each move:
-    if L: h -= 1    if R: h += 1
-    if U: v += 1    if D: v -= 1
-return h == 0 and v == 0</code></pre>
-    </div>
-</div>
-</section>
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Count and Compare</h2>
+        <div class="viz-code-block">
+        <pre><code>h ← 0, v ← 0
+        for each move:
+        if L: h -= 1    if R: h += 1
+        if U: v += 1    if D: v -= 1
+        return h == 0 and v == 0</code></pre>
+        </div>
+    </section>
 
-<!-- ─── Section 4: Interactive ────────────────────────── -->
+    <hr class="divider">
 
-<div id="interactiveMount"></div>
-
-<!-- ─── Section 5: Edge Patterns ──────────────────────── -->
-
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Edge Patterns</h2>
-    <p class="viz-body">
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Edge Patterns</h2>
+        <p class="section-intro">
         <strong>One axis balanced, one not</strong> — "UDL" has
         vertical = 0 but horizontal = −1, so the robot does not
         return.<br>
         <strong>Odd-length string</strong> — always fails, since an
         odd total displacement on any axis cannot be zero.<br>
         <strong>Empty string</strong> — trivially returns true.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 6: Complexity ─────────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Complexity</h2>
-    <p class="viz-body">
+    <section>
+        <span class="label">Complexity</span>
+        <h2>Complexity</h2>
+        <p class="section-intro">
         <strong>Time:</strong> O(n) — single pass through the moves.<br>
         <strong>Space:</strong> O(1) — two integer counters.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
 
 <script src="shared/viz/viz-engine.js"></script>
 <script src="shared/viz/viz-array.js"></script>

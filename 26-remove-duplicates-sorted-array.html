@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Remove Duplicates from Sorted Array — Unique Compaction | Interactive Visualization</title>
+<title>Remove Duplicates from Sorted Array — Unique Compaction</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
 <meta name="description" content="Interactive step-by-step visualization of LeetCode 26. Watch the write pointer compact unique values in a single pass.">
 <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/26-remove-duplicates-sorted-array.html">
 <meta name="robots" content="index, follow">
@@ -13,77 +14,93 @@
 <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Remove Duplicates from Sorted Array — Interactive Visualization","url":"https://ideasbyrobert.github.io/algorithms/26-remove-duplicates-sorted-array.html"}
-</script>
-<link rel="stylesheet" href="shared/viz/viz-system.css">
 </head>
 <body>
+<main class="page">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h1 class="viz-title">Remove Duplicates from Sorted Array</h1>
-    <p class="viz-subtitle">LeetCode 26 · Unique Value Compaction</p>
-    <p class="viz-body">
-        Given a sorted array, remove duplicates in-place so each element
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Remove Duplicates from Sorted Array · Optimal Solution</span>
+        <h1>One write pointer. Unique values compact forward.</h1>
+        <p class="hero-text">
+            Given a sorted array, remove duplicates in-place so each element
         appears only once. Return the number of unique elements. Since
         the array is sorted, duplicates are adjacent — a single forward
         pass suffices.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Compare Against Last Written</h2>
-    <p class="viz-body">
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Compare Against Last Written</h2>
+        <p class="section-intro">
         The write pointer starts at index 1 (the first element is always
         kept). For each read position, compare against the value at
         <span style="font-family:Menlo,monospace;">write − 1</span> — the
         last confirmed unique. If different, write it and advance; if the
         same, skip.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Algorithm</h2>
-    <div class="viz-code-block">
-<pre><code>write ← 1
-for read in 1..n-1:
-    if nums[read] ≠ nums[write - 1]:
+    <hr class="divider">
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Algorithm</h2>
+        <div class="viz-code-block">
+        <pre><code>write ← 1
+        for read in 1..n-1:
+        if nums[read] ≠ nums[write - 1]:
         nums[write] = nums[read]
         write += 1
-return write</code></pre>
-    </div>
-</div>
-</section>
+        return write</code></pre>
+        </div>
+    </section>
 
-<div id="interactiveMount"></div>
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Edge Patterns</h2>
-    <p class="viz-body">
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Edge Patterns</h2>
+        <p class="section-intro">
         <strong>All identical</strong> — write never advances past 1;
         result length is 1.<br><br>
         <strong>Already unique</strong> — write tracks read; every element
         copies to itself.<br><br>
         <strong>Runs of duplicates</strong> — the write pointer skips
         entire runs, keeping only the first occurrence.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Complexity</h2>
-    <p class="viz-body">
+    <hr class="divider">
+
+    <section>
+        <span class="label">Complexity</span>
+        <h2>Complexity</h2>
+        <p class="section-intro">
         <strong>Time:</strong> O(n) — single pass.<br>
         <strong>Space:</strong> O(1) — two pointers.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
 
 <script src="shared/viz/viz-engine.js"></script>
 <script src="shared/viz/viz-array.js"></script>

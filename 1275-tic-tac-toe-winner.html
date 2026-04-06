@@ -3,23 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Find Winner on a Tic-Tac-Toe Game — Signed Counters | Interactive Visualization</title>
-<meta name="description" content="Interactive step-by-step visualization of LeetCode 1275 Tic-Tac-Toe. Watch signed row, column, and diagonal counters track each move to determine the winner.">
-<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html">
-<meta name="robots" content="index, follow">
-<meta name="keywords" content="tic tac toe winner, leetcode 1275, signed counters, algorithm visualization">
-<meta property="og:title" content="Find Winner on a Tic-Tac-Toe Game — Interactive Visualization">
-<meta property="og:description" content="Step-by-step visualization of LeetCode 1275. Watch signed counters detect the winner in real time.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html">
-<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Find Winner on a Tic-Tac-Toe Game — Interactive Visualization">
-<meta name="twitter:description" content="Step-by-step visualization of LeetCode 1275. Watch signed counters detect the winner in real time.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Find Winner on a Tic-Tac-Toe Game — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 1275 Tic-Tac-Toe.","url":"https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
-</script>
+<title>Find Winner on a Tic-Tac-Toe Game — Signed Counters</title>
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
@@ -166,35 +150,58 @@
 }
 
 </style>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 1275 Tic-Tac-Toe. Watch signed row, column, and diagonal counters track each move to determine the winner.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="tic tac toe winner, leetcode 1275, signed counters, algorithm visualization">
+<meta property="og:title" content="Find Winner on a Tic-Tac-Toe Game — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 1275. Watch signed counters detect the winner in real time.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1275-tic-tac-toe-winner.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Find Winner on a Tic-Tac-Toe Game — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 1275. Watch signed counters detect the winner in real time.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
 </head>
 <body>
+<main class="page">
 
-<!-- ─── Section 1: Intro ──────────────────────────────── -->
+    <!-- ── Hero ── -->
 
-<section class="viz-section">
-<div class="viz-container">
-    <h1 class="viz-title">Find Winner on a Tic-Tac-Toe Game</h1>
-    <p class="viz-subtitle">LeetCode 1275 · Signed Counter Tracking</p>
-    <p class="viz-body">
-        Given a sequence of moves on a 3×3 board, determine the
+    <section class="hero hero-full">
+        <span class="label">Find Winner on a Tic-Tac-Toe Game · Optimal Solution</span>
+        <h1>Count moves. Detect a winner.</h1>
+        <p class="hero-text">
+            Given a sequence of moves on a 3×3 board, determine the
         outcome: A wins, B wins, Draw, or Pending. Player A moves on
         odd turns, B on even. Rather than scanning the whole board
         after each move, we track running signed counters.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 2: Insight ────────────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Signed Counters</h2>
-    <p class="viz-body">
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Signed Counters</h2>
+        <p class="section-intro">
         Maintain a score for each row, each column, and both
         diagonals. A's moves add +1; B's moves add −1. If any counter
         reaches +3 or −3, that player has completed a line and wins.
-    </p>
-    <p class="viz-body" style="margin-top:8px;">
+        </p>
+        <p class="viz-body" style="margin-top:8px;">
         A move at <span style="font-family:Menlo,monospace;">(r, c)</span>
         updates row[r] and col[c]. If
         <span style="font-family:Menlo,monospace;">r == c</span>, it also
@@ -202,43 +209,34 @@
         <span style="font-family:Menlo,monospace;">r + c == 2</span>,
         it updates the anti-diagonal. The center cell (1,1) sits on
         both diagonals.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Algorithm</h2>
-    <div class="viz-code-block">
-<pre><code>rows[3] = cols[3] = mainDiag = antiDiag = 0
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Algorithm</h2>
+        <div class="viz-code-block">
+        <pre><code>rows[3] = cols[3] = mainDiag = antiDiag = 0
+        for turn 0..n-1:
+        score = +1 if even turn (A), -1 if odd (B)
+        rows[r] += score
+        cols[c] += score
+        if r == c:     mainDiag += score
+        if r + c == 2: antiDiag += score
+        if |any counter| == 3: that player wins
+        if 9 moves played: "Draw"
+        else: "Pending"</code></pre>
+        </div>
+    </section>
 
-for turn 0..n-1:
-    score = +1 if even turn (A), -1 if odd (B)
-    rows[r] += score
-    cols[c] += score
-    if r == c:     mainDiag += score
-    if r + c == 2: antiDiag += score
+    <hr class="divider">
 
-    if |any counter| == 3: that player wins
-
-if 9 moves played: "Draw"
-else: "Pending"</code></pre>
-    </div>
-</div>
-</section>
-
-<!-- ─── Section 4: Interactive ────────────────────────── -->
-
-<div id="interactiveMount"></div>
-
-<!-- ─── Section 5: Edge Cases ─────────────────────────── -->
-
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Edge Patterns</h2>
-    <p class="viz-body">
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Edge Patterns</h2>
+        <p class="section-intro">
         <strong>Diagonal wins</strong> — The main diagonal (0,0)→(1,1)→(2,2)
         and anti-diagonal (0,2)→(1,1)→(2,0) each have their own counter.
         The center cell contributes to both.<br><br>
@@ -246,21 +244,25 @@ else: "Pending"</code></pre>
         ±3 counter is a Draw. Fewer than 9 moves is Pending.<br><br>
         <strong>Early termination</strong> — The game ends as soon as any
         counter reaches ±3. Remaining moves are never processed.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 6: Complexity ─────────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Complexity</h2>
-    <p class="viz-body">
+    <section>
+        <span class="label">Complexity</span>
+        <h2>Complexity</h2>
+        <p class="section-intro">
         <strong>Time:</strong> O(n) — at most 9 moves, each updating O(1) counters.<br>
         <strong>Space:</strong> O(1) — six counters (3 rows + 3 columns + 2 diagonals).
-    </p>
-</div>
-</section>
+        </p>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
 
 <script src="shared/viz/viz-engine.js"></script>
 <script src="shared/viz/viz-array.js"></script>

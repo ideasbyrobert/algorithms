@@ -3,23 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plus One — Right-to-Left Carry | Interactive Visualization</title>
-<meta name="description" content="Interactive step-by-step visualization of LeetCode 66 Plus One. Watch carry propagation from right to left through a digit array.">
-<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/66-plus-one.html">
-<meta name="robots" content="index, follow">
-<meta name="keywords" content="plus one, leetcode 66, carry propagation, digit array, algorithm visualization">
-<meta property="og:title" content="Plus One — Interactive Visualization">
-<meta property="og:description" content="Step-by-step visualization of LeetCode 66. Watch carry propagation through a digit array.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/66-plus-one.html">
-<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Plus One — Interactive Visualization">
-<meta name="twitter:description" content="Step-by-step visualization of LeetCode 66. Watch carry propagation through a digit array.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Plus One — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 66 Plus One.","url":"https://ideasbyrobert.github.io/algorithms/66-plus-one.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
-</script>
+<title>Plus One — Right-to-Left Carry</title>
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
@@ -35,87 +19,107 @@
 }
 
 </style>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 66 Plus One. Watch carry propagation from right to left through a digit array.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/66-plus-one.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="plus one, leetcode 66, carry propagation, digit array, algorithm visualization">
+<meta property="og:title" content="Plus One — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 66. Watch carry propagation through a digit array.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/66-plus-one.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Plus One — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 66. Watch carry propagation through a digit array.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
 </head>
 <body>
+<main class="page">
 
-<!-- ─── Section 1: Intro ──────────────────────────────── -->
+    <!-- ── Hero ── -->
 
-<section class="viz-section">
-<div class="viz-container">
-    <h1 class="viz-title">Plus One</h1>
-    <p class="viz-subtitle">LeetCode 66 · Right-to-Left Carry</p>
-    <p class="viz-body">
-        A non-negative integer is stored as an array of its decimal digits.
+    <section class="hero hero-full">
+        <span class="label">Plus One · Optimal Solution</span>
+        <h1>Carry propagation, right to left.</h1>
+        <p class="hero-text">
+            A non-negative integer is stored as an array of its decimal digits.
         Add one to the number and return the updated digit array.
         The key insight: carry propagation only matters when a digit is&nbsp;9.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 2: Carry Concept ──────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Carry Propagation</h2>
-    <p class="viz-body">
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Carry Propagation</h2>
+        <p class="section-intro">
         Start at the rightmost digit and try to add one.
         If the digit is less than&nbsp;9, increment it and stop — no carry.
         If the digit is&nbsp;9, it becomes&nbsp;0 and the carry moves left.
         This chain continues until a digit absorbs the carry or we
         run out of digits.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">The Algorithm</h2>
-    <div class="viz-code-block">
-<pre><code>for i from last index down to 0:
-    if digits[i] < 9:
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>The Algorithm</h2>
+        <div class="viz-code-block">
+        <pre><code>for i from last index down to 0:
+        if digits[i] < 9:
         digits[i] += 1
         return digits
-    digits[i] = 0
+        digits[i] = 0
+        // all digits were 9
+        return [1, 0, 0, ..., 0]</code></pre>
+        </div>
+    </section>
 
-// all digits were 9
-return [1, 0, 0, ..., 0]</code></pre>
-    </div>
-</div>
-</section>
+    <hr class="divider">
 
-<!-- ─── Section 4: Interactive ────────────────────────── -->
-
-<div id="interactiveMount"></div>
-
-<!-- ─── Section 5: Edge — All Nines ───────────────────── -->
-
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">The All-Nines Case</h2>
-    <p class="viz-body">
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>The All-Nines Case</h2>
+        <p class="section-intro">
         When every digit is&nbsp;9, every position carries.
         The loop ends without returning, meaning the original number
         was 10<sup>k</sup>&nbsp;−&nbsp;1. The result is 10<sup>k</sup>:
         a new array one element longer, starting with&nbsp;1 and
         filled with zeros.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<!-- ─── Section 6: Complexity ─────────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Complexity</h2>
-    <p class="viz-body">
+    <section>
+        <span class="label">Complexity</span>
+        <h2>Complexity</h2>
+        <p class="section-intro">
         <strong>Time:</strong> O(n) worst case — when all digits are 9.<br>
         <strong>Space:</strong> O(n) worst case — if the array must expand.
         Otherwise O(1) extra.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
 
 <script src="shared/viz/viz-engine.js"></script>
 <script src="shared/viz/viz-array.js"></script>

@@ -3,18 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Majority Element — Boyer-Moore Voting | Interactive Visualization</title>
-<meta name="description" content="Interactive visualization of LeetCode 169 Majority Element. Watch Boyer-Moore voting track candidate and balance.">
-<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/169-majority-element.html">
-<meta name="robots" content="index, follow">
-<meta property="og:title" content="Majority Element — Interactive Visualization">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/169-majority-element.html">
-<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Majority Element — Interactive Visualization","url":"https://ideasbyrobert.github.io/algorithms/169-majority-element.html"}
-</script>
+<title>Majority Element — Boyer-Moore Voting</title>
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 .vote-panel {
@@ -52,57 +41,79 @@
     .vote-val { font-size: 17px; }
 }
 </style>
+<meta name="description" content="Interactive visualization of LeetCode 169 Majority Element. Watch Boyer-Moore voting track candidate and balance.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/169-majority-element.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Majority Element — Interactive Visualization">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/169-majority-element.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
 </head>
 <body>
+<main class="page">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h1 class="viz-title">Majority Element</h1>
-    <p class="viz-subtitle">LeetCode 169 · Boyer-Moore Voting Algorithm</p>
-    <p class="viz-body">
-        Find the element that appears more than ⌊n/2⌋ times. The voting
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Majority Element · Optimal Solution</span>
+        <h1>A candidate that survives cancellation.</h1>
+        <p class="hero-text">
+            Find the element that appears more than ⌊n/2⌋ times. The voting
         algorithm needs only one pass and O(1) space — no hash map, no
         sorting.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Candidate and Balance</h2>
-    <p class="viz-body">
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the algorithm run</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Candidate and Balance</h2>
+        <p class="section-intro">
         Maintain a <em>candidate</em> and a <em>balance counter</em>.
         When balance hits zero, adopt the current value as the new
         candidate. Matching values reinforce (balance++); mismatches
         cancel (balance−−). The true majority always survives because
         it can't be fully cancelled.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Algorithm</h2>
-    <div class="viz-code-block">
-<pre><code>candidate ← null, balance ← 0
-for each value:
-    if balance == 0:
+    <hr class="divider">
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Algorithm</h2>
+        <div class="viz-code-block">
+        <pre><code>candidate ← null, balance ← 0
+        for each value:
+        if balance == 0:
         candidate ← value, balance ← 1
-    else if value == candidate:
+        else if value == candidate:
         balance += 1
-    else:
+        else:
         balance -= 1
-return candidate</code></pre>
-    </div>
-</div>
-</section>
+        return candidate</code></pre>
+        </div>
+    </section>
 
-<div id="interactiveMount"></div>
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Edge Patterns</h2>
-    <p class="viz-body">
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Edge Patterns</h2>
+        <p class="section-intro">
         <strong>Immediate restart</strong> — when balance drops to zero
         mid-array, the next element becomes the new candidate.<br><br>
         <strong>Uniform array</strong> — balance simply increments every
@@ -110,19 +121,25 @@ return candidate</code></pre>
         <strong>Guarantee</strong> — Boyer-Moore only works when a majority
         is guaranteed to exist. Without that guarantee, a verification
         pass is needed.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Complexity</h2>
-    <p class="viz-body">
+    <hr class="divider">
+
+    <section>
+        <span class="label">Complexity</span>
+        <h2>Complexity</h2>
+        <p class="section-intro">
         <strong>Time:</strong> O(n) — single pass.<br>
         <strong>Space:</strong> O(1) — two variables.
-    </p>
-</div>
-</section>
+        </p>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
 
 <script src="shared/viz/viz-engine.js"></script>
 <script src="shared/viz/viz-array.js"></script>

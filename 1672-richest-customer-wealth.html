@@ -3,23 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Richest Customer Wealth — Row-Sum Maximum | Interactive Visualization</title>
-<meta name="description" content="Interactive step-by-step visualization of LeetCode 1672 Richest Customer Wealth. Watch row sums accumulate and the running maximum update.">
-<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html">
-<meta name="robots" content="index, follow">
-<meta name="keywords" content="richest customer wealth, leetcode 1672, matrix row sum, algorithm visualization">
-<meta property="og:title" content="Richest Customer Wealth — Interactive Visualization">
-<meta property="og:description" content="Step-by-step visualization of LeetCode 1672. Watch row sums and the running maximum build.">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html">
-<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Richest Customer Wealth — Interactive Visualization">
-<meta name="twitter:description" content="Step-by-step visualization of LeetCode 1672. Watch row sums and the running maximum build.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"TechArticle","name":"Richest Customer Wealth — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 1672 Richest Customer Wealth.","url":"https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
-</script>
+<title>Richest Customer Wealth — Row-Sum Maximum</title>
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
@@ -164,49 +148,79 @@
 }
 
 </style>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 1672 Richest Customer Wealth. Watch row sums accumulate and the running maximum update.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="richest customer wealth, leetcode 1672, matrix row sum, algorithm visualization">
+<meta property="og:title" content="Richest Customer Wealth — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 1672. Watch row sums and the running maximum build.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Richest Customer Wealth — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 1672. Watch row sums and the running maximum build.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
 </head>
 <body>
+<main class="page">
 
-<!-- ─── Section 1: Intro ──────────────────────────────── -->
+    <!-- ── Hero ── -->
 
-<section class="viz-section">
-<div class="viz-container">
-    <h1 class="viz-title">Richest Customer Wealth</h1>
-    <p class="viz-subtitle">LeetCode 1672 · Matrix Row Sums</p>
-    <p class="viz-body">
-        Given <em>m</em>&nbsp;customers, each with balances across
-        <em>n</em>&nbsp;banks, find the wealthiest customer's total.
-        The answer is the largest row sum of the accounts matrix.
-    </p>
-</div>
-</section>
+    <section class="hero hero-full">
+        <span class="label">Richest Customer Wealth · Optimal Solution</span>
+        <h1>Sum each row. Keep the maximum.</h1>
+        <p class="hero-text">
+            Given <em>m</em>&nbsp;customers, each with balances across
+            <em>n</em>&nbsp;banks, find the wealthiest customer's total.
+            The answer is the largest row sum of the accounts matrix.
+            The outer loop walks rows — one per customer. The inner loop
+            accumulates every bank balance into a running sum. After each
+            row, compare to the running maximum. <code>O(m × n)</code> time.
+            <code>O(1)</code> extra space.
+        </p>
+    </section>
 
-<!-- ─── Section 2: Concept ────────────────────────────── -->
+    <hr class="divider">
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Row = Customer, Sum = Wealth</h2>
-    <p class="viz-body">
-        Each row of the matrix represents one customer's portfolio.
-        The column index identifies which bank holds that balance.
-        Summing across a row gives total wealth for that customer.
-        The richest customer is the one whose row sum is largest.
-    </p>
-</div>
-</section>
+    <!-- ── Interactive Visualization ── -->
 
-<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch row sums accumulate</h2>
+        <div id="interactiveMount"></div>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Two Nested Loops</h2>
-    <p class="viz-body">
-        The <strong>outer loop</strong> walks rows — one per customer.
-        The <strong>inner loop</strong> accumulates every bank balance
-        into a running row&nbsp;sum. After completing a row, compare the
-        sum to the running maximum. If it is larger, update the maximum.
-    </p>
-    <div class="viz-code-block">
+    <hr class="divider">
+
+    <!-- ── Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Row = Customer, Sum = Wealth</h2>
+        <p class="section-intro">
+            Each row of the matrix represents one customer's portfolio.
+            The column index identifies which bank holds that balance.
+            Summing across a row gives total wealth for that customer.
+            The richest customer is the one whose row sum is largest.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Two nested loops</h2>
+        <p class="section-intro">
+            The <strong>outer loop</strong> walks rows — one per customer.
+            The <strong>inner loop</strong> accumulates every bank balance
+            into a running row&nbsp;sum. After completing a row, compare the
+            sum to the running maximum. If it is larger, update the maximum.
+        </p>
+        <div class="viz-code-block">
 <pre><code>richest ← 0
 for each customer row in matrix:
     rowSum ← 0
@@ -214,43 +228,35 @@ for each customer row in matrix:
         rowSum ← rowSum + balance
     richest ← max(richest, rowSum)
 return richest</code></pre>
-    </div>
-</div>
-</section>
+        </div>
+    </section>
 
-<!-- ─── Section 4: Interactive ────────────────────────── -->
+    <hr class="divider">
 
-<div id="interactiveMount"></div>
+    <!-- ── Edge Cases ── -->
 
-<!-- ─── Section 5: Edge Patterns ──────────────────────── -->
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Edge patterns</h2>
+        <p class="section-intro">
+            <strong>Single customer</strong> — the only row sum is
+            automatically the answer.
+        </p>
+        <p>
+            <strong>Equal wealth</strong> — when multiple rows sum to the
+            same maximum, the shared value is still correct.
+        </p>
+        <p>
+            <strong>One bank per customer</strong> — the matrix is a column
+            vector; each cell <em>is</em> that customer's total wealth.
+        </p>
+    </section>
 
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Edge Patterns</h2>
-    <p class="viz-body">
-        <strong>Single customer</strong> — the only row sum is
-        automatically the answer.<br>
-        <strong>Equal wealth</strong> — when multiple rows sum to the
-        same maximum, the shared value is still correct.<br>
-        <strong>One bank per customer</strong> — the matrix is a column
-        vector; each cell <em>is</em> that customer's total wealth.
-    </p>
-</div>
-</section>
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
 
-<!-- ─── Section 6: Complexity ─────────────────────────── -->
-
-<section class="viz-section">
-<div class="viz-container">
-    <h2 class="viz-heading">Complexity</h2>
-    <p class="viz-body">
-        <strong>Time:</strong> O(m × n) — every cell is visited
-        exactly once.<br>
-        <strong>Space:</strong> O(1) extra — only a running sum and
-        a maximum.
-    </p>
-</div>
-</section>
+</main>
 
 <script src="shared/viz/viz-engine.js"></script>
 <script src="shared/viz/viz-array.js"></script>
