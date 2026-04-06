@@ -34,6 +34,7 @@
     "generate:markdown-to-static-html:fixture:rotate-array": "node tools/markdown-to-static-html/generate.js tools/markdown-to-static-html/test/fixtures/189-rotate-array.md",
     "generate:markdown-to-static-html:fixture:increasing-triplet-subsequence": "node tools/markdown-to-static-html/generate.js tools/markdown-to-static-html/test/fixtures/334-increasing-triplet-subsequence.md",
     "generate:markdown-to-static-html:fixture:merge-sorted-array": "node tools/markdown-to-static-html/generate.js tools/markdown-to-static-html/test/fixtures/88-merge-sorted-array.md",
+    "generate:curriculum-docs": "python3 tools/curriculum/generateCurriculumDocs.py",
     "generate:proof-page:12-integer-to-roman": "node tools/markdown-to-static-html/generate.js tools/markdown-to-static-html/test/fixtures/12-integer-to-roman.md 12-integer-to-roman.html > 12-integer-to-roman.html",
     "generate:proof-page:67-add-binary": "node tools/markdown-to-static-html/generate.js tools/markdown-to-static-html/test/fixtures/67-add-binary.md 67-add-binary.html > 67-add-binary.html",
     "generate:proof-page:80-remove-duplicates-II": "node tools/markdown-to-static-html/generate.js tools/markdown-to-static-html/test/fixtures/80-remove-duplicates-II.md 80-remove-duplicates-II.html > 80-remove-duplicates-II.html",

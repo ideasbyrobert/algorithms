@@ -1,0 +1,73 @@
+[← Back to Dynamic Programming II — Tabulation and State Machines](../chapters/ch12-dynamic-programming-ii-tabulation-and-state-machines.md)
+
+# Multi-Dimensional DP
+
+Within [Dynamic Programming II — Tabulation and State Machines](../chapters/ch12-dynamic-programming-ii-tabulation-and-state-machines.md).
+
+9 problems · 3 groupings · 0/9 implemented · Apr 6, 2026 -> Apr 17, 2026
+
+## Groupings
+
+- Grid Walks · 4 problems · Apr 6, 2026 -> Apr 17, 2026
+- String Alignment · 3 problems · Apr 6, 2026 -> Apr 14, 2026
+- Shape/Palindrome State · 2 problems · Apr 6, 2026 -> Apr 11, 2026
+
+```mermaid
+%%{init: {"theme": "base", "themeCSS": ".grid .tick line { stroke: #000000; stroke-opacity: 0.14; stroke-width: 1; } .grid .tick text { fill: #000000; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; font-family: -apple-system, BlinkMacSystemFont, \"SF Pro Text\", system-ui, sans-serif; transform: translateY(18px); } .grid + .grid .tick text { transform: translateY(-18px); } .grid path { stroke-width: 0; } .task { fill: #ffffff; stroke: #000000; stroke-width: 2; transform: translateY(8px); } .taskText, .taskTextOutsideRight, .taskTextOutsideLeft { fill: #000000; font-weight: 500; letter-spacing: 0.01em; transform: translateY(8px); } .milestone, .milestone path { fill: #000000 !important; stroke: #000000 !important; transform: translateY(8px); } .milestoneText { fill: #000000; font-style: italic; font-weight: 500; letter-spacing: 0.01em; transform: translateY(8px); } .section { opacity: 1 !important; stroke: none !important; } .sectionTitle { fill: #000000 !important; font-size: 15px !important; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; } .today { stroke: #000000; stroke-opacity: 0.28; stroke-width: 1.5; } .taskText, .taskTextOutsideRight, .taskTextOutsideLeft { font-size: 10px; } .sectionTitle { font-size: 13px !important; letter-spacing: 0.04em; } .taskTextOutsideRight, .taskTextOutsideLeft { display: none; }", "themeVariables": {"background": "#ffffff", "mainBkg": "#ffffff", "primaryColor": "#ffffff", "primaryBorderColor": "#000000", "primaryTextColor": "#000000", "textColor": "#000000", "titleColor": "#000000", "lineColor": "#000000", "secondaryColor": "#ffffff", "tertiaryColor": "#ffffff", "sectionBkgColor": "#fbfbfd", "altSectionBkgColor": "#f5f5f7", "taskBkgColor": "#ffffff", "taskBorderColor": "#000000", "taskTextColor": "#000000", "taskTextDarkColor": "#000000", "taskTextOutsideColor": "#000000", "activeTaskBkgColor": "#ffffff", "activeTaskBorderColor": "#000000", "gridColor": "#000000", "todayLineColor": "#000000", "critBkgColor": "#000000", "critBorderColor": "#000000", "doneTaskBkgColor": "#ffffff", "doneTaskBorderColor": "#000000", "fontFamily": "\"SF Mono\", \"SFMono-Regular\", ui-monospace, Menlo, monospace", "fontSize": "10px"}, "gantt": {"useMaxWidth": false, "barHeight": 24, "barGap": 22, "topPadding": 96, "rightPadding": 64, "leftPadding": 248, "gridLineStartPadding": 20, "topAxis": true, "titleTopMargin": 0, "sectionFontSize": 13, "fontSize": 10, "numberSectionStyles": 2, "bottomMarginAdj": 0}}}%%
+%% hierarchical curriculum gantt:
+%% root = chapters, chapter pages = sections, section pages = problems
+gantt
+    dateFormat YYYY-MM-DD
+    axisFormat %b '%y
+    tickInterval 2month
+
+    section Grid Walks
+    120                                :sp01, 2026-04-06, 3d
+    62                                 :sp02, after sp01, 3d
+    64                                 :sp03, after sp02, 3d
+    63                                 :sp04, after sp03, 3d
+
+    section String Alignment
+    1143                               :sp05, 2026-04-06, 3d
+    97                                 :sp06, after sp05, 3d
+    72                                 :sp07, after sp06, 3d
+
+    section Shape/Palindrome...
+    5                                  :sp08, 2026-04-06, 3d
+    221                                :sp09, after sp08, 3d
+
+    END · problem map complete        :milestone, crit, mend, after sp04 sp07 sp09, 0d
+```
+
+## Coverage
+
+- Implemented in this repo: 0/9
+- Published site index: [https://ideasbyrobert.github.io/algorithms/](https://ideasbyrobert.github.io/algorithms/)
+
+## Problems by Group
+
+### Grid Walks
+
+4 problems · Apr 6, 2026 -> Apr 17, 2026
+
+- `120` Triangle · `M` · 3d · planned
+- `62` Unique Paths · `M` · 3d · planned
+- `64` Minimum Path Sum · `M` · 3d · planned
+- `63` Unique Paths II · `M` · 3d · planned
+
+### String Alignment
+
+3 problems · Apr 6, 2026 -> Apr 14, 2026
+
+- `1143` Longest Common Subsequence · `M` · 3d · planned
+- `97` Interleaving String · `M` · 3d · planned
+- `72` Edit Distance · `M` · 3d · planned
+
+### Shape/Palindrome State
+
+2 problems · Apr 6, 2026 -> Apr 11, 2026
+
+- `5` Longest Palindromic Substring · `M` · 3d · planned
+- `221` Maximal Square · `M` · 3d · planned
+
+[← Back to Dynamic Programming II — Tabulation and State Machines](../chapters/ch12-dynamic-programming-ii-tabulation-and-state-machines.md)
