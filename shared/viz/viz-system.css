@@ -397,6 +397,87 @@ button.primary:hover { background: var(--black); }
     background: var(--ink);
 }
 
+/* ── Section-Based Layout (alternate to .page) ─────────── */
+
+.viz-section {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 32px;
+}
+
+.viz-section:first-of-type {
+    padding-top: 80px;
+}
+
+.viz-section:last-of-type {
+    padding-bottom: 88px;
+}
+
+.viz-section + .viz-section {
+    margin-top: 64px;
+}
+
+.viz-section .viz-container {
+    padding: 0;
+    margin-bottom: 0;
+    overflow-x: visible;
+}
+
+.viz-title {
+    font-family: var(--font-serif);
+    font-size: clamp(3.2rem, 7vw, 4.8rem);
+    line-height: 1.0;
+    letter-spacing: -0.05em;
+    color: var(--black);
+    font-weight: 700;
+}
+
+.viz-subtitle {
+    display: block;
+    margin-top: 14px;
+    font-family: var(--font-sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-quaternary);
+}
+
+.viz-body {
+    margin-top: 20px;
+    max-width: 56ch;
+    font-size: 1.15rem;
+    line-height: 1.85;
+    color: var(--ink-secondary);
+}
+
+.viz-heading {
+    font-family: var(--font-serif);
+    font-size: clamp(2rem, 4.2vw, 2.8rem);
+    line-height: 1.06;
+    letter-spacing: -0.04em;
+    color: var(--black);
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.viz-code-block {
+    margin-top: 24px;
+    padding: 28px 32px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    overflow-x: auto;
+}
+
+.viz-code-block pre {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    line-height: 1.72;
+    color: var(--ink);
+    white-space: pre;
+    margin: 0;
+}
+
 /* ── Viz Container (grid-based visualizations) ──────────── */
 
 .viz-container {
@@ -1076,6 +1157,8 @@ input[type="range"]::-webkit-slider-thumb {
 
 @media (max-width: 960px) {
     .page { padding: 48px 24px 72px; }
+    .viz-section { padding-left: 24px; padding-right: 24px; }
+    .viz-section:first-of-type { padding-top: 48px; }
 
     .hero {
         grid-template-columns: 1fr;
@@ -1111,6 +1194,11 @@ input[type="range"]::-webkit-slider-thumb {
 @media (max-width: 640px) {
     .page { padding: 36px 16px 56px; }
     .divider { margin: 56px 0; }
+    .viz-section { padding-left: 16px; padding-right: 16px; }
+    .viz-section:first-of-type { padding-top: 36px; }
+    .viz-section:last-of-type { padding-bottom: 56px; }
+    .viz-section + .viz-section { margin-top: 48px; }
+    .viz-code-block { padding: 20px 16px; }
 
     .interactive { padding: 0; }
 
