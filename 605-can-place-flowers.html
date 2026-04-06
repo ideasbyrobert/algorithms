@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Can Place Flowers — Greedy Left-to-Right Planting</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.cell.planted {
+    background: #1D1D1F;
+    color: #FFF;
+    border-color: #1D1D1F;
+}
+.cell.planted .cell-value,
+.cell.planted .cell-index {
+    color: #FFF;
+}
+.cell.existing {
+    background: #636366;
+}
+.cell.existing .cell-value,
+.cell.existing .cell-index {
+    color: #FFF;
+}
+.cell.blocked {
+    opacity: 0.5;
+}
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 605 Can Place Flowers. Watch the greedy left-to-right planting algorithm scan plots, check neighbors, and plant flowers in O(n) time.">
+<meta property="og:title" content="Can Place Flowers — Greedy Left-to-Right Planting">
+<meta property="og:description" content="Step through the greedy flower planting algorithm with an interactive walkthrough.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/605-can-place-flowers.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/605-can-place-flowers.html">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Can Place Flowers · Optimal Solution</span>
+        <h1>Plant greedily. Never look back.</h1>
+        <p class="hero-text">
+            A gardener walks a row of flower plots from left to right. Each empty plot
+            with no immediate neighbors gets a flower — no planning, no backtracking.
+            This greedy strategy works because planting at the earliest available spot
+            never blocks a placement that a later strategy could have used. One scan
+            checks three neighbors per plot: left, current, right. If all are empty,
+            plant and move on. <code>O(n)</code> time. <code>O(1)</code> extra space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the gardener walk the flowerbed</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Three checks, one decision</h2>
+        <p class="section-intro">
+            At every plot the algorithm asks exactly one compound question: are the left
+            neighbor, the current cell, and the right neighbor all empty? If yes, plant.
+            If no, move on. That's the entire logic.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>three-neighbor check</h3>
+                <p>Left, current, and right must all be zero. If any one is occupied, planting here would violate the no-adjacent-flowers rule. The check is a simple triple-AND.</p>
+            </article>
+            <article class="concept-card">
+                <h3>greedy invariant</h3>
+                <p>Planting at the leftmost available spot never reduces total capacity. Skipping it to plant later can only waste a slot — the greedy choice is always safe.</p>
+            </article>
+            <article class="concept-card">
+                <h3>boundary as virtual empty</h3>
+                <p>Index 0 treats its missing left neighbor as empty. The last index treats its missing right neighbor as empty. Boundaries are free real estate.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Scan, check, plant, advance</h2>
+        <p class="section-intro">
+            A single pass through the flowerbed decides every plot's fate.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Copy the bed &amp; initialize counter</h4>
+                    <p>Clone the flowerbed so mutations don't affect the caller. Set <code>plantedFlowers = 0</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Walk left to right</h4>
+                    <p>For each index, compute three booleans: <code>leftEmpty</code>, <code>currentEmpty</code>, <code>rightEmpty</code>. Boundary indices treat the missing neighbor as empty.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Plant if all three are empty</h4>
+                    <p>Set <code>workingBed[index] = 1</code> and increment the counter. This mutation ensures the next index sees its left neighbor as occupied.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Early exit or final verdict</h4>
+                    <p>If <code>plantedFlowers &ge; n</code> after any plant, return <code>true</code> immediately. After the loop, return <code>plantedFlowers &ge; n</code>.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where the gardener gets creative</h2>
+        <p class="section-intro">
+            Boundary conditions and density limits test the algorithm's correctness.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>All empty — max density</h3>
+                <p>
+                    An empty bed of length <em>k</em> can hold <code>⌈k/2⌉</code> flowers.
+                    The greedy scanner plants at indices 0, 2, 4, … automatically achieving
+                    maximum density without any special logic.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Single plot</h3>
+                <p>
+                    A bed of length 1 has both boundaries adjacent. The missing left and
+                    missing right are both treated as empty, so the single plot is always
+                    plantable — the triple-AND passes trivially.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Insufficient space</h3>
+                <p>
+                    When pre-existing flowers fragment the bed into gaps too small or too
+                    few, the scanner exhausts every plot without meeting the target. The
+                    final comparison <code>planted &ge; n</code> returns false.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current plot" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "index",     label: "Index" },
+        { id: "neighbors", label: "Neighbors" },
+        { id: "action",    label: "Action" },
+        { id: "verdict",   label: "Verdict" }
+    ],
+    values: [
+        { id: "planted", label: "Planted" },
+        { id: "needed",  label: "Needed (n)" }
+    ],
+    orderTitle: "Planting Log"
+});
+
+var ptrElements = VizArray.createPointers(refs.container, [
+    { id: "i", label: "i", position: "above" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "Canonical [1,0,0,0,1] n=1 → true",
+        data: { bed: [1, 0, 0, 0, 1], n: 1 },
+        desc: "The classic example. One empty slot in the middle is plantable — left and right neighbors are far enough away."
+    },
+    {
+        name: "All empty [0,0,0,0,0] n=2 → true",
+        data: { bed: [0, 0, 0, 0, 0], n: 2 },
+        desc: "Five empty plots. Greedy plants at index 0 and index 2, reaching the target before even checking index 3."
+    },
+    {
+        name: "Boundary plants [0,0,0] n=2 → true",
+        data: { bed: [0, 0, 0], n: 2 },
+        desc: "Both boundary plots are plantable. Index 0 has no left neighbor, index 2 has no right neighbor — two flowers fit perfectly."
+    },
+    {
+        name: "Too many [1,0,0,0,1] n=2 → false",
+        data: { bed: [1, 0, 0, 0, 1], n: 2 },
+        desc: "Only one gap of size 3 between two existing flowers — room for exactly 1 new flower, but 2 are needed."
+    },
+    {
+        name: "Alternating [1,0,1,0,1] n=1 → false",
+        data: { bed: [1, 0, 1, 0, 1], n: 1 },
+        desc: "Every empty plot has an occupied neighbor. The scan finds zero plantable spots — even one flower is too many."
+    },
+    {
+        name: "Mixed [0,0,1,0,0] n=2 → true",
+        data: { bed: [0, 0, 1, 0, 0], n: 2 },
+        desc: "A flower in the center creates two gaps. Index 0 is plantable (boundary), and index 4 is plantable (boundary). Two flowers fit.",
+        mobileDefault: true
+    },
+    {
+        name: "Single empty [0] n=1 → true",
+        data: { bed: [0], n: 1 },
+        desc: "One empty plot with both boundaries virtual-empty. The triple-AND passes trivially — plant and done."
+    },
+    {
+        name: "Already full [1,0,1] n=1 → false",
+        data: { bed: [1, 0, 1], n: 1 },
+        desc: "The only empty plot (index 1) has occupied neighbors on both sides. No room for even one flower."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var originalBed = preset.data.bed;
+    var needed = preset.data.n;
+    var bed = originalBed.slice();
+    var steps = [];
+    var order = [];
+    var plantedSoFar = 0;
+
+    for (var i = 0; i < bed.length; i++) {
+        var leftEmpty = i === 0 || bed[i - 1] === 0;
+        var currentEmpty = bed[i] === 0;
+        var rightEmpty = i === bed.length - 1 || bed[i + 1] === 0;
+        var action;
+
+        if (!currentEmpty) {
+            action = "skip-occupied";
+        } else if (!leftEmpty || !rightEmpty) {
+            action = "skip-blocked";
+        } else {
+            action = "plant";
+            bed[i] = 1;
+            plantedSoFar++;
+        }
+
+        var earlyExit = action === "plant" && plantedSoFar >= needed;
+
+        steps.push({
+            index: i,
+            value: originalBed[i],
+            leftEmpty: leftEmpty,
+            currentEmpty: currentEmpty,
+            rightEmpty: rightEmpty,
+            action: action,
+            plantedSoFar: plantedSoFar,
+            bed: bed.slice(),
+            earlyExit: earlyExit
+        });
+
+        order.push(action === "plant" ? "Plant \uD83C\uDF38" : "Skip");
+
+        if (earlyExit) break;
+    }
+
+    var success = plantedSoFar >= needed;
+
+    return {
+        steps: steps,
+        order: order,
+        originalBed: originalBed,
+        needed: needed,
+        success: success,
+        desc: preset.desc
+    };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var currentBed = step ? step.bed : trace.originalBed;
+    var highlights = new Map();
+
+    if (step) {
+        for (var j = 0; j < currentBed.length; j++) {
+            if (trace.originalBed[j] === 1) {
+                highlights.set(j, "existing");
+            } else if (currentBed[j] === 1) {
+                highlights.set(j, "planted");
+            }
+        }
+
+        for (var k = 0; k < step.index; k++) {
+            if (!highlights.has(k) && trace.originalBed[k] === 0 && currentBed[k] === 0) {
+                highlights.set(k, "blocked");
+            }
+        }
+    } else {
+        for (var j2 = 0; j2 < currentBed.length; j2++) {
+            if (trace.originalBed[j2] === 1) {
+                highlights.set(j2, "existing");
+            }
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: currentBed,
+        current: step ? step.index : undefined,
+        highlights: highlights
+    });
+
+    /* Status bar */
+    if (step) {
+        refs.status.index.textContent = String(step.index);
+
+        var left = step.leftEmpty ? "\u2713" : "\u2717";
+        var cur = step.currentEmpty ? "\u2713" : "\u2717";
+        var right = step.rightEmpty ? "\u2713" : "\u2717";
+        refs.status.neighbors.textContent = "L:" + left + " C:" + cur + " R:" + right;
+
+        if (step.action === "plant") {
+            refs.status.action.textContent = "Plant!";
+        } else if (step.action === "skip-occupied") {
+            refs.status.action.textContent = "Skip \u2014 occupied";
+        } else {
+            refs.status.action.textContent = "Skip \u2014 neighbor";
+        }
+
+        if (step.earlyExit || engine.position === trace.steps.length - 1) {
+            refs.status.verdict.textContent = trace.success
+                ? "\u2713 planted " + step.plantedSoFar + "/" + trace.needed
+                : "\u2717 cannot plant";
+        } else {
+            refs.status.verdict.textContent = "Scanning\u2026";
+        }
+    } else {
+        refs.status.index.textContent = "\u2014";
+        refs.status.neighbors.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+        refs.status.verdict.textContent = "\u2014";
+    }
+
+    /* Values bar */
+    refs.values.planted.textContent = step ? String(step.plantedSoFar) : "0";
+    refs.values.needed.textContent = String(trace.needed);
+
+    /* Note */
+    refs.note.textContent = describeStep(engine);
+
+    /* Pointer */
+    requestAnimationFrame(function () {
+        var ptrs = {};
+        if (step) {
+            ptrs.i = { index: step.index };
+        } else {
+            ptrs.i = { index: 0 };
+        }
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: ptrs,
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    var trace = engine.trace;
+
+    if (!step) {
+        return trace.desc + " Press Play or Next to begin scanning the flowerbed.";
+    }
+
+    var plotState = step.currentEmpty ? "empty" : "occupied";
+    var leftState = step.leftEmpty ? "empty" : "occupied";
+    var rightState = step.rightEmpty ? "empty" : "occupied";
+
+    var desc = "Index " + step.index + ": plot is " + plotState + ". Left " + leftState + ", right " + rightState + ". ";
+
+    if (step.action === "plant") {
+        desc += "Plant here!";
+        if (step.earlyExit) {
+            desc += " Planted " + step.plantedSoFar + "/" + trace.needed + " \u2014 target reached, early exit.";
+        } else {
+            desc += " Planted " + step.plantedSoFar + "/" + trace.needed + " so far.";
+        }
+    } else if (step.action === "skip-occupied") {
+        desc += "Cannot plant \u2014 plot already occupied.";
+    } else {
+        desc += "Cannot plant \u2014 neighbor blocked.";
+    }
+
+    if (!step.earlyExit && engine.position === trace.steps.length - 1) {
+        desc += trace.success
+            ? " Scan complete \u2014 target met!"
+            : " Scan complete \u2014 only " + step.plantedSoFar + " planted, needed " + trace.needed + ".";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 800
+});
+
+engine.init();
+
+VizEngine.onResize(function () {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
