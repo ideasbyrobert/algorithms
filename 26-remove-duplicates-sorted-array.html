@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Remove Duplicates from Sorted Array — Unique Compaction | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 26. Watch the write pointer compact unique values in a single pass.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/26-remove-duplicates-sorted-array.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Remove Duplicates from Sorted Array — Interactive Visualization">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/26-remove-duplicates-sorted-array.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Remove Duplicates from Sorted Array — Interactive Visualization","url":"https://ideasbyrobert.github.io/algorithms/26-remove-duplicates-sorted-array.html"}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+</head>
+<body>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Remove Duplicates from Sorted Array</h1>
+    <p class="viz-subtitle">LeetCode 26 · Unique Value Compaction</p>
+    <p class="viz-body">
+        Given a sorted array, remove duplicates in-place so each element
+        appears only once. Return the number of unique elements. Since
+        the array is sorted, duplicates are adjacent — a single forward
+        pass suffices.
+    </p>
+</div>
+</section>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Compare Against Last Written</h2>
+    <p class="viz-body">
+        The write pointer starts at index 1 (the first element is always
+        kept). For each read position, compare against the value at
+        <span style="font-family:Menlo,monospace;">write − 1</span> — the
+        last confirmed unique. If different, write it and advance; if the
+        same, skip.
+    </p>
+</div>
+</section>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Algorithm</h2>
+    <div class="viz-code-block">
+<pre><code>write ← 1
+for read in 1..n-1:
+    if nums[read] ≠ nums[write - 1]:
+        nums[write] = nums[read]
+        write += 1
+return write</code></pre>
+    </div>
+</div>
+</section>
+
+<div id="interactiveMount"></div>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Edge Patterns</h2>
+    <p class="viz-body">
+        <strong>All identical</strong> — write never advances past 1;
+        result length is 1.<br><br>
+        <strong>Already unique</strong> — write tracks read; every element
+        copies to itself.<br><br>
+        <strong>Runs of duplicates</strong> — the write pointer skips
+        entire runs, keeping only the first occurrence.
+    </p>
+</div>
+</section>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(n) — single pass.<br>
+        <strong>Space:</strong> O(1) — two pointers.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [{ dot: true, label: "read position" }],
+    pointers: [
+        { id: "read",  label: "read",  position: "above" },
+        { id: "write", label: "write", position: "below" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "action", label: "Action" },
+        { id: "unique", label: "Unique" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+var PRESETS = [
+    { name: "[0,0,1,1,1,2,2,3,3,4]", data: [0,0,1,1,1,2,2,3,3,4] },
+    { name: "[1,1,2,3,3]", mobileDefault: true, data: [1,1,2,3,3] },
+    { name: "[1,1,2]", data: [1,1,2] },
+    { name: "[1,2,3,4,5]", data: [1,2,3,4,5] },
+    { name: "[7,7,7,7]", data: [7,7,7,7] },
+    { name: "[1]", data: [1] }
+];
+
+function buildTrace(preset) {
+    var nums = preset.data.slice();
+    var steps = [];
+    if (nums.length <= 1) return { steps: steps, finalK: nums.length, original: preset.data.slice() };
+
+    var write = 1;
+    for (var read = 1; read < nums.length; read++) {
+        var isUnique = nums[read] !== nums[write - 1];
+        if (isUnique) {
+            nums[write] = nums[read];
+            write++;
+        }
+        steps.push({
+            array: nums.slice(),
+            read: read,
+            write: write,
+            isUnique: isUnique,
+            value: preset.data[read],
+            lastWritten: nums[write - (isUnique ? 1 : 0) - (isUnique ? 0 : 0)]
+        });
+    }
+    return { steps: steps, finalK: write, original: preset.data.slice() };
+}
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var step = pos >= 0 ? trace.steps[pos] : null;
+    var arr = step ? step.array : trace.original;
+
+    var highlights = new Map();
+    if (step) highlights.set(step.read, "current");
+
+    VizArray.renderCells(refs.grid, { array: arr, highlights: highlights });
+
+    refs.pointers.read.index = step ? step.read : 1;
+    refs.pointers.write.index = step ? (step.isUnique ? step.write - 1 : step.write) : 1;
+    if (pos < 0) { refs.pointers.read.index = 1; refs.pointers.write.index = 1; }
+    VizArray.positionPointers(refs);
+
+    if (step) {
+        refs.status.action.textContent = step.isUnique
+            ? step.value + " \u2260 prev \u2192 write to [" + (step.write - 1) + "]"
+            : step.value + " == prev \u2192 skip";
+        refs.status.unique.textContent = step.write;
+    } else {
+        refs.status.action.textContent = "\u2014";
+        refs.status.unique.textContent = "\u2014";
+    }
+}
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var s = engine.currentStep();
+    if (s.isUnique) return "read[" + s.read + "]=" + s.value + " is new \u2192 write to [" + (s.write - 1) + "]";
+    return "read[" + s.read + "]=" + s.value + " is duplicate \u2192 skip";
+}
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 400
+});
+engine.init();
+VizEngine.onResize(function() { if (engine.trace) onRender(engine); });
+
+</script>
+</body>
+</html>
