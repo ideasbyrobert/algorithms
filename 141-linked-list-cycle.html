@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Linked List Cycle — Floyd's Tortoise and Hare · Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of Linked List Cycle detection using Floyd's tortoise-and-hare algorithm. Watch slow and fast pointers prove a cycle exists — or reach null. O(n) explained visually.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="linked list cycle, LeetCode 141, Floyd's algorithm, tortoise and hare, cycle detection, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/141-linked-list-cycle.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Linked List Cycle — Floyd's Tortoise and Hare · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Linked List Cycle detection. Watch slow and fast pointers chase through the list.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/141-linked-list-cycle.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Linked List Cycle — Floyd's Tortoise and Hare · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Linked List Cycle detection. Watch slow and fast pointers chase through the list.">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Cycle Layout ───────────────────────────────────────── */
+
+.cycle-viz {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    width: fit-content;
+    margin: 0 auto;
+    position: relative;
+    padding-bottom: 56px;
+}
+
+.viz-container:has(.cycle-viz) {
+    padding-top: 104px;
+    padding-bottom: 56px;
+    overflow-x: auto;
+}
+
+/* ── Linked List Nodes ──────────────────────────────────── */
+
+.ll-node {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: transparent;
+    flex-shrink: 0;
+    transition: transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                background 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-node .cell-value {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: color 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-node .node-index {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: var(--ink-quaternary);
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.ll-node.current {
+    background: var(--ink);
+    transform: scale(1.06);
+    z-index: 3;
+}
+
+.ll-node.current .cell-value {
+    color: var(--white);
+}
+
+/* ── Arrows ─────────────────────────────────────────────── */
+
+.ll-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 72px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.ll-arrow svg { overflow: visible; }
+
+.ll-arrow .arrow-line {
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    fill: none;
+}
+
+.ll-arrow .arrow-head {
+    fill: var(--ink);
+}
+
+/* ── Null marker ────────────────────────────────────────── */
+
+.ll-null {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ink-quaternary);
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    padding: 0 4px;
+}
+
+/* ── Pointers ───────────────────────────────────────────── */
+
+.ll-pointer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    transition: left 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                top 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 5;
+    pointer-events: none;
+    transform: translateX(-50%);
+}
+
+.ll-pointer-above {
+    flex-direction: column;
+}
+
+.ll-pointer .ptr-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--ink);
+    white-space: nowrap;
+}
+
+.ll-pointer .ptr-arrow {
+    font-size: 0.55rem;
+    line-height: 1;
+    color: var(--ink);
+}
+
+/* ── Cycle Back-edge ────────────────────────────────────── */
+
+.cycle-back-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.back-edge-line {
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    stroke-dasharray: 6 4;
+    fill: none;
+}
+
+.back-edge-head {
+    fill: var(--ink);
+}
+
+/* ── Responsive ─────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .ll-node { width: 56px; height: 56px; }
+    .ll-node .cell-value { font-size: 0.95rem; }
+    .ll-node .node-index { font-size: 0.55rem; bottom: -16px; }
+    .ll-arrow { width: 24px; height: 56px; }
+    .ll-pointer .ptr-label { font-size: 0.62rem; }
+    .cycle-viz { padding-bottom: 44px; }
+    .viz-container:has(.cycle-viz) {
+        padding-top: 80px;
+        padding-bottom: 44px;
+    }
+}
+
+</style>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">141 · Linked List Cycle</span>
+        <h1>Two runners on the same track.</h1>
+        <p class="hero-text">
+            Given a linked list, determine whether it contains a cycle — a node that can be
+            reached again by continuously following <code>.Next</code> pointers.
+            Floyd's tortoise-and-hare algorithm sends two pointers through the list:
+            <code>slow</code> advances one step at a time, <code>fast</code> advances two.
+            If a cycle exists, the faster pointer eventually laps the slower and they meet
+            on the same node. If no cycle exists, <code>fast</code> reaches <code>null</code>.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch slow and fast chase through the list</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Tortoise, hare, and node identity</h2>
+        <p class="section-intro">
+            Cycle detection requires no extra memory. The key insight is that two
+            pointers moving at different speeds must eventually collide inside any
+            cycle — and that collision is about node references, not values.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>Tortoise and hare</h3>
+                <p>Slow moves one step per iteration, fast moves two. Inside a cycle of
+                length <em>C</em>, the gap between them shrinks by exactly 1 each step.
+                After at most <em>C</em> iterations inside the cycle, the gap reaches 0
+                and they occupy the same node.</p>
+                <span class="guard-code">speed difference of 1 guarantees convergence</span>
+            </article>
+            <article class="concept-card">
+                <h3>Node identity</h3>
+                <p>A cycle means the traversal revisits the same <em>node reference</em> —
+                the same object in memory. Seeing the same <em>value</em> twice does not
+                prove a cycle: different nodes may hold identical values. Tracking visited
+                values in a hash set would produce false positives.</p>
+                <span class="guard-code">reference equality, not value equality</span>
+            </article>
+            <article class="concept-card">
+                <h3>Meeting ≠ entry</h3>
+                <p>When slow and fast meet, they share the same node reference — but that
+                node is not necessarily the cycle's entry point. The meeting point lies
+                somewhere inside the cycle, determined by the tail length and cycle length.
+                Finding the exact entry requires a second pass (problem 142).</p>
+                <span class="guard-code">the meeting point is inside the cycle</span>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Two pointers, one pass, constant space</h2>
+        <p class="section-intro">
+            The algorithm uses O(1) extra space — just two pointer variables.
+            It makes at most O(n) steps before detecting a cycle or proving
+            the list is acyclic.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize</h4>
+                    <p>Set <code>slow = head</code> and <code>fast = head</code>. Both
+                    pointers start at the same node.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Advance pointers</h4>
+                    <p>While <code>fast</code> and <code>fast.Next</code> are not null:
+                    move <code>slow = slow.Next</code> (one step) and
+                    <code>fast = fast.Next.Next</code> (two steps).</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Check identity</h4>
+                    <p>After each advance, compare <code>slow</code> and <code>fast</code>
+                    by reference. If they point to the same node object, a cycle exists —
+                    return <code>true</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Terminate</h4>
+                    <p>If the loop exits because <code>fast</code> or <code>fast.Next</code>
+                    reached <code>null</code>, the list is acyclic — return <code>false</code>.
+                    A finite list always terminates the fast pointer.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Degenerate inputs</h2>
+        <p class="section-intro">
+            The algorithm handles all boundary cases without special branches.
+            The while-loop condition naturally covers empty lists, single nodes,
+            and self-cycles.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Empty list</h3>
+                <p>
+                    When <code>head</code> is <code>null</code>, there are no nodes to
+                    traverse. The while condition fails immediately. Return <code>false</code>.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Self-cycle</h3>
+                <p>
+                    A single node whose <code>.Next</code> points to itself. After one
+                    advance, both slow and fast land on the same node — cycle detected in
+                    a single step. Try the <strong>"self-cycle"</strong> preset.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Duplicate values ≠ cycle</h3>
+                <p>
+                    A list like <code>[1, 2, 1]</code> with no cycle contains the value 1
+                    at two different nodes. Comparing values would falsely report a cycle.
+                    Floyd's algorithm compares node <em>references</em>, not values, so it
+                    correctly returns <code>false</code>.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { className: "dashed", label: "cycle back-edge" },
+        { dot: true, label: "current position" }
+    ],
+    gridClass: "cycle-viz",
+    status: [
+        { id: "slow",   label: "slow" },
+        { id: "fast",   label: "fast" },
+        { id: "same",   label: "Same node?" },
+        { id: "action", label: "Action" }
+    ],
+    values: [
+        { id: "result", label: "result" },
+        { id: "steps",  label: "steps" }
+    ],
+    orderTitle: "Slow Pointer Path"
+});
+
+/* ── Pointer elements ──────────────────────────────────── */
+
+var ptrSlow = createPointer(refs.container, "slow", "above");
+var ptrFast = createPointer(refs.container, "fast", "above");
+
+function createPointer(container, label, position) {
+    var wrapper = document.createElement("div");
+    wrapper.className = "ll-pointer ll-pointer-" + position;
+
+    var labelEl = document.createElement("span");
+    labelEl.className = "ptr-label";
+    labelEl.textContent = label;
+
+    var arrowEl = document.createElement("span");
+    arrowEl.className = "ptr-arrow";
+    arrowEl.textContent = "\u25BC";
+
+    wrapper.appendChild(labelEl);
+    wrapper.appendChild(arrowEl);
+    wrapper.style.opacity = "0";
+    container.appendChild(wrapper);
+    return wrapper;
+}
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "[3,2,0,-4] pos=1 (canonical cycle)",
+        values: [3, 2, 0, -4],
+        cyclePos: 1,
+        desc: "The canonical LeetCode example. Four nodes with a cycle from node -4 back to node 2 (index 1). Pointers meet at node -4 after 3 steps."
+    },
+    {
+        name: "[1,2,3,4,5,6] pos=3 (long tail + cycle)",
+        values: [1, 2, 3, 4, 5, 6],
+        cyclePos: 3,
+        desc: "Six nodes. The tail [1\u21922\u21923] feeds into a cycle [4\u21925\u21926\u21924]. Slow chases fast around the loop."
+    },
+    {
+        name: "[1,2] pos=0 (full cycle)",
+        values: [1, 2],
+        cyclePos: 0,
+        mobileDefault: true,
+        desc: "Two nodes, both in the cycle. Node 2 connects back to node 1 (index 0). The shortest non-trivial cycle."
+    },
+    {
+        name: "[7] pos=0 (self-cycle)",
+        values: [7],
+        cyclePos: 0,
+        desc: "A single node whose .Next points to itself. Detected immediately: one advance brings both pointers back to the same node."
+    },
+    {
+        name: "[1,2,3,4] pos=-1 (no cycle)",
+        values: [1, 2, 3, 4],
+        cyclePos: -1,
+        desc: "Four nodes, no cycle. The fast pointer reaches null after 2 steps, proving the list is finite."
+    },
+    {
+        name: "[10,20,30] pos=-1 (no cycle, odd)",
+        values: [10, 20, 30],
+        cyclePos: -1,
+        desc: "Three nodes, no cycle. Fast reaches the end in one step \u2014 fast.Next is null, so the loop exits."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var values = preset.values;
+    var cyclePos = preset.cyclePos;
+    var n = values.length;
+
+    if (n === 0) {
+        return { steps: [], order: [], values: values, cyclePos: cyclePos,
+                 hasCycle: false, meetIdx: -1, desc: preset.desc };
+    }
+
+    var nextOf = [];
+    for (var i = 0; i < n - 1; i++) nextOf[i] = i + 1;
+    nextOf[n - 1] = cyclePos >= 0 ? cyclePos : -1;
+
+    var slow = 0, fast = 0;
+    var steps = [];
+    var hasCycle = false;
+    var meetIdx = -1;
+
+    while (fast >= 0 && nextOf[fast] >= 0) {
+        slow = nextOf[slow];
+        var fastMid = nextOf[fast];
+        fast = nextOf[fastMid];
+
+        var met = (fast >= 0 && slow === fast);
+
+        steps.push({
+            slowIdx: slow,
+            fastIdx: fast,
+            slowValue: values[slow],
+            fastValue: fast >= 0 ? values[fast] : null,
+            met: met
+        });
+
+        if (met) {
+            hasCycle = true;
+            meetIdx = slow;
+            break;
+        }
+    }
+
+    var order = steps.map(function(s) { return String(s.slowValue); });
+    return {
+        steps: steps,
+        order: order,
+        values: values,
+        cyclePos: cyclePos,
+        hasCycle: hasCycle,
+        meetIdx: meetIdx,
+        desc: preset.desc
+    };
+}
+
+/* ── Cycle visualization renderer ──────────────────────── */
+
+function renderCycleViz(gridEl, trace, step, position) {
+    gridEl.innerHTML = "";
+
+    var values = trace.values;
+    var n = values.length;
+    var cyclePos = trace.cyclePos;
+    var slowIdx = step ? step.slowIdx : -1;
+    var fastIdx = step ? step.fastIdx : -1;
+
+    for (var i = 0; i < n; i++) {
+        var node = document.createElement("div");
+        node.className = "ll-node";
+
+        if (position >= 0 && step) {
+            if (i === slowIdx || (fastIdx >= 0 && i === fastIdx)) {
+                node.classList.add("current");
+            }
+        } else if (position < 0 && i === 0) {
+            node.classList.add("current");
+        }
+
+        var val = document.createElement("span");
+        val.className = "cell-value";
+        val.textContent = values[i];
+        node.appendChild(val);
+
+        var idx = document.createElement("span");
+        idx.className = "node-index";
+        idx.textContent = i;
+        node.appendChild(idx);
+
+        gridEl.appendChild(node);
+
+        if (i < n - 1) {
+            gridEl.appendChild(makeForwardArrow());
+        }
+    }
+
+    if (cyclePos < 0 && n > 0) {
+        gridEl.appendChild(makeForwardArrow());
+        var nullEl = document.createElement("span");
+        nullEl.className = "ll-null";
+        nullEl.textContent = "null";
+        gridEl.appendChild(nullEl);
+    }
+}
+
+function makeForwardArrow() {
+    var el = document.createElement("span");
+    el.className = "ll-arrow";
+
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "36");
+    svg.setAttribute("height", "12");
+    svg.setAttribute("viewBox", "0 0 36 12");
+
+    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("class", "arrow-line");
+    line.setAttribute("x1", "0");
+    line.setAttribute("y1", "6");
+    line.setAttribute("x2", "30");
+    line.setAttribute("y2", "6");
+
+    var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    head.setAttribute("class", "arrow-head");
+    head.setAttribute("points", "28,2 36,6 28,10");
+
+    svg.appendChild(line);
+    svg.appendChild(head);
+    el.appendChild(svg);
+    return el;
+}
+
+/* ── Cycle back-edge drawing ───────────────────────────── */
+
+function drawBackEdge(gridEl, cyclePos) {
+    var old = gridEl.querySelector(".cycle-back-svg");
+    if (old) old.remove();
+
+    var nodes = gridEl.querySelectorAll(".ll-node");
+    if (!nodes.length || cyclePos < 0) return;
+
+    var n = nodes.length;
+    var lastNode = nodes[n - 1];
+    var targetNode = nodes[cyclePos];
+    var gridRect = gridEl.getBoundingClientRect();
+
+    var lastR = lastNode.getBoundingClientRect();
+    var targetR = targetNode.getBoundingClientRect();
+
+    var x1 = lastR.right - gridRect.left + 4;
+    var y1 = lastR.top + lastR.height / 2 - gridRect.top;
+
+    var x2 = targetR.left + targetR.width / 2 - gridRect.left;
+    var y2 = targetR.bottom - gridRect.top + 4;
+
+    var ns = "http://www.w3.org/2000/svg";
+    var svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("class", "cycle-back-svg");
+
+    var dropDown = 36;
+    var r = 12;
+    var yBottom = Math.max(y1, y2) + dropDown;
+
+    var d;
+    if (n === 1 && cyclePos === 0) {
+        d = "M " + x1 + " " + y1 +
+            " C " + (x1 + 36) + " " + (yBottom + 12) +
+            ", " + (x2 - 36) + " " + (yBottom + 12) +
+            ", " + x2 + " " + y2;
+    } else {
+        d = "M " + x1 + " " + y1 +
+            " L " + x1 + " " + (yBottom - r) +
+            " Q " + x1 + " " + yBottom + " " + (x1 - r) + " " + yBottom +
+            " L " + (x2 + r) + " " + yBottom +
+            " Q " + x2 + " " + yBottom + " " + x2 + " " + (yBottom - r) +
+            " L " + x2 + " " + y2;
+    }
+
+    var path = document.createElementNS(ns, "path");
+    path.setAttribute("d", d);
+    path.setAttribute("class", "back-edge-line");
+
+    var arrow = document.createElementNS(ns, "polygon");
+    arrow.setAttribute("points",
+        (x2 - 4) + "," + y2 + " " +
+        (x2 + 4) + "," + y2 + " " +
+        x2 + "," + (y2 - 7));
+    arrow.setAttribute("class", "back-edge-head");
+
+    svg.appendChild(path);
+    svg.appendChild(arrow);
+    gridEl.appendChild(svg);
+}
+
+/* ── Pointer positioning ───────────────────────────────── */
+
+function positionPointers(containerEl, gridEl, step, position) {
+    var nodes = gridEl.querySelectorAll(".ll-node");
+    if (!nodes.length) {
+        ptrSlow.style.opacity = "0";
+        ptrFast.style.opacity = "0";
+        return;
+    }
+
+    var containerRect = containerEl.getBoundingClientRect();
+
+    function posPtr(ptr, idx) {
+        if (idx < 0 || idx >= nodes.length) {
+            ptr.style.opacity = "0";
+            return;
+        }
+        var nodeRect = nodes[idx].getBoundingClientRect();
+        ptr.style.opacity = "1";
+        ptr.style.left = (nodeRect.left + nodeRect.width / 2 - containerRect.left + containerEl.scrollLeft) + "px";
+        ptr.style.top = (nodeRect.top - containerRect.top - 48) + "px";
+    }
+
+    if (position < 0) {
+        posPtr(ptrSlow, 0);
+        posPtr(ptrFast, 0);
+        ptrFast.style.top = (parseFloat(ptrFast.style.top) - 28) + "px";
+    } else if (step) {
+        posPtr(ptrSlow, step.slowIdx);
+        posPtr(ptrFast, step.fastIdx);
+        if (step.slowIdx >= 0 && step.fastIdx >= 0 && step.slowIdx === step.fastIdx) {
+            ptrFast.style.top = (parseFloat(ptrFast.style.top) - 28) + "px";
+        }
+    }
+
+    var activeNode = gridEl.querySelector(".ll-node.current");
+    if (activeNode) {
+        var cr = containerEl.getBoundingClientRect();
+        var nr = activeNode.getBoundingClientRect();
+        var dx = (nr.left + nr.width / 2) - (cr.left + cr.width / 2);
+        if (Math.abs(dx) > cr.width * 0.35) {
+            containerEl.scrollBy({ left: dx, behavior: "smooth" });
+        }
+    }
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    renderCycleViz(refs.grid, trace, step, pos);
+
+    /* Status bar */
+    if (!step) {
+        var headVal = trace.values.length > 0 ? String(trace.values[0]) : "\u2205";
+        refs.status.slow.textContent = headVal;
+        refs.status.fast.textContent = headVal;
+        refs.status.same.textContent = "yes (start)";
+        refs.status.action.textContent = "\u2014";
+    } else {
+        refs.status.slow.textContent = String(step.slowValue);
+        refs.status.fast.textContent = step.fastValue != null ? String(step.fastValue) : "null";
+        refs.status.same.textContent = step.met ? "yes!" : "no";
+        if (step.met) {
+            refs.status.action.textContent = "cycle detected!";
+        } else if (step.fastIdx < 0) {
+            refs.status.action.textContent = "no cycle";
+        } else {
+            refs.status.action.textContent = "continue";
+        }
+    }
+
+    /* Values bar */
+    if (!step) {
+        refs.values.result.textContent = "pending";
+        refs.values.steps.textContent = "0";
+    } else {
+        var isLast = pos === trace.steps.length - 1;
+        if (step.met) {
+            refs.values.result.textContent = "cycle detected";
+        } else if (isLast) {
+            refs.values.result.textContent = "no cycle";
+        } else {
+            refs.values.result.textContent = "pending";
+        }
+        refs.values.steps.textContent = String(pos + 1);
+    }
+
+    /* Note */
+    refs.note.textContent = describeStep(engine);
+
+    /* Pointers and back-edge after layout */
+    requestAnimationFrame(function() {
+        positionPointers(refs.container, refs.grid, step, pos);
+        if (trace.cyclePos >= 0) {
+            drawBackEdge(refs.grid, trace.cyclePos);
+        }
+    });
+
+    if (pos < 0) refs.container.scrollLeft = 0;
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    var trace = engine.trace;
+
+    if (!step) {
+        if (trace.values.length === 0) return "Empty list \u2014 no nodes to traverse. No cycle.";
+        return trace.desc + " Both slow and fast start at the head (" + trace.values[0] + "). Press Play or Next to begin.";
+    }
+
+    var idx = engine.position + 1;
+    var isLast = engine.position === trace.steps.length - 1;
+
+    var slowDesc = "slow \u2192 " + step.slowValue + " (index " + step.slowIdx + ")";
+    var fastDesc = step.fastIdx >= 0
+        ? "fast \u2192 " + step.fastValue + " (index " + step.fastIdx + ")"
+        : "fast \u2192 null";
+
+    if (step.met) {
+        return "Step " + idx + ": " + slowDesc + ", " + fastDesc +
+            ". Both pointers reference the same node \u2014 cycle detected! " +
+            "The meeting point is node " + step.slowValue + " (index " + step.slowIdx + ").";
+    }
+
+    if (isLast && !step.met) {
+        if (step.fastIdx < 0) {
+            return "Step " + idx + ": " + slowDesc + ", " + fastDesc +
+                ". fast has reached null \u2014 the list has a finite end. No cycle exists.";
+        }
+        return "Step " + idx + ": " + slowDesc + ", " + fastDesc +
+            ". Different nodes. fast is at the end of the list (fast.Next is null). No further steps possible. No cycle exists.";
+    }
+
+    return "Step " + idx + ": " + slowDesc + ", " + fastDesc + ". Different nodes \u2014 continue.";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 1400
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
