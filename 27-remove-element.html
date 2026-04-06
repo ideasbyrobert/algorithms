@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Remove Element — Write Pointer Compaction | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 27 Remove Element. Watch the write pointer compact keepers in a single pass.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/27-remove-element.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="remove element, leetcode 27, write pointer, in-place compaction, algorithm visualization">
+<meta property="og:title" content="Remove Element — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 27. Watch write pointer compaction.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/27-remove-element.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Remove Element — Interactive Visualization","url":"https://ideasbyrobert.github.io/algorithms/27-remove-element.html"}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.target-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font: 600 13px/1 'Menlo', monospace;
+    background: #F5F5F7;
+    color: #1D1D1F;
+    border: 1.5px solid #C7C7CC;
+    margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+
+<!-- ─── Section 1: Intro ──────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Remove Element</h1>
+    <p class="viz-subtitle">LeetCode 27 · Write Pointer Compaction</p>
+    <p class="viz-body">
+        Given an array and a value, remove all instances of that value
+        in-place and return the new length. The order of remaining
+        elements may change.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 2: Insight ────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Read/Write Pointer</h2>
+    <p class="viz-body">
+        A read pointer scans every element. A write pointer tracks where
+        the next keeper should land. When the read pointer finds a
+        non-target value, it copies it to the write position and both
+        advance. When it finds the target, only the read pointer moves —
+        the write pointer stays put, effectively skipping the&nbsp;match.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Algorithm</h2>
+    <div class="viz-code-block">
+<pre><code>write ← 0
+for read in 0..n-1:
+    if nums[read] ≠ val:
+        nums[write] = nums[read]
+        write += 1
+return write</code></pre>
+    </div>
+</div>
+</section>
+
+<!-- ─── Section 4: Interactive ────────────────────────── -->
+
+<div id="interactiveMount"></div>
+
+<!-- ─── Section 5: Edge Cases ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Edge Patterns</h2>
+    <p class="viz-body">
+        <strong>No matches</strong> — write tracks read exactly; every
+        element is copied to itself. The array is unchanged.<br><br>
+        <strong>All matches</strong> — write never advances; the result
+        length is 0.<br><br>
+        <strong>Write ≤ read invariant</strong> — the write pointer never
+        overtakes the read pointer, so no unread data is overwritten.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 6: Complexity ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(n) — single pass.<br>
+        <strong>Space:</strong> O(1) — in-place with two pointers.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "read" }
+    ],
+    pointers: [
+        { id: "read",  label: "read",  position: "above" },
+        { id: "write", label: "write", position: "below" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "action", label: "Action" },
+        { id: "kept",   label: "Kept" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* Target badge */
+var tbWrap = document.createElement("div");
+tbWrap.style.textAlign = "center";
+tbWrap.style.marginBottom = "8px";
+tbWrap.innerHTML = '<span class="target-badge" id="targetBadge">val = ?</span>';
+refs.grid.parentNode.insertBefore(tbWrap, refs.grid);
+var targetBadge = document.getElementById("targetBadge");
+
+var PRESETS = [
+    { name: "[3,2,2,3,4,3,5] val=3", data: { nums: [3,2,2,3,4,3,5], val: 3 } },
+    { name: "[0,1,2,2,3] val=2", mobileDefault: true, data: { nums: [0,1,2,2,3], val: 2 } },
+    { name: "[0,1,2,2,3,0,4,2] val=2", data: { nums: [0,1,2,2,3,0,4,2], val: 2 } },
+    { name: "[1,2,3,4,5] val=9", data: { nums: [1,2,3,4,5], val: 9 } },
+    { name: "[3,3,3] val=3", data: { nums: [3,3,3], val: 3 } },
+    { name: "[4] val=4", data: { nums: [4], val: 4 } }
+];
+
+function buildTrace(preset) {
+    var d = preset.data;
+    var nums = d.nums.slice();
+    var val = d.val;
+    var steps = [];
+    var write = 0;
+
+    for (var read = 0; read < nums.length; read++) {
+        var keep = nums[read] !== val;
+        if (keep) {
+            nums[write] = nums[read];
+            write++;
+        }
+        steps.push({
+            array: nums.slice(),
+            read: read,
+            write: write,
+            keep: keep,
+            value: d.nums[read]
+        });
+    }
+
+    return { steps: steps, val: val, finalK: write };
+}
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var step = pos >= 0 ? trace.steps[pos] : null;
+    var arr = step ? step.array : engine.presets[engine.currentPresetIndex || 0].data.nums;
+
+    targetBadge.textContent = "val = " + trace.val;
+
+    var highlights = new Map();
+    if (step) highlights.set(step.read, "current");
+
+    VizArray.renderCells(refs.grid, { array: arr, highlights: highlights });
+
+    refs.pointers.read.index = step ? step.read : 0;
+    refs.pointers.write.index = step ? (step.keep ? step.write - 1 : step.write) : 0;
+    if (pos < 0) { refs.pointers.read.index = 0; refs.pointers.write.index = 0; }
+    VizArray.positionPointers(refs);
+
+    if (step) {
+        refs.status.action.textContent = step.keep
+            ? "Keep " + step.value + " \u2192 write to [" + (step.write - 1) + "]"
+            : "Skip " + step.value + " (matches val)";
+        refs.status.kept.textContent = step.write + " of " + trace.steps.length;
+    } else {
+        refs.status.action.textContent = "\u2014";
+        refs.status.kept.textContent = "\u2014";
+    }
+}
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var step = engine.currentStep();
+    if (step.keep) return "read[" + step.read + "]=" + step.value + " \u2260 val \u2192 copy to write[" + (step.write - 1) + "]";
+    return "read[" + step.read + "]=" + step.value + " == val \u2192 skip";
+}
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 400
+});
+
+engine.init();
+VizEngine.onResize(function() { if (engine.trace) onRender(engine); });
+
+</script>
+</body>
+</html>
