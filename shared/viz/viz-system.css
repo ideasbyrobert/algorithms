@@ -497,6 +497,52 @@ body > #interactiveMount {
     background: transparent;
 }
 
+.viz-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 14px;
+    padding: 32px;
+    text-align: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.viz-placeholder[hidden] {
+    display: none;
+}
+
+.viz-placeholder-label {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-quaternary);
+}
+
+.viz-placeholder-cta {
+    padding: 10px 18px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 980px;
+    background: var(--white);
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    line-height: 1.2;
+    color: var(--ink);
+}
+
+.viz-placeholder-preset {
+    max-width: 34rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--ink-tertiary);
+}
+
 .viz-grid {
     display: grid;
     gap: 20px;

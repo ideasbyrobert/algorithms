@@ -122,8 +122,20 @@ const VizPage = (() =>
     ).join("\n")
     return [
       '<div class="viz-container" id="vizContainer">',
+      placeholder(),
       lbls, frms,
       `<div id="vizGrid" class="${gridClass}" aria-live="polite"></div>`,
+      '</div>'
+    ].join("\n")
+  }
+
+  function placeholder()
+  {
+    return [
+      '<div class="viz-placeholder" id="vizPlaceholder" hidden aria-hidden="true">',
+      '<span class="viz-placeholder-label">Ready</span>',
+      '<div class="viz-placeholder-cta">Press Play or Next</div>',
+      '<p class="viz-placeholder-preset" id="vizPlaceholderPreset"></p>',
       '</div>'
     ].join("\n")
   }
@@ -183,6 +195,8 @@ const VizPage = (() =>
     const refs = {
       grid:      document.getElementById("vizGrid"),
       container: document.getElementById("vizContainer"),
+      placeholder: document.getElementById("vizPlaceholder"),
+      placeholderPreset: document.getElementById("vizPlaceholderPreset"),
       frames:    {},
       labels:    {},
       values:    {},

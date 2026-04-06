@@ -37,6 +37,7 @@ const VizEngine = (() =>
     let trace      = null  // result of buildTrace()
     let position   = -1    // current step index (-1 = initial)
     let intervalId = null
+    let presetIndex = 0
 
     /* dom refs (resolved lazily on first use) */
     let dom = null
@@ -52,6 +53,10 @@ const VizEngine = (() =>
         stepSlider:   $("stepSlider"),
         stepLabel:    $("stepLabel"),
         stepHint:     $("stepHint"),
+        vizContainer: $("vizContainer"),
+        vizGrid:      $("vizGrid"),
+        vizPlaceholder: $("vizPlaceholder"),
+        vizPlaceholderPreset: $("vizPlaceholderPreset"),
         orderStrip:   $("orderStrip"),
         note:         $("note")
       }
@@ -135,14 +140,52 @@ const VizEngine = (() =>
       })
     }
 
-    function load(presetIndex) 
+    function load(nextPresetIndex) 
     {
       pause()
+      presetIndex = Number.isInteger(nextPresetIndex) ? nextPresetIndex : 0
+      presetIndex = Math.max(0, Math.min(presetIndex, presets.length - 1))
       if (dom.presetSelect) dom.presetSelect.value = presetIndex
       trace = buildTrace(presets[presetIndex])
       position = -1
       syncSlider()
       render()
+    }
+
+    function currentPresetName()
+    {
+      if (!presets.length) return ""
+      const preset = presets[presetIndex]
+      return preset ? preset.name : ""
+    }
+
+    function shouldShowPlaceholder()
+    {
+      if (!dom.vizPlaceholder || !dom.vizGrid) return false
+      if (position >= 0) return false
+      if (dom.vizGrid.querySelector("svg, canvas, img")) return false
+
+      const text = dom.vizGrid.textContent.replace(/\s+/g, "")
+      return text.length === 0
+    }
+
+    function syncPlaceholder()
+    {
+      if (!dom.vizPlaceholder) return
+
+      const visible = shouldShowPlaceholder()
+      dom.vizPlaceholder.hidden = !visible
+      dom.vizPlaceholder.setAttribute("aria-hidden", visible ? "false" : "true")
+
+      if (dom.vizContainer) 
+      {
+        dom.vizContainer.dataset.placeholderVisible = visible ? "true" : "false"
+      }
+
+      if (dom.vizPlaceholderPreset) 
+      {
+        dom.vizPlaceholderPreset.textContent = visible ? currentPresetName() : ""
+      }
     }
 
     /* ── Transport ─────────────────────────────────── */
@@ -265,6 +308,8 @@ const VizEngine = (() =>
       {
         dom.stepHint.textContent = describeStep(engine)
       }
+
+      syncPlaceholder()
 
       /* Order strip */
       renderOrderStrip()
