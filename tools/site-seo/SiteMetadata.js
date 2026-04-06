@@ -11,8 +11,9 @@ const siteMetadata = {
   collectionDescription:
     'A force-based curriculum for LeetCode and interview algorithms, ' +
     'combining interactive visualizations, formal correctness proofs, ' +
-    'and chapter-by-chapter progression across arrays, strings, linked lists, ' +
-    'hash maps, binary search, trees, graphs, dynamic programming, greedy, and backtracking.',
+    'and chapter-by-chapter progression across arrays, strings, ' +
+    'linked lists, hash maps, binary search, trees, graphs, ' +
+    'dynamic programming, greedy, and backtracking.',
   language: 'en',
   locale: 'en_US',
   twitterCard: 'summary_large_image',
