@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Add Two Numbers — Digit-by-Digit Addition with Carry · Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of Add Two Numbers. Watch carry propagate through linked-list column addition. O(max(m,n)) explained visually.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="add two numbers, LeetCode 2, linked list addition, carry propagation, dummy head, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/2-add-two-numbers.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Add Two Numbers — Digit-by-Digit Addition with Carry · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Add Two Numbers. Watch carry propagate through linked-list column addition.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/2-add-two-numbers.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Add Two Numbers — Digit-by-Digit Addition with Carry · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Add Two Numbers. Watch carry propagate through linked-list column addition.">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Addition Layout ───────────────────────────────────── */
+
+.addition-viz {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.viz-container:has(.addition-viz) {
+    padding-top: 56px;
+    padding-bottom: 56px;
+    overflow-x: auto;
+}
+
+.addition-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.addition-row-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-tertiary);
+    width: 56px;
+    text-align: right;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+}
+
+.addition-chain {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-height: 72px;
+}
+
+.addition-empty {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-quaternary);
+    font-style: italic;
+}
+
+.addition-flow-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+/* ── Carry Row ─────────────────────────────────────────── */
+
+.carry-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.carry-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-tertiary);
+    width: 56px;
+    text-align: right;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+}
+
+.carry-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1.5px solid rgba(0, 0, 0, 0.08);
+    color: var(--ink-quaternary);
+    transition: all 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.carry-badge.nonzero {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--white);
+}
+
+/* ── Linked List Nodes ─────────────────────────────────── */
+
+.ll-node {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: transparent;
+    flex-shrink: 0;
+    transition: opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                background 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-node .cell-value {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-node.current {
+    background: var(--ink);
+    transform: scale(1.06);
+    z-index: 3;
+}
+
+.ll-node.current .cell-value {
+    color: var(--white);
+}
+
+.ll-node.consumed {
+    opacity: 0.15;
+    transform: scale(0.92);
+}
+
+/* ── Arrows ────────────────────────────────────────────── */
+
+.ll-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 72px;
+    flex-shrink: 0;
+}
+
+.ll-arrow svg {
+    overflow: visible;
+}
+
+.ll-arrow .arrow-line {
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    fill: none;
+    transition: opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-arrow .arrow-head {
+    fill: var(--ink);
+    transition: opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-arrow.consumed-arrow .arrow-line,
+.ll-arrow.consumed-arrow .arrow-head {
+    opacity: 0.12;
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .addition-viz { gap: 18px; }
+    .addition-row { gap: 8px; }
+    .addition-row-label { width: 44px; font-size: 0.62rem; }
+    .carry-label { width: 44px; font-size: 0.62rem; }
+    .carry-row { gap: 8px; }
+    .addition-chain { min-height: 56px; }
+    .ll-node { width: 56px; height: 56px; }
+    .ll-node .cell-value { font-size: 0.95rem; }
+    .ll-arrow { width: 24px; height: 56px; }
+    .carry-badge { width: 28px; height: 28px; font-size: 0.78rem; border-radius: 8px; }
+    .viz-container:has(.addition-viz) {
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+}
+
+</style>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">2 · Add Two Numbers</span>
+        <h1>Column addition, one node at a time.</h1>
+        <p class="hero-text">
+            Think of grade-school column addition: stack two numbers, add from the rightmost
+            column forward, write down the ones digit, and carry any overflow into the next
+            column. These two linked lists are already laid out from the ones place forward —
+            each node is a column. Walk both chains in lockstep with a carry variable, summing
+            each pair of digits plus the incoming carry. The ones place of that sum becomes the
+            next result node; the tens place carries forward. A dummy head avoids the
+            first-node edge case. When one chain runs out, treat its missing digits as zero.
+            When both are exhausted, any leftover carry becomes a final node. One pass.
+            O(max(m,&nbsp;n))&nbsp;time. O(1)&nbsp;extra space beyond the result.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch carry propagate through the sum</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Digit-by-digit addition with carry</h2>
+        <p class="section-intro">
+            The algorithm processes both lists simultaneously, one position at a time.
+            At each column, three values contribute to the sum: the digit from the first
+            list, the digit from the second list, and the carry from the previous column.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>Column sum</h3>
+                <p>At each position, compute <code>l₁.val + l₂.val + carry</code>.
+                The ones digit (<code>sum % 10</code>) becomes the output node's value.
+                The tens digit (<code>sum / 10</code>) becomes the carry for the next column.
+                This mirrors exactly how pencil-and-paper addition works.</p>
+                <span class="guard-code">sum % 10 → output, sum / 10 → carry</span>
+            </article>
+            <article class="concept-card">
+                <h3>Carry propagation</h3>
+                <p>Carry can only be 0 or 1 — the maximum column sum is 9 + 9 + 1 = 19.
+                The carry flows forward until both lists are exhausted <em>and</em> the
+                carry is zero. This three-part termination condition
+                (<code>l₁ || l₂ || carry</code>) is what creates the final node when
+                the sum has more digits than either input.</p>
+                <span class="guard-code">max carry is 1, flows until both lists end</span>
+            </article>
+            <article class="concept-card">
+                <h3>Dummy head</h3>
+                <p>A temporary sentinel node created before the loop. Every output digit
+                is attached through <code>tail.Next</code> — including the first. No
+                special-case logic for the empty result. At the end,
+                <code>dummyHead.Next</code> gives the real head of the sum list.</p>
+                <span class="guard-code">eliminates the first-node special case</span>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Sum, emit, carry — until both lists and carry are exhausted</h2>
+        <p class="section-intro">
+            The main loop runs while either list has remaining nodes or a carry is pending.
+            Each iteration consumes one node from each list (if available), computes the
+            column sum, and emits a single output digit.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Initialize</h4>
+                    <p>Create a dummy head node. Set <code>tail = dummyHead</code> and
+                    <code>carry = 0</code>. Both input pointers start at their respective heads.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Read column digits</h4>
+                    <p>While <code>l₁ ≠ null || l₂ ≠ null || carry &gt; 0</code>:
+                    read the current digit from each list (or 0 if that list is exhausted).</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Compute column sum</h4>
+                    <p>Add the two digits and the incoming carry:
+                    <code>columnSum = l₁.val + l₂.val + carry</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Emit digit, update carry</h4>
+                    <p>Create a new node with value <code>columnSum % 10</code>.
+                    Attach it via <code>tail.Next</code> and advance <code>tail</code>.
+                    Set <code>carry = columnSum / 10</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">5</span>
+                <div class="step-body">
+                    <h4>Advance both pointers</h4>
+                    <p>Move each non-null input pointer to its next node. If a list has
+                    already ended, it continues to contribute 0.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">6</span>
+                <div class="step-body">
+                    <h4>Return result</h4>
+                    <p>Return <code>dummyHead.Next</code> — the first real node of the
+                    sum list. The dummy head is discarded.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>When the addition is not straightforward</h2>
+        <p class="section-intro">
+            Three situations push beyond the basic case. The loop's termination
+            condition — <code>l₁ || l₂ || carry</code> — handles all of them
+            without special branches.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Different lengths</h3>
+                <p>
+                    When one list is shorter, it runs out first. The algorithm treats its
+                    missing digits as 0 — the remaining columns simply add the longer
+                    list's digit to the carry. No padding or alignment is needed because
+                    the null-coalescing (<code>l?.val ?? 0</code>) handles it inline.
+                    Try the <strong>"[2,4,3] + [5]"</strong> preset.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Carry chain</h3>
+                <p>
+                    When every column produces a carry, the overflow ripples through the
+                    entire sum. Adding 999 + 1 produces carries at every position until
+                    a final carry creates a new most-significant digit. The loop continues
+                    as long as carry is nonzero, even after both lists are exhausted.
+                    Try the <strong>"[9,9,9] + [1]"</strong> preset.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Final carry</h3>
+                <p>
+                    When the last column produces a carry, the result has more digits than
+                    either input. The loop runs one extra iteration with both list pointers
+                    null — only the carry contributes. This creates the most-significant
+                    digit of the sum. Try the <strong>"[5] + [5]"</strong> preset.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { className: "solid", label: "current column (being added)" },
+        { dot: true, label: "latest output digit" }
+    ],
+    gridClass: "addition-viz",
+    status: [
+        { id: "l1Digit",  label: "l\u2081 digit" },
+        { id: "l2Digit",  label: "l\u2082 digit" },
+        { id: "carry",    label: "carry in" },
+        { id: "column",   label: "sum \u2192 digit" }
+    ],
+    values: [
+        { id: "digits",   label: "digits" },
+        { id: "carryOut", label: "carry out" }
+    ],
+    orderTitle: "Sum Digits"
+});
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "[2,4,3] + [5,6,4] (canonical)",
+        list1: [2, 4, 3],
+        list2: [5, 6, 4],
+        desc: "The classic LeetCode example: 342 + 465 = 807. The second column (4 + 6) produces a carry that flows into the third."
+    },
+    {
+        name: "[9,9] + [1] (carry chain)",
+        list1: [9, 9],
+        list2: [1],
+        mobileDefault: true,
+        desc: "99 + 1 = 100. A carry chain that ripples through the entire sum and creates a final node."
+    },
+    {
+        name: "[9,9,9] + [1] (long carry chain)",
+        list1: [9, 9, 9],
+        list2: [1],
+        desc: "999 + 1 = 1000. Every column produces a carry. The sum has one more digit than either input."
+    },
+    {
+        name: "[2,4,3] + [5] (different lengths)",
+        list1: [2, 4, 3],
+        list2: [5],
+        desc: "342 + 5 = 347. The shorter list runs out after one column. Remaining columns add only l\u2081\u2019s digit to the carry."
+    },
+    {
+        name: "[5] + [5] (final carry)",
+        list1: [5],
+        list2: [5],
+        desc: "5 + 5 = 10. A single column produces a carry, which creates a second node. The result is longer than both inputs."
+    },
+    {
+        name: "[0] + [0] (zero)",
+        list1: [0],
+        list2: [0],
+        desc: "The degenerate case. 0 + 0 = 0. No carry, one output digit."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var l1 = preset.list1.slice();
+    var l2 = preset.list2.slice();
+    var steps = [];
+    var result = [];
+    var carry = 0;
+    var pos = 0;
+
+    while (pos < l1.length || pos < l2.length || carry > 0) {
+        var leftDigit = pos < l1.length ? l1[pos] : null;
+        var rightDigit = pos < l2.length ? l2[pos] : null;
+        var carryIn = carry;
+        var columnSum = (leftDigit !== null ? leftDigit : 0) +
+                        (rightDigit !== null ? rightDigit : 0) + carryIn;
+        var outputDigit = columnSum % 10;
+        carry = Math.floor(columnSum / 10);
+
+        result.push(outputDigit);
+
+        steps.push({
+            position: pos,
+            leftDigit: leftDigit,
+            rightDigit: rightDigit,
+            carryIn: carryIn,
+            columnSum: columnSum,
+            outputDigit: outputDigit,
+            carryOut: carry,
+            result: result.slice(),
+            isFinalCarry: leftDigit === null && rightDigit === null && carryIn > 0
+        });
+
+        pos++;
+    }
+
+    var order = result.map(String);
+    return {
+        steps: steps,
+        order: order,
+        list1: l1,
+        list2: l2,
+        result: result,
+        desc: preset.desc
+    };
+}
+
+/* ── Addition visualization renderer ───────────────────── */
+
+function renderAdditionViz(gridEl, trace, step, position) {
+    gridEl.innerHTML = "";
+
+    var l1 = trace.list1;
+    var l2 = trace.list2;
+    var currentPos = step ? step.position : -1;
+    var resultValues = step ? step.result : [];
+    var carryOut = step ? step.carryOut : 0;
+
+    gridEl.appendChild(buildInputRow("l\u2081", l1, currentPos));
+    gridEl.appendChild(buildInputRow("l\u2082", l2, currentPos));
+    gridEl.appendChild(buildCarryRow(carryOut));
+
+    var divider = document.createElement("div");
+    divider.className = "addition-flow-divider";
+    gridEl.appendChild(divider);
+
+    gridEl.appendChild(buildSumRow(resultValues, position));
+}
+
+function buildInputRow(label, values, currentPos) {
+    var row = document.createElement("div");
+    row.className = "addition-row";
+
+    var lbl = document.createElement("span");
+    lbl.className = "addition-row-label";
+    lbl.textContent = label;
+    row.appendChild(lbl);
+
+    var chain = document.createElement("div");
+    chain.className = "addition-chain";
+
+    if (values.length === 0) {
+        var empty = document.createElement("span");
+        empty.className = "addition-empty";
+        empty.textContent = "(empty)";
+        chain.appendChild(empty);
+    } else {
+        for (var i = 0; i < values.length; i++) {
+            var node = document.createElement("div");
+            node.className = "ll-node";
+
+            if (currentPos >= 0 && i < currentPos) {
+                node.classList.add("consumed");
+            }
+            if (i === currentPos && i < values.length) {
+                node.classList.add("current");
+            }
+
+            var val = document.createElement("span");
+            val.className = "cell-value";
+            val.textContent = values[i];
+            node.appendChild(val);
+
+            chain.appendChild(node);
+
+            if (i < values.length - 1) {
+                chain.appendChild(makeArrow(currentPos >= 0 && i < currentPos));
+            }
+        }
+    }
+
+    row.appendChild(chain);
+    return row;
+}
+
+function buildCarryRow(carryValue) {
+    var row = document.createElement("div");
+    row.className = "carry-row";
+
+    var lbl = document.createElement("span");
+    lbl.className = "carry-label";
+    lbl.textContent = "carry";
+    row.appendChild(lbl);
+
+    var badge = document.createElement("span");
+    badge.className = "carry-badge";
+    if (carryValue > 0) badge.classList.add("nonzero");
+    badge.textContent = carryValue;
+    row.appendChild(badge);
+
+    return row;
+}
+
+function buildSumRow(resultValues, position) {
+    var row = document.createElement("div");
+    row.className = "addition-row";
+
+    var lbl = document.createElement("span");
+    lbl.className = "addition-row-label";
+    lbl.textContent = "sum";
+    row.appendChild(lbl);
+
+    var chain = document.createElement("div");
+    chain.className = "addition-chain";
+
+    if (resultValues.length === 0) {
+        var empty = document.createElement("span");
+        empty.className = "addition-empty";
+        empty.textContent = "waiting\u2026";
+        chain.appendChild(empty);
+    } else {
+        for (var i = 0; i < resultValues.length; i++) {
+            var node = document.createElement("div");
+            node.className = "ll-node";
+
+            if (i === resultValues.length - 1 && position >= 0) {
+                node.classList.add("current");
+            }
+
+            var val = document.createElement("span");
+            val.className = "cell-value";
+            val.textContent = resultValues[i];
+            node.appendChild(val);
+
+            chain.appendChild(node);
+
+            if (i < resultValues.length - 1) {
+                chain.appendChild(makeArrow(false));
+            }
+        }
+    }
+
+    row.appendChild(chain);
+    return row;
+}
+
+function makeArrow(isConsumed) {
+    var el = document.createElement("span");
+    el.className = "ll-arrow";
+    if (isConsumed) el.classList.add("consumed-arrow");
+
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "36");
+    svg.setAttribute("height", "12");
+    svg.setAttribute("viewBox", "0 0 36 12");
+
+    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("class", "arrow-line");
+    line.setAttribute("x1", "0");
+    line.setAttribute("y1", "6");
+    line.setAttribute("x2", "30");
+    line.setAttribute("y2", "6");
+
+    var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    head.setAttribute("class", "arrow-head");
+    head.setAttribute("points", "28,2 36,6 28,10");
+
+    svg.appendChild(line);
+    svg.appendChild(head);
+    el.appendChild(svg);
+    return el;
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    renderAdditionViz(refs.grid, trace, step, pos);
+
+    /* Status bar */
+    if (!step) {
+        refs.status.l1Digit.textContent = trace.list1.length > 0 ? String(trace.list1[0]) : "\u2014";
+        refs.status.l2Digit.textContent = trace.list2.length > 0 ? String(trace.list2[0]) : "\u2014";
+        refs.status.carry.textContent = "0";
+        refs.status.column.textContent = "\u2014";
+    } else {
+        refs.status.l1Digit.textContent = step.leftDigit !== null ? String(step.leftDigit) : "\u2014";
+        refs.status.l2Digit.textContent = step.rightDigit !== null ? String(step.rightDigit) : "\u2014";
+        refs.status.carry.textContent = String(step.carryIn);
+        refs.status.column.textContent = step.columnSum + " \u2192 " + step.outputDigit;
+    }
+
+    /* Values bar */
+    refs.values.digits.textContent = step
+        ? step.result.length + " of " + trace.result.length
+        : "0 of " + trace.result.length;
+
+    refs.values.carryOut.textContent = step
+        ? (step.carryOut > 0 ? "carry " + step.carryOut + " \u2192" : "no carry")
+        : "\u2014";
+
+    /* Note */
+    refs.note.textContent = describeStep(engine);
+
+    /* Auto-scroll for mobile */
+    requestAnimationFrame(function() {
+        var active = refs.container.querySelector(".addition-row:last-child .ll-node.current");
+        if (active) {
+            var cr = refs.container.getBoundingClientRect();
+            var nr = active.getBoundingClientRect();
+            var dx = (nr.left + nr.width / 2) - (cr.left + cr.width / 2);
+            if (Math.abs(dx) > cr.width * 0.35) {
+                refs.container.scrollBy({ left: dx, behavior: "smooth" });
+            }
+        }
+    });
+
+    if (pos < 0) refs.container.scrollLeft = 0;
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    var trace = engine.trace;
+
+    if (!step) {
+        if (trace.list1.length === 0 && trace.list2.length === 0)
+            return "Both lists are empty \u2014 nothing to add.";
+        return trace.desc + " Press Play or Next to begin.";
+    }
+
+    var resultStr = step.result.join(" \u2192 ");
+    var isLast = engine.position === trace.steps.length - 1;
+
+    if (step.isFinalCarry) {
+        return "Both lists are exhausted but carry is " + step.carryIn +
+            ". Create a final node with value " + step.outputDigit + "." +
+            " Addition complete: " + resultStr + ".";
+    }
+
+    var leftStr = step.leftDigit !== null ? String(step.leftDigit) : "0";
+    var rightStr = step.rightDigit !== null ? String(step.rightDigit) : "0";
+
+    var desc = "Column " + (step.position + 1) + ": " + leftStr + " + " + rightStr;
+    if (step.carryIn > 0) desc += " + carry " + step.carryIn;
+    desc += " = " + step.columnSum + ".";
+    desc += " Output digit: " + step.outputDigit + ".";
+
+    if (step.carryOut > 0) {
+        desc += " Carry " + step.carryOut + " forward.";
+    } else {
+        desc += " No carry.";
+    }
+
+    if (isLast) {
+        desc += " Addition complete: " + resultStr + ".";
+    } else {
+        desc += " Sum so far: " + resultStr + ".";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 1200
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
