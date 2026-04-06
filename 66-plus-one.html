@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plus One — Right-to-Left Carry | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 66 Plus One. Watch carry propagation from right to left through a digit array.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/66-plus-one.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="plus one, leetcode 66, carry propagation, digit array, algorithm visualization">
+<meta property="og:title" content="Plus One — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 66. Watch carry propagation through a digit array.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/66-plus-one.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Plus One — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 66. Watch carry propagation through a digit array.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Plus One — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 66 Plus One.","url":"https://ideasbyrobert.github.io/algorithms/66-plus-one.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+#interactiveMount .cell.modified {
+    background: #F5F5F7;
+    border-color: #AEAEB2;
+    color: #636366;
+}
+
+#interactiveMount .cell.expanded {
+    background: #F5F5F7;
+    border: 2px solid #1D1D1F;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ─── Section 1: Intro ──────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Plus One</h1>
+    <p class="viz-subtitle">LeetCode 66 · Right-to-Left Carry</p>
+    <p class="viz-body">
+        A non-negative integer is stored as an array of its decimal digits.
+        Add one to the number and return the updated digit array.
+        The key insight: carry propagation only matters when a digit is&nbsp;9.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 2: Carry Concept ──────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Carry Propagation</h2>
+    <p class="viz-body">
+        Start at the rightmost digit and try to add one.
+        If the digit is less than&nbsp;9, increment it and stop — no carry.
+        If the digit is&nbsp;9, it becomes&nbsp;0 and the carry moves left.
+        This chain continues until a digit absorbs the carry or we
+        run out of digits.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">The Algorithm</h2>
+    <div class="viz-code-block">
+<pre><code>for i from last index down to 0:
+    if digits[i] < 9:
+        digits[i] += 1
+        return digits
+    digits[i] = 0
+
+// all digits were 9
+return [1, 0, 0, ..., 0]</code></pre>
+    </div>
+</div>
+</section>
+
+<!-- ─── Section 4: Interactive ────────────────────────── -->
+
+<div id="interactiveMount"></div>
+
+<!-- ─── Section 5: Edge — All Nines ───────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">The All-Nines Case</h2>
+    <p class="viz-body">
+        When every digit is&nbsp;9, every position carries.
+        The loop ends without returning, meaning the original number
+        was 10<sup>k</sup>&nbsp;−&nbsp;1. The result is 10<sup>k</sup>:
+        a new array one element longer, starting with&nbsp;1 and
+        filled with zeros.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 6: Complexity ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(n) worst case — when all digits are 9.<br>
+        <strong>Space:</strong> O(n) worst case — if the array must expand.
+        Otherwise O(1) extra.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current digit" },
+        { dot: true, label: "carried (set to 0)" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "idx",    label: "Index" },
+        { id: "digit",  label: "Digit" },
+        { id: "action", label: "Action" }
+    ],
+    values: [],
+    showOrder: true,
+    orderTitle: "Result Digits"
+});
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    { name: "[2,7,8,9,9,9] \u2014 Carry Chain", data: [2,7,8,9,9,9] },
+    { name: "[1,2,9,9,9] \u2014 Compact", mobileDefault: true, data: [1,2,9,9,9] },
+    { name: "[1,2,3] \u2014 No Carry", data: [1,2,3] },
+    { name: "[9,9,9] \u2014 All Nines", data: [9,9,9] },
+    { name: "[0] \u2014 Zero", data: [0] },
+    { name: "[4,3,2,1] \u2014 Single Step", data: [4,3,2,1] }
+];
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var digits = preset.data.slice();
+    var original = preset.data.slice();
+    var steps = [];
+
+    for (var i = digits.length - 1; i >= 0; i--) {
+        if (digits[i] < 9) {
+            digits[i]++;
+            steps.push({
+                type: "increment", index: i,
+                before: digits[i] - 1, after: digits[i],
+                digits: digits.slice()
+            });
+            return { steps: steps, order: digits.slice(), original: original, expanded: false };
+        }
+        digits[i] = 0;
+        steps.push({
+            type: "carry", index: i,
+            before: 9, after: 0,
+            digits: digits.slice()
+        });
+    }
+
+    var expanded = [1].concat(digits);
+    steps.push({
+        type: "expand", index: 0,
+        digits: expanded.slice()
+    });
+
+    return { steps: steps, order: expanded.slice(), original: original, expanded: true };
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var steps = trace.steps;
+
+    var curDigits = pos >= 0 ? steps[pos].digits : trace.original;
+    var step = pos >= 0 ? steps[pos] : null;
+
+    var highlights = new Map();
+    if (step) {
+        if (step.type === "expand") {
+            highlights.set(0, "expanded");
+        } else {
+            highlights.set(step.index, "current");
+        }
+        for (var i = 0; i < pos; i++) {
+            if (steps[i].type === "carry") {
+                highlights.set(steps[i].index, "modified");
+            }
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: curDigits,
+        highlights: highlights
+    });
+
+    /* Status */
+    if (step) {
+        if (step.type === "expand") {
+            refs.status.idx.textContent = "\u2014";
+            refs.status.digit.textContent = "\u2014";
+            refs.status.action.textContent = "all 9s \u2192 prepend 1";
+        } else {
+            refs.status.idx.textContent = step.index;
+            refs.status.digit.textContent = step.before;
+            refs.status.action.textContent = step.type === "carry"
+                ? "9 \u2192 0, carry"
+                : step.before + " \u2192 " + step.after + ", stop";
+        }
+    } else {
+        refs.status.idx.textContent = "\u2014";
+        refs.status.digit.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+    }
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var step = engine.currentStep();
+    if (step.type === "carry") {
+        return "digits[" + step.index + "] = 9 \u2192 set to 0, carry left";
+    }
+    if (step.type === "increment") {
+        return "digits[" + step.index + "] = " + step.before + " < 9 \u2192 increment to " + step.after + ", done";
+    }
+    return "All digits were 9 \u2192 prepend 1 for [1, 0, \u2026, 0]";
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
