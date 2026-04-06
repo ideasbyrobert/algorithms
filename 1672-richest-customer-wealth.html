@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Richest Customer Wealth — Row-Sum Maximum | Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of LeetCode 1672 Richest Customer Wealth. Watch row sums accumulate and the running maximum update.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html">
+<meta name="robots" content="index, follow">
+<meta name="keywords" content="richest customer wealth, leetcode 1672, matrix row sum, algorithm visualization">
+<meta property="og:title" content="Richest Customer Wealth — Interactive Visualization">
+<meta property="og:description" content="Step-by-step visualization of LeetCode 1672. Watch row sums and the running maximum build.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Richest Customer Wealth — Interactive Visualization">
+<meta name="twitter:description" content="Step-by-step visualization of LeetCode 1672. Watch row sums and the running maximum build.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Richest Customer Wealth — Interactive Visualization","description":"Interactive step-by-step visualization of LeetCode 1672 Richest Customer Wealth.","url":"https://ideasbyrobert.github.io/algorithms/1672-richest-customer-wealth.html","author":{"@type":"Organization","name":"GitHub Copilot"},"publisher":{"@type":"Organization","name":"Ideas by Robert"}}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Matrix grid ──────────────────────────────────────── */
+
+.matrix-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 0;
+}
+
+.sum-expression {
+    font: 500 14px/1 'Menlo', monospace;
+    color: #636366;
+    margin-bottom: 24px;
+    text-align: center;
+    min-height: 20px;
+    letter-spacing: -0.01em;
+}
+
+.matrix-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.matrix-row.header-row {
+    margin-bottom: 12px;
+}
+
+.row-label {
+    width: 32px;
+    font: 500 12px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #8E8E93;
+    text-align: right;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+    transition: color 0.25s ease, font-weight 0.25s ease;
+}
+
+.col-header {
+    width: 64px;
+    font: 500 10px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #AEAEB2;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.wealth-header {
+    width: 52px;
+    font: 600 11px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #AEAEB2;
+    text-align: center;
+    margin-left: 12px;
+}
+
+.m-cell {
+    width: 64px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 400 15px/1 'Menlo', monospace;
+    color: #1D1D1F;
+    background: #FFFFFF;
+    border: 1.5px solid #C7C7CC;
+    border-radius: 10px;
+    transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.m-cell.current {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border-color: #1D1D1F;
+}
+
+.m-cell.summed {
+    background: #F5F5F7;
+    border-color: #AEAEB2;
+}
+
+.m-cell.comparing {
+    background: #F5F5F7;
+    border-color: #8E8E93;
+    color: #1D1D1F;
+}
+
+.m-cell.done {
+    background: #FAFAFA;
+    border-color: #E5E5EA;
+    color: #AEAEB2;
+}
+
+.wealth-col {
+    width: 52px;
+    text-align: center;
+    margin-left: 12px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wealth-num {
+    font: 600 15px/1 'Menlo', monospace;
+    color: #636366;
+    transition: color 0.25s ease;
+}
+
+.wealth-num.is-max {
+    color: #1D1D1F;
+}
+
+.wealth-partial {
+    font: 400 13px/1 'Menlo', monospace;
+    color: #C7C7CC;
+}
+
+.max-row .row-label {
+    color: #1D1D1F;
+    font-weight: 600;
+}
+
+.active-row .row-label {
+    color: #636366;
+}
+
+/* ── Mobile ───────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .sum-expression { font-size: 12px; margin-bottom: 16px; }
+    .row-label { width: 24px; font-size: 11px; }
+    .col-header { width: 48px; font-size: 9px; }
+    .m-cell { width: 48px; height: 36px; font-size: 13px; border-radius: 8px; }
+    .wealth-header { width: 40px; font-size: 10px; margin-left: 8px; }
+    .wealth-col { width: 40px; margin-left: 8px; }
+    .wealth-num { font-size: 13px; }
+    .wealth-partial { font-size: 11px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ─── Section 1: Intro ──────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Richest Customer Wealth</h1>
+    <p class="viz-subtitle">LeetCode 1672 · Matrix Row Sums</p>
+    <p class="viz-body">
+        Given <em>m</em>&nbsp;customers, each with balances across
+        <em>n</em>&nbsp;banks, find the wealthiest customer's total.
+        The answer is the largest row sum of the accounts matrix.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 2: Concept ────────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Row = Customer, Sum = Wealth</h2>
+    <p class="viz-body">
+        Each row of the matrix represents one customer's portfolio.
+        The column index identifies which bank holds that balance.
+        Summing across a row gives total wealth for that customer.
+        The richest customer is the one whose row sum is largest.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 3: Algorithm ──────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Two Nested Loops</h2>
+    <p class="viz-body">
+        The <strong>outer loop</strong> walks rows — one per customer.
+        The <strong>inner loop</strong> accumulates every bank balance
+        into a running row&nbsp;sum. After completing a row, compare the
+        sum to the running maximum. If it is larger, update the maximum.
+    </p>
+    <div class="viz-code-block">
+<pre><code>richest ← 0
+for each customer row in matrix:
+    rowSum ← 0
+    for each balance in row:
+        rowSum ← rowSum + balance
+    richest ← max(richest, rowSum)
+return richest</code></pre>
+    </div>
+</div>
+</section>
+
+<!-- ─── Section 4: Interactive ────────────────────────── -->
+
+<div id="interactiveMount"></div>
+
+<!-- ─── Section 5: Edge Patterns ──────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Edge Patterns</h2>
+    <p class="viz-body">
+        <strong>Single customer</strong> — the only row sum is
+        automatically the answer.<br>
+        <strong>Equal wealth</strong> — when multiple rows sum to the
+        same maximum, the shared value is still correct.<br>
+        <strong>One bank per customer</strong> — the matrix is a column
+        vector; each cell <em>is</em> that customer's total wealth.
+    </p>
+</div>
+</section>
+
+<!-- ─── Section 6: Complexity ─────────────────────────── -->
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(m × n) — every cell is visited
+        exactly once.<br>
+        <strong>Space:</strong> O(1) extra — only a running sum and
+        a maximum.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Page scaffold ────────────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    gridClass: "matrix-grid-wrap",
+    status: [
+        { id: "customer", label: "Customer" },
+        { id: "rowSum",   label: "Row Sum" },
+        { id: "richest",  label: "Richest" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* ── Presets ──────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "3 × 3 — Classic",
+        matrix: [[1,5,3],[7,3,2],[3,5,4]]
+    },
+    {
+        name: "3 × 2 — Compact",
+        mobileDefault: true,
+        matrix: [[1,5],[7,3],[3,5]]
+    },
+    {
+        name: "Single Customer",
+        matrix: [[2,8,7]]
+    },
+    {
+        name: "Equal Wealth (All 8)",
+        matrix: [[4,4],[3,5],[1,7]]
+    },
+    {
+        name: "Richest First",
+        matrix: [[5,5],[4,1],[2,2]]
+    },
+    {
+        name: "4 × 2 — Climbing Max",
+        matrix: [[1,1],[2,2],[3,3],[4,4]]
+    }
+];
+
+/* ── Build trace ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var matrix = preset.matrix;
+    var rows = matrix.length;
+    var cols = matrix[0].length;
+    var steps = [];
+    var richest = 0;
+    var richestRow = -1;
+
+    for (var r = 0; r < rows; r++) {
+        var rowSum = 0;
+        for (var c = 0; c < cols; c++) {
+            rowSum += matrix[r][c];
+            steps.push({
+                type: "sum",
+                row: r,
+                col: c,
+                value: matrix[r][c],
+                rowSum: rowSum,
+                richest: richest,
+                richestRow: richestRow
+            });
+        }
+        var prev = richest;
+        if (rowSum > richest) {
+            richest = rowSum;
+            richestRow = r;
+        }
+        steps.push({
+            type: "compare",
+            row: r,
+            wealth: rowSum,
+            prevRichest: prev,
+            richest: richest,
+            richestRow: richestRow,
+            isNewMax: rowSum > prev
+        });
+    }
+
+    return { steps: steps, matrix: matrix, answer: richest };
+}
+
+/* ── Render ──────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var pos = engine.position;
+    var matrix = trace.matrix;
+    var steps = trace.steps;
+    var rows = matrix.length;
+    var cols = matrix[0].length;
+
+    /* Derive display state up to current position */
+    var completedWealth = {};
+    var maxWealth = 0;
+    var maxRow = -1;
+
+    for (var i = 0; i <= pos; i++) {
+        if (i < 0) continue;
+        var s = steps[i];
+        if (s.type === "compare") {
+            completedWealth[s.row] = s.wealth;
+            maxWealth = s.richest;
+            maxRow = s.richestRow;
+        }
+    }
+
+    /* Active row and summed columns (for sum steps) */
+    var activeRow = -1;
+    var summedCols = {};
+    var currentCol = -1;
+    var currentRowSum = 0;
+    var comparingRow = -1;
+
+    if (pos >= 0) {
+        var cur = steps[pos];
+        if (cur.type === "sum") {
+            activeRow = cur.row;
+            currentCol = cur.col;
+            currentRowSum = cur.rowSum;
+            for (var j = 0; j <= pos; j++) {
+                if (steps[j].type === "sum" && steps[j].row === activeRow) {
+                    summedCols[steps[j].col] = true;
+                }
+            }
+        } else {
+            comparingRow = cur.row;
+        }
+    }
+
+    /* Build sum expression */
+    var sumExpr = "";
+    if (pos >= 0) {
+        var cur = steps[pos];
+        if (cur.type === "sum") {
+            var parts = [];
+            for (var c = 0; c <= cur.col; c++) {
+                parts.push(matrix[cur.row][c]);
+            }
+            sumExpr = parts.join(" + ") + " = " + cur.rowSum;
+        } else {
+            sumExpr = "\u03A3 row " + cur.row + " = " + cur.wealth;
+            if (cur.isNewMax) {
+                sumExpr += "  \u2192  new maximum";
+            } else if (cur.wealth === cur.prevRichest) {
+                sumExpr += "  =  " + cur.prevRichest + "  (tie)";
+            } else {
+                sumExpr += "  \u2264  " + cur.prevRichest;
+            }
+        }
+    }
+
+    /* Build HTML */
+    var h = '<div class="matrix-layout">';
+    h += '<div class="sum-expression">' + (sumExpr || "\u2014") + '</div>';
+
+    /* Header row */
+    h += '<div class="matrix-row header-row">';
+    h += '<div class="row-label"></div>';
+    for (var c = 0; c < cols; c++) {
+        h += '<div class="col-header">Bank ' + c + '</div>';
+    }
+    h += '<div class="wealth-header">\u03A3</div>';
+    h += '</div>';
+
+    /* Data rows */
+    for (var r = 0; r < rows; r++) {
+        var isComplete = r in completedWealth;
+        var isActive = (r === activeRow);
+        var isComparing = (r === comparingRow);
+        var isMax = (r === maxRow && isComplete);
+
+        var rowCls = "matrix-row";
+        if (isActive) rowCls += " active-row";
+        if (isMax) rowCls += " max-row";
+
+        h += '<div class="' + rowCls + '">';
+        h += '<div class="row-label">C' + r + '</div>';
+
+        for (var c = 0; c < cols; c++) {
+            var cls = "m-cell";
+            if (isComparing) {
+                cls += " comparing";
+            } else if (isActive && c === currentCol) {
+                cls += " current";
+            } else if (isActive && summedCols[c] && c !== currentCol) {
+                cls += " summed";
+            } else if (isComplete) {
+                cls += " done";
+            }
+            h += '<div class="' + cls + '">' + matrix[r][c] + '</div>';
+        }
+
+        /* Wealth column */
+        h += '<div class="wealth-col">';
+        if (isComplete) {
+            h += '<span class="wealth-num' + (isMax ? ' is-max' : '') + '">' + completedWealth[r] + '</span>';
+        } else if (isActive && pos >= 0 && steps[pos].type === "sum") {
+            h += '<span class="wealth-partial">' + currentRowSum + '</span>';
+        }
+        h += '</div>';
+
+        h += '</div>';
+    }
+
+    h += '</div>';
+    refs.grid.innerHTML = h;
+
+    /* Update status */
+    if (pos >= 0) {
+        var cur = steps[pos];
+        refs.status.customer.textContent = "Customer " + cur.row;
+        refs.status.rowSum.textContent = cur.type === "sum" ? cur.rowSum : cur.wealth;
+        refs.status.richest.textContent = maxWealth || "\u2014";
+    } else {
+        refs.status.customer.textContent = "\u2014";
+        refs.status.rowSum.textContent = "\u2014";
+        refs.status.richest.textContent = "\u2014";
+    }
+}
+
+/* ── Describe step ───────────────────────────────────── */
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var step = engine.currentStep();
+    if (step.type === "sum") {
+        return "accounts[" + step.row + "][" + step.col + "] = " + step.value + "  \u2192  row sum = " + step.rowSum;
+    }
+    if (step.isNewMax) {
+        return "Customer " + step.row + " wealth " + step.wealth + " > " + step.prevRichest + "  \u2192  new richest";
+    }
+    if (step.wealth === step.prevRichest) {
+        return "Customer " + step.row + " wealth " + step.wealth + " = " + step.prevRichest + "  \u2192  tie, unchanged";
+    }
+    return "Customer " + step.row + " wealth " + step.wealth + " < " + step.prevRichest + "  \u2192  unchanged";
+}
+
+/* ── Initialize ──────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
