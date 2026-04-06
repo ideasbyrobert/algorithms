@@ -1,106 +1,201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Formal Proof of the Three-Reversal Rotation Algorithm</title>
-  <meta name="description" content="Formal proof and correctness analysis for the three-reversal rotation algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/189-rotate-array.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithm Proofs" />
-  <meta property="og:title" content="Formal Proof of the Three-Reversal Rotation Algorithm" />
-  <meta property="og:description" content="Formal proof and correctness analysis for the three-reversal rotation algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/189-rotate-array.html" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Formal Proof of the Three-Reversal Rotation Algorithm" />
-  <meta name="twitter:description" content="Formal proof and correctness analysis for the three-reversal rotation algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Formal Proof of the Three-Reversal Rotation Algorithm","description":"Formal proof and correctness analysis for the three-reversal rotation algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms.","url":"https://ideasbyrobert.github.io/algorithms/189-rotate-array.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/189-rotate-array.html","inLanguage":"en","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"formal proof, algorithm correctness, LeetCode, interview algorithms, Three-Reversal Rotation"}</script>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png" />
-  <link rel="stylesheet" href="assets/styles/document-page.css" />
-  <script src="assets/scripts/mathjax-config.js"></script>
-  <script src="assets/scripts/load-mathjax.js" data-cdn-source="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" data-local-source="assets/vendor/mathjax/tex-mml-chtml.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rotate Array — Three-Reversal Trick | Interactive Visualization</title>
+<meta name="description" content="Interactive visualization of LeetCode 189 Rotate Array. Watch the three-reversal trick rotate in-place.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/189-rotate-array.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Rotate Array — Interactive Visualization">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/189-rotate-array.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Rotate Array — Interactive Visualization","url":"https://ideasbyrobert.github.io/algorithms/189-rotate-array.html"}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.phase-badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: 16px;
+    font: 600 11px/1 'SF Pro Text', -apple-system, sans-serif;
+    letter-spacing: 0.02em;
+    margin-bottom: 10px;
+    background: #F5F5F7;
+    color: #636366;
+    border: 1px solid #C7C7CC;
+    transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+.phase-badge.active { background: #1D1D1F; color: #FFFFFF; border-color: #1D1D1F; }
+</style>
 </head>
 <body>
-  <main>
-    <article><h1>Formal Proof of the Three-Reversal Rotation Algorithm</h1>
-<p>To establish the correctness of the Three-Reversal Rotation algorithm, we must rigorously prove three properties: that reversing a concatenation reverses the block order while internally reversing each block, that a two-pointer swap loop correctly reverses any contiguous segment in place, and that composing three specific reversals produces exactly the right rotation. We will dismantle the problem into a reversal-concatenation identity (§2), an in-place reversal primitive (§3), and a three-phase composition theorem (§4).</p>
-<h2>1. First Principles &amp; System Definitions</h2>
-<p><strong>Problem objects.</strong> Let <span class="inline-math">$A = (a_0, a_1, \ldots, a_{n-1})$</span> be a finite sequence of integers. For any rotation amount <span class="inline-math">$k \ge 0$</span>, define the <em>effective rotation</em>:</p>
-<div class="equation">$$k' = k \bmod n$$</div>
-<p>Partition <span class="inline-math">$A$</span> into two contiguous <em>blocks</em> determined by <span class="inline-math">$k'$</span>:</p>
-<div class="equation">$$F = (a_0, a_1, \ldots, a_{n-k'-1}) \quad \text{(front block, length } n - k'\text{)}$$</div>
-<div class="equation">$$T = (a_{n-k'}, a_{n-k'+1}, \ldots, a_{n-1}) \quad \text{(tail block, length } k'\text{)}$$</div>
-<p>so that <span class="inline-math">$A = F \| T$</span>, where <span class="inline-math">$\|$</span> denotes concatenation.</p>
-<p>For any finite sequence <span class="inline-math">$X = (x_0, x_1, \ldots, x_{d-1})$</span>, define the <em>reversal</em>:</p>
-<div class="equation">$$\text{Rev}(X) = (x_{d-1}, x_{d-2}, \ldots, x_0)$$</div>
-<p>The <em>right rotation by <span class="inline-math">$k$</span></em> produces:</p>
-<div class="equation">$$\text{Rot}_k(A) = T \| F = (a_{n-k'}, \ldots, a_{n-1}, a_0, \ldots, a_{n-k'-1})$$</div>
-<p><strong>Preconditions and contract assumptions.</strong></p>
-<ul><li><p><span class="inline-math">$n \ge 1$</span>, <span class="inline-math">$k \ge 0$</span>.</p></li><li><p>In-place mutation of <span class="inline-math">$A$</span> is permitted.</p></li></ul>
-<p><strong>Postcondition.</strong></p>
-<div class="equation">$$A^{(f)} = T \| F$$</div>
-<p>Equivalently: <span class="inline-math">$A^{(f)}[j] = A^{(0)}[(j - k') \bmod n]$</span> for all <span class="inline-math">$0 \le j &lt; n$</span>.</p>
-<p><strong>State variables.</strong> The algorithm applies three segment-reversal operations in sequence. Within each reversal:</p>
-<ul><li><p><span class="inline-math">$l, r \in \{0, 1, \ldots, n-1\}$</span> — left and right swap pointers, converging toward each other.</p></li></ul>
-<p><strong>Initialization.</strong></p>
-<div class="equation">$$\text{Phase 1: } l = 0, \; r = n - 1$$</div>
-<div class="equation">$$\text{Phase 2: } l = 0, \; r = k' - 1$$</div>
-<div class="equation">$$\text{Phase 3: } l = k', \; r = n - 1$$</div>
-<p><strong>Mutation model.</strong> <span class="inline-math">$A^{(0)}$</span> is the input. <span class="inline-math">$A^{(1)}$</span> is the state after Phase 1 (whole-array reversal). <span class="inline-math">$A^{(2)}$</span> after Phase 2 (front-block reversal). <span class="inline-math">$A^{(f)}$</span> after Phase 3 (back-block reversal).</p>
-<h2>2. The Reversal-Concatenation Identity</h2>
-<p><strong>Theorem 1: Reversing a concatenation reverses the block order with each block internally reversed.</strong></p>
-<p>For any finite sequences <span class="inline-math">$X = (x_0, \ldots, x_{p-1})$</span> and <span class="inline-math">$Y = (y_0, \ldots, y_{q-1})$</span>:</p>
-<div class="equation">$$\text{Rev}(X \| Y) = \text{Rev}(Y) \| \text{Rev}(X)$$</div>
-<p><em>Proof:</em></p>
-<p>The concatenation <span class="inline-math">$X \| Y = (x_0, \ldots, x_{p-1}, y_0, \ldots, y_{q-1})$</span> has length <span class="inline-math">$p + q$</span>. Its reversal reads right-to-left:</p>
-<div class="equation">$$\text{Rev}(X \| Y) = (y_{q-1}, \ldots, y_0, x_{p-1}, \ldots, x_0)$$</div>
-<p>The first <span class="inline-math">$q$</span> elements are <span class="inline-math">$(y_{q-1}, \ldots, y_0) = \text{Rev}(Y)$</span>. The remaining <span class="inline-math">$p$</span> elements are <span class="inline-math">$(x_{p-1}, \ldots, x_0) = \text{Rev}(X)$</span>. Therefore:</p>
-<div class="equation">$$\text{Rev}(X \| Y) = \text{Rev}(Y) \| \text{Rev}(X) \quad \blacksquare$$</div>
-<p><strong>Corollary 1.1: Reversal is an involution.</strong></p>
-<div class="equation">$$\text{Rev}(\text{Rev}(X)) = X$$</div>
-<p>For <span class="inline-math">$X = (x_0, \ldots, x_{p-1})$</span>: <span class="inline-math">$\text{Rev}(X) = (x_{p-1}, \ldots, x_0)$</span>, and reversing again restores the original left-to-right order.</p>
-<h2>3. Algorithm Mapping: The In-Place Reversal Primitive</h2>
-<p>Each of the three phases reverses a contiguous segment <span class="inline-math">$A[l..r]$</span> using a two-pointer swap loop: <span class="inline-math">$l$</span> starts at the left boundary, <span class="inline-math">$r$</span> at the right boundary, and on each step they swap <span class="inline-math">$A[l] \leftrightarrow A[r]$</span> and converge (<span class="inline-math">$l \gets l + 1$</span>, <span class="inline-math">$r \gets r - 1$</span>) until <span class="inline-math">$l \ge r$</span>.</p>
-<p><strong>Lemma 1: The two-pointer swap loop correctly reverses <span class="inline-math">$A[l..r]$</span> in place.</strong></p>
-<p><em>Proof:</em></p>
-<p>Define the loop invariant: after <span class="inline-math">$t$</span> iterations, the outermost <span class="inline-math">$t$</span> pairs have been swapped — positions <span class="inline-math">$l, \ldots, l + t - 1$</span> and <span class="inline-math">$r - t + 1, \ldots, r$</span> hold their reversed values, and the unprocessed interior <span class="inline-math">$A[l + t .. r - t]$</span> retains its original content.</p>
-<ol><li><p><em>Base case (<span class="inline-math">$t = 0$</span>).</em> No swaps have occurred. The entire segment is unprocessed. The invariant holds vacuously.</p></li><li><p><em>Inductive step.</em> The swap <span class="inline-math">$A[l + t] \leftrightarrow A[r - t]$</span> places position <span class="inline-math">$l + t$</span> and <span class="inline-math">$r - t$</span> into their reversed positions, extending the processed boundary inward by one on each side.</p></li><li><p><em>Termination.</em> The loop exits when <span class="inline-math">$l + t \ge r - t$</span>, i.e., <span class="inline-math">$t \ge \lfloor d / 2 \rfloor$</span> where <span class="inline-math">$d = r - l + 1$</span>. At this point, all <span class="inline-math">$\lfloor d / 2 \rfloor$</span> pairs have been swapped. If <span class="inline-math">$d$</span> is odd, the center element remains in place — which is its correct reversed position. The segment is fully reversed. <span class="inline-math">$\blacksquare$</span></p></li></ol>
-<p>Phases 2 and 3 operate on disjoint segments (<span class="inline-math">$[0, k'-1]$</span> and <span class="inline-math">$[k', n-1]$</span>), so they cannot interfere with each other. Every element participates in exactly one swap during Phase 1 and at most one swap during Phases 2–3.</p>
-<h2>4. Proof of Correctness: The Three-Phase Rotation</h2>
-<p><strong>Theorem 2: The three-phase algorithm produces <span class="inline-math">$A^{(f)} = T \| F$</span>.</strong></p>
-<p><em>Proof:</em></p>
-<p>By the block decomposition from §1, <span class="inline-math">$A^{(0)} = F \| T$</span>.</p>
-<p><strong>Phase 1</strong> — Reverse the whole array (<span class="inline-math">$[0, n-1]$</span>):</p>
-<div class="equation">$$A^{(1)} = \text{Rev}(A^{(0)}) = \text{Rev}(F \| T) = \text{Rev}(T) \| \text{Rev}(F) \quad \text{(by Theorem 1)}$$</div>
-<p>The front <span class="inline-math">$k'$</span> positions now hold <span class="inline-math">$\text{Rev}(T)$</span> and the back <span class="inline-math">$n - k'$</span> positions hold <span class="inline-math">$\text{Rev}(F)$</span>.</p>
-<p><strong>Phase 2</strong> — Reverse the front block (<span class="inline-math">$[0, k'-1]$</span>):</p>
-<div class="equation">$$A^{(2)}[0..k'-1] = \text{Rev}(\text{Rev}(T)) = T \quad \text{(by Corollary 1.1)}$$</div>
-<p>The back block is untouched: <span class="inline-math">$A^{(2)}[k'..n-1] = \text{Rev}(F)$</span>.</p>
-<p><strong>Phase 3</strong> — Reverse the back block (<span class="inline-math">$[k', n-1]$</span>):</p>
-<div class="equation">$$A^{(f)}[k'..n-1] = \text{Rev}(\text{Rev}(F)) = F \quad \text{(by Corollary 1.1)}$$</div>
-<p>The front block is untouched: <span class="inline-math">$A^{(f)}[0..k'-1] = T$</span>.</p>
-<p>Therefore:</p>
-<div class="equation">$$A^{(f)} = T \| F = \text{Rot}_k(A^{(0)}) \quad \blacksquare$$</div>
-<p><strong>Corollary 2.1:</strong> If <span class="inline-math">$k' = 0$</span> (rotation is a multiple of <span class="inline-math">$n$</span>), <span class="inline-math">$T$</span> is empty, <span class="inline-math">$F = A$</span>, and <span class="inline-math">$A^{(f)} = A^{(0)}$</span>. The algorithm short-circuits before any reversal is performed.</p>
-<p><strong>Corollary 2.2:</strong> If <span class="inline-math">$n = 1$</span>, then <span class="inline-math">$k' = 0$</span> for any <span class="inline-math">$k$</span>, so the single-element array is unchanged.</p>
-<p><strong>Corollary 2.3:</strong> If <span class="inline-math">$k' = n - 1$</span>, <span class="inline-math">$F$</span> is a single element and <span class="inline-math">$T$</span> has <span class="inline-math">$n - 1$</span> elements. The result moves the first element to the last position — equivalent to a left rotation by 1.</p>
-<hr />
-<h2>5. Mechanical Execution (System Trace)</h2>
-<p><strong>Input System.</strong> <span class="inline-math">$A^{(0)} = (1, 2, 3, 4, 5, 6, 7)$</span>, <span class="inline-math">$n = 7$</span>, <span class="inline-math">$k = 3$</span>, <span class="inline-math">$k' = 3$</span>.</p>
-<p>Block decomposition: <span class="inline-math">$F = (1, 2, 3, 4)$</span>, <span class="inline-math">$T = (5, 6, 7)$</span>. Target: <span class="inline-math">$T \| F = (5, 6, 7, 1, 2, 3, 4)$</span>.</p>
-<div class="table-wrap"><table><thead><tr><th>Phase</th><th>Operation</th><th>Segment</th><th>Array state</th></tr></thead><tbody><tr><td><strong>0</strong></td><td>initial</td><td>—</td><td><span class="inline-math">$(1, 2, 3, 4, 5, 6, 7)$</span></td></tr><tr><td><strong>1</strong></td><td><span class="inline-math">$\text{Rev}(0, 6)$</span></td><td>whole array</td><td><span class="inline-math">$(7, 6, 5, 4, 3, 2, 1)$</span></td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$\text{Rev}(0, 2)$</span></td><td>front <span class="inline-math">$k' = 3$</span></td><td><span class="inline-math">$(5, 6, 7, 4, 3, 2, 1)$</span></td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$\text{Rev}(3, 6)$</span></td><td>back <span class="inline-math">$n - k' = 4$</span></td><td><span class="inline-math">$(5, 6, 7, 1, 2, 3, 4)$</span></td></tr></tbody></table></div>
-<p><strong>Detail of Phase 1 swaps:</strong></p>
-<div class="table-wrap"><table><thead><tr><th>Swap</th><th><span class="inline-math">$l$</span></th><th><span class="inline-math">$r$</span></th><th>Before</th><th>After</th></tr></thead><tbody><tr><td><strong>1</strong></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$6$</span></td><td><span class="inline-math">$A[0] = 1,\; A[6] = 7$</span></td><td><span class="inline-math">$A[0] = 7,\; A[6] = 1$</span></td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$5$</span></td><td><span class="inline-math">$A[1] = 2,\; A[5] = 6$</span></td><td><span class="inline-math">$A[1] = 6,\; A[5] = 2$</span></td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$4$</span></td><td><span class="inline-math">$A[2] = 3,\; A[4] = 5$</span></td><td><span class="inline-math">$A[2] = 5,\; A[4] = 3$</span></td></tr></tbody></table></div>
-<p>Position 3 (<span class="inline-math">$A[3] = 4$</span>) is the midpoint — it stays in place.</p>
-<p><em>Note on Phase 1: After the whole-array reversal, the front three positions hold <span class="inline-math">$(7, 6, 5) = \text{Rev}(T)$</span> — the tail block has arrived in the correct region but in reversed internal order. By Theorem 1, the reversal of the concatenation <span class="inline-math">$F \| T$</span> necessarily delivered <span class="inline-math">$\text{Rev}(T)$</span> to the front and <span class="inline-math">$\text{Rev}(F)$</span> to the back. This is the moment where the reversal-concatenation identity manifests most visibly: the two blocks have swapped positions, but each block's internal order has been inverted. Phases 2 and 3 each apply Corollary 1.1 to undo the internal reversal within each block, restoring the original left-to-right order without disturbing each other's region.</em></p>
-<p><strong>Result:</strong> <span class="inline-math">$A^{(f)} = (5, 6, 7, 1, 2, 3, 4) = T \| F$</span>.</p>
-<p>The theoretical guarantees translate into the mechanical result: Theorem 1 predicted the whole-array reversal would swap the block positions while internally reversing each block, Corollary 1.1 ensured each subsequent phase-reversal restored the original internal order, and Theorem 2 composed the three phases into the target rotation <span class="inline-math">$T \| F = (5, 6, 7, 1, 2, 3, 4)$</span>.</p></article>
-  </main>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Rotate Array</h1>
+    <p class="viz-subtitle">LeetCode 189 · Three-Reversal Trick</p>
+    <p class="viz-body">
+        Rotate an array to the right by k steps. Instead of shifting
+        elements one at a time (O(n·k)), reverse three segments in
+        O(n) total — the whole array, the front k, then the back n−k.
+    </p>
+</div>
+</section>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Three Reversals</h2>
+    <p class="viz-body">
+        <strong>Step 1:</strong> Reverse the entire array — this puts
+        the tail block (which should move to front) into position, but
+        both blocks are backwards.<br>
+        <strong>Step 2:</strong> Reverse the first k elements — fixes
+        the front block.<br>
+        <strong>Step 3:</strong> Reverse the remaining n−k elements —
+        fixes the back block.
+    </p>
+</div>
+</section>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Algorithm</h2>
+    <div class="viz-code-block">
+<pre><code>k ← k % n
+reverse(0, n - 1)     // whole array
+reverse(0, k - 1)     // front block
+reverse(k, n - 1)     // back block</code></pre>
+    </div>
+</div>
+</section>
+
+<div id="interactiveMount"></div>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Edge Patterns</h2>
+    <p class="viz-body">
+        <strong>k ≥ n</strong> — normalize: k = k % n. Rotating by
+        the full length is a no-op.<br><br>
+        <strong>k = 0</strong> — array unchanged; skip all reversals.<br><br>
+        <strong>Each reversal</strong> is a two-pointer swap from
+        endpoints inward — O(segment length/2) swaps.
+    </p>
+</div>
+</section>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(n) — each element touched at most twice.<br>
+        <strong>Space:</strong> O(1) — in-place swaps.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [{ dot: true, label: "swap pair" }],
+    gridClass: "viz-array",
+    status: [
+        { id: "phase", label: "Phase" },
+        { id: "swap",  label: "Swap" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* Phase badge */
+var pbWrap = document.createElement("div");
+pbWrap.style.textAlign = "center";
+pbWrap.innerHTML = '<span class="phase-badge" id="phaseBadge">Initial</span>';
+refs.grid.parentNode.insertBefore(pbWrap, refs.grid);
+var phaseBadge = document.getElementById("phaseBadge");
+
+var PRESETS = [
+    { name: "[1,2,3,4,5,6,7] k=3", data: { nums: [1,2,3,4,5,6,7], k: 3 } },
+    { name: "[1,2,3,4] k=2", mobileDefault: true, data: { nums: [1,2,3,4], k: 2 } },
+    { name: "[-1,-100,3,99] k=2", data: { nums: [-1,-100,3,99], k: 2 } },
+    { name: "[1,2,3,4,5] k=1", data: { nums: [1,2,3,4,5], k: 1 } },
+    { name: "[1,2,3,4,5,6] k=6", data: { nums: [1,2,3,4,5,6], k: 6 } },
+    { name: "[1,2] k=1", data: { nums: [1,2], k: 1 } }
+];
+
+function buildTrace(preset) {
+    var d = preset.data;
+    var nums = d.nums.slice();
+    var n = nums.length;
+    var k = d.k % n;
+    var steps = [];
+
+    function rev(arr, l, r, phase) {
+        while (l < r) {
+            var tmp = arr[l]; arr[l] = arr[r]; arr[r] = tmp;
+            steps.push({ array: arr.slice(), left: l, right: r, phase: phase });
+            l++; r--;
+        }
+    }
+
+    if (k > 0) {
+        rev(nums, 0, n - 1, "Reverse all");
+        rev(nums, 0, k - 1, "Reverse front " + k);
+        rev(nums, k, n - 1, "Reverse back " + (n - k));
+    }
+
+    return { steps: steps, k: k, original: d.nums.slice() };
+}
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var step = pos >= 0 ? trace.steps[pos] : null;
+    var arr = step ? step.array : trace.original;
+
+    var highlights = new Map();
+    if (step) {
+        highlights.set(step.left, "current");
+        highlights.set(step.right, "current");
+    }
+    VizArray.renderCells(refs.grid, { array: arr, highlights: highlights });
+
+    var phase = step ? step.phase : "Initial";
+    phaseBadge.textContent = phase;
+    phaseBadge.className = "phase-badge" + (step ? " active" : "");
+
+    if (step) {
+        refs.status.phase.textContent = step.phase;
+        refs.status.swap.textContent = "[" + step.left + "] \u21C4 [" + step.right + "]";
+    } else {
+        refs.status.phase.textContent = trace.k === 0 ? "k=0, no rotation" : "Ready";
+        refs.status.swap.textContent = "\u2014";
+    }
+}
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var s = engine.currentStep();
+    return s.phase + ": swap [" + s.left + "] \u21C4 [" + s.right + "]";
+}
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 350
+});
+engine.init();
+VizEngine.onResize(function() { if (engine.trace) onRender(engine); });
+
+</script>
 </body>
 </html>
