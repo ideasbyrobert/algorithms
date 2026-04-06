@@ -281,4 +281,9 @@
   <url><loc>https://ideasbyrobert.github.io/algorithms/48-rotate-image.html</loc></url>
   <url><loc>https://ideasbyrobert.github.io/algorithms/36-valid-sudoku.html</loc></url>
   <url><loc>https://ideasbyrobert.github.io/algorithms/289-game-of-life.html</loc></url>
+  <url>
+    <loc>https://ideasbyrobert.github.io/algorithms/206-reverse-linked-list.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

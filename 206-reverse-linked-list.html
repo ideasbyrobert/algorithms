@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Reverse Linked List — Pointer Rewiring · Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of Reverse Linked List. Watch prev, curr, and next pointers rewire the chain in place. O(n) explained visually.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="reverse linked list, LeetCode 206, pointer reversal, linked list algorithm, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/206-reverse-linked-list.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Reverse Linked List — Pointer Rewiring · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Reverse Linked List. Watch prev, curr, and next pointers rewire the chain in place.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/206-reverse-linked-list.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Reverse Linked List — Pointer Rewiring · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Reverse Linked List. Watch prev, curr, and next pointers rewire the chain in place.">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Linked List Layout ────────────────────────────────── */
+
+.viz-linked-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    width: fit-content;
+    margin: 0 auto;
+    position: relative;
+}
+
+.viz-container:has(.viz-linked-list) {
+    padding-top: 104px;
+    padding-bottom: 104px;
+    overflow-x: auto;
+}
+
+/* Nodes */
+.ll-node {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: transparent;
+    flex-shrink: 0;
+    transition: transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                background 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-node .cell-value {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: color 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-node .node-index {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 500;
+    color: var(--ink-quaternary);
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.ll-node.current {
+    background: var(--ink);
+    transform: scale(1.06);
+    z-index: 3;
+}
+
+.ll-node.current .cell-value {
+    color: var(--white);
+}
+
+.ll-node.reversed-node {
+    background: transparent;
+}
+
+.ll-node.reversed-node .cell-value {
+    color: var(--fill-tertiary);
+}
+
+.ll-node .visit-badge {
+    position: absolute;
+    top: -8px;
+    left: -6px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    display: inline-grid;
+    place-items: center;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--white);
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-3px);
+    transition: opacity 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 4;
+}
+
+.ll-node.processed .visit-badge,
+.ll-node.current .visit-badge {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.ll-node.current .visit-badge {
+    background: var(--white);
+    color: var(--ink);
+}
+
+/* Arrows */
+.ll-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 72px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.ll-arrow svg {
+    overflow: visible;
+}
+
+.ll-arrow .arrow-line {
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    fill: none;
+    transition: opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-arrow .arrow-head {
+    fill: var(--ink);
+    transition: opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-arrow.reversed .arrow-line {
+    stroke-width: 2;
+    stroke-dasharray: 6 4;
+}
+
+.ll-arrow.break-arrow .arrow-line,
+.ll-arrow.break-arrow .arrow-head {
+    opacity: 0.12;
+}
+
+.ll-arrow.break-arrow .arrow-line {
+    stroke-dasharray: 2 4;
+    stroke-width: 1;
+}
+
+/* Null markers */
+.ll-null {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ink-quaternary);
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    padding: 0 4px;
+}
+
+/* Pointers (reuse array-pointer system) */
+.ll-pointer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    transition: left 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                top 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                opacity 250ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 5;
+    pointer-events: none;
+    transform: translateX(-50%);
+}
+
+.ll-pointer-above {
+    flex-direction: column;
+}
+
+.ll-pointer-below {
+    flex-direction: column-reverse;
+}
+
+.ll-pointer .ptr-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--ink);
+    white-space: nowrap;
+}
+
+.ll-pointer .ptr-arrow {
+    font-size: 0.55rem;
+    line-height: 1;
+    color: var(--ink);
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .ll-node {
+        width: 56px;
+        height: 56px;
+    }
+    .ll-node .cell-value { font-size: 0.95rem; }
+    .ll-node .node-index { font-size: 0.55rem; bottom: -16px; }
+    .ll-arrow { width: 24px; height: 56px; }
+    .ll-pointer .ptr-label { font-size: 0.62rem; }
+    .viz-container:has(.viz-linked-list) {
+        padding-top: 80px;
+        padding-bottom: 80px;
+    }
+}
+
+</style>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">206 · Reverse Linked List</span>
+        <h1>Rewiring the chain, one pointer at a time.</h1>
+        <p class="hero-text">
+            A singly linked list flows in one direction: each node holds a value and a reference
+            to the next. Reversing it means redirecting every <code>.Next</code> pointer backward
+            without losing the rest of the chain. Three moving references — <code>prev</code>,
+            <code>curr</code>, and <code>next</code> — walk through the list in a single pass,
+            flipping each link as they go. When <code>curr</code> reaches null, <code>prev</code>
+            holds the new head.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the pointers rewire the list</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Three references, one invariant</h2>
+        <p class="section-intro">
+            At every moment during the traversal, the list is split into two chains:
+            a reversed prefix ending at <code>prev</code>, and an unreversed suffix
+            starting at <code>curr</code>. Each iteration moves one node from the
+            suffix into the prefix.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>prev</h3>
+                <p>Head of the reversed prefix chain. Starts as <code>null</code> — because
+                before any processing, the reversed chain is empty. Ends as the new head of
+                the fully reversed list.</p>
+                <span class="guard-code">initially null</span>
+            </article>
+            <article class="concept-card">
+                <h3>curr</h3>
+                <p>The node being processed right now. Its <code>.Next</code> pointer will
+                be redirected from the forward chain to the reversed chain. When <code>curr</code>
+                reaches <code>null</code>, every node has been rewired.</p>
+                <span class="guard-code">moves forward each step</span>
+            </article>
+            <article class="concept-card">
+                <h3>next</h3>
+                <p>A temporary reference that saves <code>curr.Next</code> before we overwrite it.
+                Without this, rewiring <code>curr.Next = prev</code> would sever our only path
+                to the rest of the list.</p>
+                <span class="guard-code">the safety net</span>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Four operations per node, one pass</h2>
+        <p class="section-intro">
+            The loop runs while <code>curr ≠ null</code>. Each iteration performs
+            exactly four pointer operations on the current node, then advances.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Save the forward link</h4>
+                    <p>Store <code>next = curr.Next</code>. This preserves access to the
+                    rest of the unreversed chain before we overwrite <code>curr.Next</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Reverse the pointer</h4>
+                    <p>Set <code>curr.Next = prev</code>. The current node now points backward
+                    into the reversed prefix instead of forward into the unreversed suffix.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Advance prev</h4>
+                    <p>Set <code>prev = curr</code>. The reversed prefix has grown by one node —
+                    <code>prev</code> now points to the node we just rewired.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Advance curr</h4>
+                    <p>Set <code>curr = next</code>. We move to the saved reference, resuming
+                    the walk through the unreversed suffix.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>When the list is trivial</h2>
+        <p class="section-intro">
+            The algorithm handles degenerate inputs gracefully — no special-case branches needed.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Empty list</h3>
+                <p>
+                    When <code>head</code> is <code>null</code>, <code>curr</code> starts as
+                    <code>null</code> and the loop body never executes. <code>prev</code> remains
+                    <code>null</code>, which is the correct answer: the reverse of an empty list
+                    is an empty list.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Single node</h3>
+                <p>
+                    With one node, the loop runs exactly once. <code>next</code> is saved as
+                    <code>null</code>, <code>curr.Next</code> is set to <code>null</code>
+                    (it already was), and <code>prev</code> becomes the sole node. The same
+                    node is returned — a single-element list is its own reverse.
+                    Try the <strong>"single node"</strong> preset.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Two nodes</h3>
+                <p>
+                    The minimal non-trivial case. Two iterations swap the direction of the
+                    single link. The original tail becomes the new head, and the original head
+                    becomes the new tail with <code>.Next = null</code>.
+                    Try the <strong>"two nodes"</strong> preset.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { className: "dashed", label: "reversed link" },
+        { dot: true, label: "current node" }
+    ],
+    gridClass: "viz-linked-list",
+    status: [
+        { id: "prev",   label: "prev" },
+        { id: "curr",   label: "curr" },
+        { id: "next",   label: "next" },
+        { id: "action", label: "Action" }
+    ],
+    values: [
+        { id: "reversed", label: "reversed", accent: "" },
+        { id: "remaining", label: "remaining", accent: "" }
+    ],
+    orderTitle: "Processing Order"
+});
+
+/* ── Pointer elements ──────────────────────────────────── */
+
+var ptrPrev = createPointer(refs.container, "prev", "above");
+var ptrCurr = createPointer(refs.container, "curr", "above");
+
+function createPointer(container, label, position) {
+    var wrapper = document.createElement("div");
+    wrapper.className = "ll-pointer ll-pointer-" + position;
+
+    var labelEl = document.createElement("span");
+    labelEl.className = "ptr-label";
+    labelEl.textContent = label;
+
+    var arrowEl = document.createElement("span");
+    arrowEl.className = "ptr-arrow";
+    arrowEl.textContent = position === "above" ? "\u25BC" : "\u25B2";
+
+    if (position === "above") {
+        wrapper.appendChild(labelEl);
+        wrapper.appendChild(arrowEl);
+    } else {
+        wrapper.appendChild(arrowEl);
+        wrapper.appendChild(labelEl);
+    }
+
+    wrapper.style.opacity = "0";
+    container.appendChild(wrapper);
+    return wrapper;
+}
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "1 → 2 → 3 → 4 → 5 (canonical, 5 steps)",
+        values: [1, 2, 3, 4, 5],
+        desc: "The classic five-node list. Each step peels one node off the forward chain and prepends it to the reversed chain."
+    },
+    {
+        name: "10 → 20 → 30 (3 nodes, easy to follow)",
+        values: [10, 20, 30],
+        mobileDefault: true,
+        desc: "Three nodes — small enough to see every pointer move clearly. Watch how the link between 10 and 20 flips first."
+    },
+    {
+        name: "3 → 7 → 1 → 9 → 4 → 6 (non-sequential values)",
+        values: [3, 7, 1, 9, 4, 6],
+        desc: "Six nodes with non-sequential values. The values are irrelevant to the algorithm — only the pointers change."
+    },
+    {
+        name: "-3 → 0 → 5 → -1 → 8 (mixed negatives)",
+        values: [-3, 0, 5, -1, 8],
+        desc: "Negative and zero values. The algorithm treats all nodes identically — the values stored in each node do not affect the pointer rewiring."
+    },
+    {
+        name: "1 → 2 (two nodes — minimal reversal)",
+        values: [1, 2],
+        desc: "The smallest non-trivial case. Two iterations swap the single link direction. The original tail becomes the new head."
+    },
+    {
+        name: "42 (single node — already reversed)",
+        values: [42],
+        desc: "A single-element list is its own reverse. One iteration runs: curr.Next is set to null (it already was), and prev becomes the sole node."
+    },
+    {
+        name: "1 → 2 → 3 → 4 → 5 → 6 → 7 (7 nodes, longer chain)",
+        values: [1, 2, 3, 4, 5, 6, 7],
+        desc: "Seven nodes. A longer chain makes the growing reversed prefix and shrinking forward suffix more dramatic."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var values = preset.values;
+    var n = values.length;
+    var steps = [];
+
+    for (var k = 0; k < n; k++) {
+        var prevIdx = k > 0 ? k - 1 : null;
+        var currIdx = k;
+        var nextIdx = k < n - 1 ? k + 1 : null;
+
+        var reversedPrefix = [];
+        for (var r = k; r >= 0; r--) reversedPrefix.push(values[r]);
+
+        var remainingSuffix = [];
+        for (var f = k + 1; f < n; f++) remainingSuffix.push(values[f]);
+
+        steps.push({
+            processedIndex: k,
+            processedValue: values[k],
+            prevIndex: prevIdx,
+            currAfterIndex: nextIdx,
+            reversedCount: k + 1,
+            reversedPrefix: reversedPrefix,
+            remainingSuffix: remainingSuffix,
+            prevValue: prevIdx != null ? values[prevIdx] : "null",
+            currValue: values[k],
+            nextValue: nextIdx != null ? values[nextIdx] : "null"
+        });
+    }
+
+    var order = values.map(function(v) { return String(v); });
+    return { steps: steps, order: order, values: values, desc: preset.desc };
+}
+
+/* ── Linked list renderer ──────────────────────────────── */
+
+function renderLinkedList(gridEl, trace, step, position) {
+    gridEl.innerHTML = "";
+    var values = trace.values;
+    var n = values.length;
+    var reversedCount = step ? step.reversedCount : 0;
+    var currentIndex = step ? step.processedIndex : null;
+
+    /* Left null marker (visible once reversals begin) */
+    if (reversedCount > 0) {
+        gridEl.appendChild(makeNull());
+        gridEl.appendChild(makeArrow("reversed"));
+    }
+
+    for (var i = 0; i < n; i++) {
+        /* Node */
+        var node = document.createElement("div");
+        node.className = "ll-node";
+        node.dataset.index = i;
+
+        if (i === currentIndex && position >= 0) {
+            node.classList.add("current");
+        } else if (i < reversedCount) {
+            node.classList.add("reversed-node");
+            node.classList.add("processed");
+        }
+
+        var val = document.createElement("span");
+        val.className = "cell-value";
+        val.textContent = values[i];
+        node.appendChild(val);
+
+        var idx = document.createElement("span");
+        idx.className = "node-index";
+        idx.textContent = i;
+        node.appendChild(idx);
+
+        /* Visit badge */
+        if (i < reversedCount) {
+            var badge = document.createElement("span");
+            badge.className = "visit-badge";
+            badge.textContent = i + 1;
+            node.appendChild(badge);
+        }
+
+        gridEl.appendChild(node);
+
+        /* Arrow between nodes */
+        if (i < n - 1) {
+            var arrowType;
+            var nextSlot = i + 1;
+            if (nextSlot < reversedCount) {
+                arrowType = "reversed";
+            } else if (nextSlot === reversedCount) {
+                arrowType = "break";
+            } else {
+                arrowType = "forward";
+            }
+            gridEl.appendChild(makeArrow(arrowType));
+        }
+    }
+
+    /* Right null marker (visible while forward chain exists) */
+    if (reversedCount < n) {
+        gridEl.appendChild(makeArrow("forward"));
+        gridEl.appendChild(makeNull());
+    }
+}
+
+function makeNull() {
+    var el = document.createElement("span");
+    el.className = "ll-null";
+    el.textContent = "null";
+    return el;
+}
+
+function makeArrow(type) {
+    var el = document.createElement("span");
+    el.className = "ll-arrow";
+
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "36");
+    svg.setAttribute("height", "12");
+    svg.setAttribute("viewBox", "0 0 36 12");
+
+    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+
+    line.setAttribute("class", "arrow-line");
+    head.setAttribute("class", "arrow-head");
+
+    if (type === "forward") {
+        line.setAttribute("x1", "0"); line.setAttribute("y1", "6");
+        line.setAttribute("x2", "30"); line.setAttribute("y2", "6");
+        head.setAttribute("points", "28,2 36,6 28,10");
+    } else if (type === "reversed") {
+        el.classList.add("reversed");
+        line.setAttribute("x1", "6"); line.setAttribute("y1", "6");
+        line.setAttribute("x2", "36"); line.setAttribute("y2", "6");
+        head.setAttribute("points", "8,2 0,6 8,10");
+    } else {
+        el.classList.add("break-arrow");
+        line.setAttribute("x1", "0"); line.setAttribute("y1", "6");
+        line.setAttribute("x2", "30"); line.setAttribute("y2", "6");
+        head.setAttribute("points", "28,2 36,6 28,10");
+    }
+
+    svg.appendChild(line);
+    svg.appendChild(head);
+    el.appendChild(svg);
+    return el;
+}
+
+/* ── Pointer positioning ───────────────────────────────── */
+
+function positionLLPointers(containerEl, gridEl, step, position) {
+    var nodes = gridEl.querySelectorAll(".ll-node");
+    if (!nodes.length) { ptrPrev.style.opacity = "0"; ptrCurr.style.opacity = "0"; return; }
+
+    var containerRect = containerEl.getBoundingClientRect();
+
+    if (position < 0) {
+        /* Initial state: curr at node 0, prev hidden */
+        ptrPrev.style.opacity = "0";
+        var node0 = nodes[0];
+        if (node0) {
+            var rect = node0.getBoundingClientRect();
+            ptrCurr.style.opacity = "1";
+            ptrCurr.style.left = (rect.left + rect.width / 2 - containerRect.left + containerEl.scrollLeft) + "px";
+            ptrCurr.style.top = (rect.top - containerRect.top - 48) + "px";
+        }
+        return;
+    }
+
+    /* prev pointer */
+    var prevIdx = step.processedIndex;
+    if (prevIdx != null && prevIdx < nodes.length) {
+        var prevRect = nodes[prevIdx].getBoundingClientRect();
+        ptrPrev.style.opacity = "1";
+        ptrPrev.style.left = (prevRect.left + prevRect.width / 2 - containerRect.left + containerEl.scrollLeft) + "px";
+        ptrPrev.style.top = (prevRect.top - containerRect.top - 48) + "px";
+    } else {
+        ptrPrev.style.opacity = "0";
+    }
+
+    /* curr pointer */
+    var currIdx = step.currAfterIndex;
+    if (currIdx != null && currIdx < nodes.length) {
+        var currRect = nodes[currIdx].getBoundingClientRect();
+        ptrCurr.style.opacity = "1";
+        ptrCurr.style.left = (currRect.left + currRect.width / 2 - containerRect.left + containerEl.scrollLeft) + "px";
+        ptrCurr.style.top = (currRect.top - containerRect.top - 48) + "px";
+
+        /* Collision avoidance: if prev and curr are adjacent, stagger */
+        if (prevIdx != null && currIdx === prevIdx + 1) {
+            ptrPrev.style.top = (parseFloat(ptrPrev.style.top) - 26) + "px";
+        }
+    } else {
+        /* curr is null — algorithm done */
+        ptrCurr.style.opacity = "0";
+    }
+
+    /* Auto-scroll to keep current node visible on mobile */
+    var activeNode = gridEl.querySelector(".ll-node.current");
+    if (activeNode) {
+        var cr = containerEl.getBoundingClientRect();
+        var cellR = activeNode.getBoundingClientRect();
+        var cellCx = cellR.left + cellR.width / 2;
+        var viewCx = cr.left + cr.width / 2;
+        var dx = cellCx - viewCx;
+        if (Math.abs(dx) > cr.width * 0.35) {
+            containerEl.scrollBy({ left: dx, behavior: "smooth" });
+        }
+    }
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    renderLinkedList(refs.grid, trace, step, pos);
+
+    /* Status display */
+    if (!step) {
+        refs.status.prev.textContent = "null";
+        refs.status.curr.textContent = trace.values.length > 0 ? String(trace.values[0]) : "null";
+        refs.status.next.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+    } else {
+        refs.status.prev.textContent = String(step.prevValue);
+        refs.status.curr.textContent = String(step.currValue);
+        refs.status.next.textContent = String(step.nextValue);
+        refs.status.action.textContent = step.currValue + ".Next \u2192 " + step.prevValue;
+    }
+
+    /* Values bar */
+    refs.values.reversed.textContent = step
+        ? step.reversedPrefix.join(" \u2192 ")
+        : "\u2014";
+    refs.values.remaining.textContent = step
+        ? (step.remainingSuffix.length > 0 ? step.remainingSuffix.join(" \u2192 ") : "empty")
+        : trace.values.join(" \u2192 ");
+
+    /* Note */
+    refs.note.textContent = describeStep(engine);
+
+    /* Pointers */
+    requestAnimationFrame(function() {
+        positionLLPointers(refs.container, refs.grid, step, pos);
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    var trace = engine.trace;
+    if (!step) {
+        if (trace.values.length === 0) return "Empty list — nothing to reverse.";
+        return trace.desc + " Press Play or Next to begin.";
+    }
+
+    var v = step.currValue;
+    var n = trace.values.length;
+
+    if (step.processedIndex === n - 1) {
+        return "Final step: node " + v + "\u2019s .Next is set to " +
+            (step.prevValue !== "null" ? "node " + step.prevValue : "null") +
+            ". curr advances to null — the loop ends. prev (node " + v +
+            ") is the new head of the reversed list: " +
+            step.reversedPrefix.join(" \u2192 ") + " \u2192 null.";
+    }
+
+    return "Processing node " + v + ": save next = " + step.nextValue +
+        ", set " + v + ".Next = " + step.prevValue +
+        ", advance prev to " + v + ", advance curr to " + step.nextValue +
+        ". Reversed chain: " + step.reversedPrefix.join(" \u2192 ") + " \u2192 null.";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 1200
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>
