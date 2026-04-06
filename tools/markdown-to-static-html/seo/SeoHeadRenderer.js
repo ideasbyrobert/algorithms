@@ -22,9 +22,13 @@ class SeoHeadRenderer
       this.renderProperty('og:title', metadata.title),
       this.renderProperty('og:description', metadata.description),
       this.renderProperty('og:url', metadata.canonicalUrl),
+      this.renderProperty('og:image', metadata.socialImageUrl),
+      this.renderProperty('og:image:width', metadata.socialImageWidth),
+      this.renderProperty('og:image:height', metadata.socialImageHeight),
       this.renderMeta('twitter:card', metadata.twitterCard),
       this.renderMeta('twitter:title', metadata.title),
       this.renderMeta('twitter:description', metadata.description),
+      this.renderMeta('twitter:image', metadata.socialImageUrl),
       this.renderJsonLd(metadata.structuredData)
     ].join('\n')
   }

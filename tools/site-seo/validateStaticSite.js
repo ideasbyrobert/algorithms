@@ -2,23 +2,24 @@ const fs = require('fs')
 const path = require('path')
 const siteMetadata = require('./SiteMetadata')
 const {
-  proofPages,
+  publishedHtmlPages,
   requiredStaticFiles,
   allPublishedPaths
 } = require('./ProofPageCatalog')
 
 const projectRoot = path.resolve(__dirname, '..', '..')
-const publishedHtmlFiles = ['index.html'].concat(proofPages)
+const articlePages = publishedHtmlPages()
+const publishedHtmlFiles = ['index.html'].concat(articlePages)
 const requiredFiles = publishedHtmlFiles.concat(requiredStaticFiles)
 
 requiredFiles.forEach(assertExists)
 
 const indexHtml = readProjectFile('index.html')
-proofPages.forEach((proofPagePath) =>
+articlePages.forEach((htmlPath) =>
   assertContains(
     indexHtml,
-    'href="' + proofPagePath + '"',
-    'Missing index link ' + proofPagePath
+    'href="' + htmlPath + '"',
+    'Missing index link ' + htmlPath
   )
 )
 
@@ -62,8 +63,11 @@ function assertSeoMarkers(filePath, html)
   [
     '<meta name="description"',
     '<link rel="canonical"',
+    '<meta property="og:site_name"',
     '<meta property="og:title"',
+    '<meta property="og:image"',
     '<meta name="twitter:card"',
+    '<meta name="twitter:image"',
     'application/ld+json'
   ].forEach((marker) =>
     assertContains(html, marker, 'Missing ' + marker + ' in ' + filePath)

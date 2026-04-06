@@ -23,6 +23,9 @@ class DocumentPageMetadataFactory
       siteName: this.siteMetadata.siteName,
       twitterCard: this.siteMetadata.twitterCard,
       openGraphType: 'article',
+      socialImageUrl: this.siteMetadata.defaultSocialImageUrl,
+      socialImageWidth: this.siteMetadata.defaultSocialImageWidth,
+      socialImageHeight: this.siteMetadata.defaultSocialImageHeight,
       structuredData: this.createStructuredData(title, description, canonicalUrl)
     }
   }
@@ -38,8 +41,8 @@ class DocumentPageMetadataFactory
     const introduction = paragraph ? paragraph.text : title
     const normalized = this.cleanText(introduction)
     const siteContext =
-      'Part of The Mechanics of Problem-Solving, a growing ' +
-      'collection of formal proofs for LeetCode and interview algorithms.'
+      'Part of The Mechanics of Problem-Solving, a curriculum of interactive ' +
+      'algorithm visualizations, formal proofs, and guided interview practice.'
     const summaryLimit = 240 - siteContext.length - 1
     const summary = this.truncate(this.ensureSentence(normalized), summaryLimit)
     const withContext = summary + ' ' + siteContext
@@ -98,6 +101,7 @@ class DocumentPageMetadataFactory
       url: canonicalUrl,
       mainEntityOfPage: canonicalUrl,
       inLanguage: this.siteMetadata.language,
+      image: this.siteMetadata.defaultSocialImageUrl,
       isPartOf: {
         '@type': 'CollectionPage',
         name: this.siteMetadata.collectionName,
@@ -117,6 +121,7 @@ class DocumentPageMetadataFactory
     return [
       'formal proof',
       'algorithm correctness',
+      'algorithm curriculum',
       'LeetCode',
       'interview algorithms',
       this.problemName(title)

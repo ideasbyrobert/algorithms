@@ -18,9 +18,24 @@ describe('StaticPageGenerator SEO metadata', () =>
     expect(html).toContain('<link rel="canonical" href="' + canonicalUrl + '" />')
     expect(html).toContain('<meta property="og:type" content="article" />')
     expect(html).toContain('<meta property="og:url" content="' + canonicalUrl + '" />')
-    expect(html).toContain('<meta name="twitter:card" content="summary" />')
+    expect(html).toContain(
+      '<meta property="og:image" content="' +
+      siteMetadata.defaultSocialImageUrl +
+      '" />'
+    )
+    expect(html).toContain(
+      '<meta name="twitter:card" content="' +
+      siteMetadata.twitterCard +
+      '" />'
+    )
+    expect(html).toContain(
+      '<meta name="twitter:image" content="' +
+      siteMetadata.defaultSocialImageUrl +
+      '" />'
+    )
     expect(html).toContain('application/ld+json')
     expect(html).toContain('"@type":"TechArticle"')
     expect(html).toContain('"url":"' + canonicalUrl + '"')
+    expect(html).toContain('"image":"' + siteMetadata.defaultSocialImageUrl + '"')
   })
 })

@@ -1,16 +1,11 @@
-const proofPages = [
-  '12-integer-to-roman.html',
-  '67-add-binary.html',
-  '80-remove-duplicates-II.html',
-  '88-merge-sorted-array.html',
-  '169-majority-element.html',
-  '189-rotate-array.html',
-  '274-hindex.html',
-  '334-increasing-triplet-subsequence.html'
-]
+const fs = require('fs')
+const path = require('path')
+
+const projectRoot = path.resolve(__dirname, '..', '..')
 
 const requiredStaticFiles = [
   'assets/styles/document-page.css',
+  'assets/og/default.png',
   'assets/scripts/mathjax-config.js',
   'assets/scripts/load-mathjax.js',
   'assets/vendor/mathjax/tex-mml-chtml.js',
@@ -18,13 +13,23 @@ const requiredStaticFiles = [
   'sitemap.xml'
 ]
 
+function publishedHtmlPages()
+{
+  return fs.readdirSync(projectRoot)
+    .filter((entry) => entry.endsWith('.html'))
+    .filter((entry) => entry !== 'index.html')
+    .filter((entry) => fs.statSync(path.join(projectRoot, entry)).isFile())
+    .sort()
+}
+
 function allPublishedPaths()
 {
-  return [''].concat(proofPages)
+  return [''].concat(publishedHtmlPages())
 }
 
 module.exports = {
-  proofPages,
+  proofPages: publishedHtmlPages(),
+  publishedHtmlPages,
   requiredStaticFiles,
   allPublishedPaths
 }
