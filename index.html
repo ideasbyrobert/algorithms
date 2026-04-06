@@ -24,31 +24,24 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <style>
     :root {
-      color-scheme: light;
-      --background: #f5f5f7;
-      --surface: #ffffff;
-      --surface-soft: #fafafa;
-      --text-strong: #000000;
-      --text: #1d1d1f;
-      --muted: #48484A;
+      --bg: #F5F5F7;
+      --surface: #FFFFFF;
+      --ink: #1D1D1F;
+      --ink-secondary: #48484A;
+      --ink-tertiary: #636366;
+      --ink-quaternary: #8E8E93;
+      --ink-faint: #AEAEB2;
+      --chrome: #C7C7CC;
+      --fill: #F5F5F7;
+      --fill-soft: #FAFAFA;
       --border: rgba(0, 0, 0, 0.08);
       --rule: rgba(0, 0, 0, 0.06);
-      --chrome-surface: rgba(0, 0, 0, 0.015);
-      --chrome-border: rgba(0, 0, 0, 0.04);
-      --chrome-border-strong: rgba(0, 0, 0, 0.055);
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.08);
-      --prose-font: "New York", "New York Large", "New York Medium", "New York Small", ui-serif, Georgia, serif;
-      --ui-font: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --mono-font: "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --ui: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --mono: "SF Mono", SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     }
 
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      -webkit-text-size-adjust: 100%;
-    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
 
     body {
       margin: 0;
@@ -56,133 +49,217 @@
       display: grid;
       place-items: center;
       padding: clamp(16px, 4vw, 32px);
-      background: linear-gradient(180deg, #ffffff 0%, var(--background) 100%);
-      color: var(--text);
-      font-family: var(--ui-font);
+      background: linear-gradient(180deg, #FFFFFF 0%, var(--bg) 100%);
+      font-family: var(--ui);
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
-      font-kerning: auto;
-      font-optical-sizing: auto;
+      color: var(--ink);
     }
 
     main {
-      width: min(100%, 720px);
-      padding: clamp(24px, 6vw, 56px) clamp(20px, 5vw, 48px);
+      width: min(100%, 680px);
+      padding: clamp(32px, 6vw, 56px) clamp(24px, 5vw, 44px);
       border: 1px solid var(--border);
       border-radius: clamp(20px, 4vw, 28px);
       background: var(--surface);
-      box-shadow: var(--shadow);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.07);
     }
 
-    main > :last-child {
-      margin-bottom: 0;
+    /* ── Header ── */
+
+    .page-header { margin-bottom: 40px; }
+
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink-quaternary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin: 0 0 10px;
     }
 
     h1 {
-      margin: 0 0 20px;
-      font-size: clamp(2rem, 7vw, 4rem);
-      color: var(--text-strong);
+      font-size: clamp(2.5rem, 8vw, 3.75rem);
       font-weight: 700;
-      letter-spacing: -0.035em;
+      color: #000000;
+      letter-spacing: -0.04em;
       line-height: 1.05;
-      font-family: var(--ui-font);
+      margin: 0;
     }
 
-    p {
-      margin: 0 0 20px;
-      color: var(--text);
-      font-size: 1rem;
-      line-height: 1.72;
-      font-family: var(--prose-font);
+    /* ── Filter Bar ── */
+
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 40px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 2px 0;
     }
 
-    .eyebrow {
-      margin: 0 0 10px;
-      color: var(--muted);
-      font-size: 0.82rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-family: var(--ui-font);
-    }
+    .filter-bar::-webkit-scrollbar { display: none; }
 
-    .section-label {
-      margin: 0 0 30px;
-      padding-top: 14px;
-      border-top: 1px solid var(--rule);
-      color: var(--text);
-      font-size: 1rem;
+    .pill {
+      flex-shrink: 0;
+      appearance: none;
+      -webkit-appearance: none;
+      border: 1px solid var(--chrome);
+      border-radius: 980px;
+      padding: 7px 18px;
+      font-family: var(--ui);
+      font-size: 13px;
       font-weight: 500;
-      letter-spacing: -0.01em;
-      line-height: 1.5;
-      text-transform: none;
-      font-family: var(--prose-font);
+      color: var(--ink-tertiary);
+      background: transparent;
+      cursor: pointer;
+      transition: all 200ms ease;
+      white-space: nowrap;
+      line-height: 1.3;
     }
 
-    .link-list {
-      display: grid;
-      gap: 16px;
+    .pill:hover { background: var(--fill); }
+
+    .pill.active {
+      background: var(--ink);
+      color: var(--surface);
+      border-color: var(--ink);
     }
 
-    a {
+    .pill:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+
+    .pill-count {
+      font-weight: 400;
+      opacity: 0.5;
+      margin-left: 2px;
+    }
+
+    .pill.active .pill-count { opacity: 0.6; }
+
+    /* ── Category Sections ── */
+
+    .categories {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      transition: opacity 200ms ease;
+    }
+
+    .category.hidden { display: none; }
+
+    .cat-header {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 10px;
+      padding: 0 4px;
+    }
+
+    .cat-header h2 {
+      font-family: var(--ui);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0;
+    }
+
+    .cat-count {
+      font-family: var(--ui);
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink-faint);
+    }
+
+    /* ── Grouped Table ── */
+
+    .cat-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .problem-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 18px 20px;
-      border: 1px solid var(--chrome-border);
-      border-radius: 20px;
-      background: linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.98) 0%,
-        var(--chrome-surface) 100%
-      );
-      color: var(--text-strong);
+      padding: 14px 16px;
       text-decoration: none;
-      font-size: 1rem;
-      font-weight: 600;
-      font-family: var(--ui-font);
-      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      color: inherit;
+      border-bottom: 1px solid var(--rule);
+      transition: background 150ms ease;
     }
 
-    a > span:first-child {
-      color: var(--text-strong);
+    .problem-row:last-child { border-bottom: none; }
+    .problem-row:hover { background: var(--fill-soft); }
+    .problem-row:active { background: var(--fill); }
+
+    .problem-row:focus-visible {
+      outline: 2px solid var(--ink);
+      outline-offset: -2px;
+    }
+
+    .problem-row::after {
+      content: '\203A';
+      font-size: 18px;
+      font-weight: 300;
+      color: var(--chrome);
+      flex-shrink: 0;
+      margin-left: 14px;
+    }
+
+    .problem-num {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--ink-faint);
+      width: 42px;
+      flex-shrink: 0;
+      text-align: right;
+      padding-right: 14px;
+    }
+
+    .problem-info { flex: 1; min-width: 0; }
+
+    .problem-name {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
       letter-spacing: -0.01em;
+      line-height: 1.35;
     }
 
-    a:hover {
-      transform: translateY(-1px);
-      border-color: var(--chrome-border-strong);
-      background: linear-gradient(
-        180deg,
-        #ffffff 0%,
-        rgba(0, 0, 0, 0.02) 100%
-      );
+    .problem-technique {
+      display: block;
+      font-size: 13px;
+      color: var(--ink-tertiary);
+      margin-top: 2px;
+      line-height: 1.3;
     }
 
-    .link-meta {
-      display: none;
+    /* ── Proofs ── */
+
+    .proofs-section {
+      margin-top: 48px;
+      padding-top: 44px;
+      border-top: 1px solid var(--rule);
+      transition: opacity 200ms ease;
     }
 
-    .group-label {
-      margin: 20px 0 12px;
-      color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-family: var(--ui-font);
-    }
+    .proofs-section.hidden { display: none; }
 
-    .group-label:first-child {
-      margin-top: 0;
-    }
+    /* ── Mobile ── */
 
     @media (max-width: 720px) {
       body {
         display: block;
         padding: 0;
-        background: #ffffff;
+        background: var(--surface);
       }
 
       main {
@@ -190,268 +267,332 @@
         padding: 24px 20px 40px;
         border: 0;
         border-radius: 0;
-        background: transparent;
         box-shadow: none;
+        background: transparent;
       }
+
+      .filter-bar {
+        margin-left: -20px;
+        margin-right: -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      .categories { gap: 32px; }
+      .problem-num { width: 36px; padding-right: 10px; }
+      .problem-name { font-size: 14px; }
+      .problem-technique { font-size: 12px; }
     }
   </style>
 </head>
 <body>
   <main>
-    <p class="eyebrow">The Mechanics of Problem-Solving</p>
-    <h1>Algorithms</h1>
+    <header class="page-header">
+      <p class="eyebrow">The Mechanics of Problem-Solving</p>
+      <h1>Algorithms</h1>
+    </header>
 
-    <p>
-      Interactive algorithm visualizations, formal proofs, and curriculum maps
-      for LeetCode and interview-style problems. The project is organized around
-      forces and mechanics, so each page teaches not just a solution, but the
-      deeper shape of the problem it belongs to.
-    </p>
+    <nav class="filter-bar" role="tablist" aria-label="Filter by topic">
+      <button class="pill active" data-filter="all" role="tab" aria-selected="true">All</button>
+      <button class="pill" data-filter="array" role="tab" aria-selected="false">Array <span class="pill-count">13</span></button>
+      <button class="pill" data-filter="string" role="tab" aria-selected="false">String <span class="pill-count">16</span></button>
+      <button class="pill" data-filter="matrix" role="tab" aria-selected="false">Matrix <span class="pill-count">7</span></button>
+      <button class="pill" data-filter="math" role="tab" aria-selected="false">Math <span class="pill-count">3</span></button>
+      <button class="pill" data-filter="hashing" role="tab" aria-selected="false">Hashing <span class="pill-count">1</span></button>
+      <button class="pill" data-filter="search" role="tab" aria-selected="false">Search <span class="pill-count">1</span></button>
+      <button class="pill" data-filter="linked-list" role="tab" aria-selected="false">Linked List <span class="pill-count">3</span></button>
+    </nav>
 
-    <p>
-      Browse arrays, strings, linked lists, matrices, binary search, and more
-      through step-by-step lessons designed to be readable, visual, and
-      mechanically precise.
-    </p>
+    <div class="categories">
 
-    <p class="section-label">Interactive Visualizations</p>
+      <section class="category" data-cat="array">
+        <div class="cat-header"><h2>Array</h2><span class="cat-count">13</span></div>
+        <div class="cat-card">
+          <a href="283-move-zeroes.html" class="problem-row">
+            <span class="problem-num">283</span>
+            <div class="problem-info"><span class="problem-name">Move Zeroes</span><span class="problem-technique">Write Pointer Compaction</span></div>
+          </a>
+          <a href="189-rotate-array.html" class="problem-row">
+            <span class="problem-num">189</span>
+            <div class="problem-info"><span class="problem-name">Rotate Array</span><span class="problem-technique">Three-Reversal Trick</span></div>
+          </a>
+          <a href="169-majority-element.html" class="problem-row">
+            <span class="problem-num">169</span>
+            <div class="problem-info"><span class="problem-name">Majority Element</span><span class="problem-technique">Boyer-Moore Voting</span></div>
+          </a>
+          <a href="80-remove-duplicates-sorted-array-ii.html" class="problem-row">
+            <span class="problem-num">80</span>
+            <div class="problem-info"><span class="problem-name">Remove Duplicates from Sorted Array II</span><span class="problem-technique">Lookback-2</span></div>
+          </a>
+          <a href="26-remove-duplicates-sorted-array.html" class="problem-row">
+            <span class="problem-num">26</span>
+            <div class="problem-info"><span class="problem-name">Remove Duplicates from Sorted Array</span><span class="problem-technique">Unique Compaction</span></div>
+          </a>
+          <a href="27-remove-element.html" class="problem-row">
+            <span class="problem-num">27</span>
+            <div class="problem-info"><span class="problem-name">Remove Element</span><span class="problem-technique">Write Pointer Compaction</span></div>
+          </a>
+          <a href="1603-design-parking-system.html" class="problem-row">
+            <span class="problem-num">1603</span>
+            <div class="problem-info"><span class="problem-name">Design Parking System</span><span class="problem-technique">Capacity Counters</span></div>
+          </a>
+          <a href="1275-tic-tac-toe-winner.html" class="problem-row">
+            <span class="problem-num">1275</span>
+            <div class="problem-info"><span class="problem-name">Find Winner on a Tic-Tac-Toe Game</span><span class="problem-technique">Signed Counters</span></div>
+          </a>
+          <a href="1431-kids-candies.html" class="problem-row">
+            <span class="problem-num">1431</span>
+            <div class="problem-info"><span class="problem-name">Kids With the Greatest Number of Candies</span><span class="problem-technique">Fixed Threshold</span></div>
+          </a>
+          <a href="896-monotonic-array.html" class="problem-row">
+            <span class="problem-num">896</span>
+            <div class="problem-info"><span class="problem-name">Monotonic Array</span><span class="problem-technique">Two Direction Flags</span></div>
+          </a>
+          <a href="1822-sign-of-product.html" class="problem-row">
+            <span class="problem-num">1822</span>
+            <div class="problem-info"><span class="problem-name">Sign of the Product</span><span class="problem-technique">Running Sign Flip</span></div>
+          </a>
+          <a href="605-can-place-flowers.html" class="problem-row">
+            <span class="problem-num">605</span>
+            <div class="problem-info"><span class="problem-name">Can Place Flowers</span><span class="problem-technique">Greedy Left-to-Right Planting</span></div>
+          </a>
+          <a href="1502-arithmetic-progression.html" class="problem-row">
+            <span class="problem-num">1502</span>
+            <div class="problem-info"><span class="problem-name">Arithmetic Progression</span><span class="problem-technique">Sort and Gap Check</span></div>
+          </a>
+        </div>
+      </section>
 
-    <p class="group-label">Array</p>
-    <div class="link-list">
-      <a href="283-move-zeroes.html">
-        <span>283 Move Zeroes — Write Pointer Compaction</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="189-rotate-array.html">
-        <span>189 Rotate Array — Three-Reversal Trick</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="169-majority-element.html">
-        <span>169 Majority Element — Boyer-Moore Voting</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="80-remove-duplicates-sorted-array-ii.html">
-        <span>80 Remove Duplicates from Sorted Array II — Lookback-2</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="26-remove-duplicates-sorted-array.html">
-        <span>26 Remove Duplicates from Sorted Array — Unique Compaction</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="27-remove-element.html">
-        <span>27 Remove Element — Write Pointer Compaction</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="1603-design-parking-system.html">
-        <span>1603 Design Parking System — Capacity Counters</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="1275-tic-tac-toe-winner.html">
-        <span>1275 Find Winner on a Tic-Tac-Toe Game — Signed Counters</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="1431-kids-candies.html">
-        <span>1431 Kids With the Greatest Number of Candies — Fixed Threshold</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="896-monotonic-array.html">
-        <span>896 Monotonic Array — Two Direction Flags</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="1822-sign-of-product.html">
-        <span>1822 Sign of the Product — Running Sign Flip</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="605-can-place-flowers.html">
-        <span>605 Can Place Flowers — Greedy Left-to-Right Planting</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="1502-arithmetic-progression.html">
-        <span>1502 Arithmetic Progression — Sort and Gap Check</span>
-        <span class="link-meta">Open</span>
-      </a>
+      <section class="category" data-cat="string">
+        <div class="cat-header"><h2>String</h2><span class="cat-count">16</span></div>
+        <div class="cat-card">
+          <a href="1071-gcd-of-strings.html" class="problem-row">
+            <span class="problem-num">1071</span>
+            <div class="problem-info"><span class="problem-name">GCD of Strings</span><span class="problem-technique">Concatenation Test and Length GCD</span></div>
+          </a>
+          <a href="14-longest-common-prefix.html" class="problem-row">
+            <span class="problem-num">14</span>
+            <div class="problem-info"><span class="problem-name">Longest Common Prefix</span><span class="problem-technique">Vertical Column Scan</span></div>
+          </a>
+          <a href="13-roman-to-integer.html" class="problem-row">
+            <span class="problem-num">13</span>
+            <div class="problem-info"><span class="problem-name">Roman to Integer</span><span class="problem-technique">Lookahead Subtraction</span></div>
+          </a>
+          <a href="58-length-of-last-word.html" class="problem-row">
+            <span class="problem-num">58</span>
+            <div class="problem-info"><span class="problem-name">Length of Last Word</span><span class="problem-technique">Reverse Scan</span></div>
+          </a>
+          <a href="28-find-first-occurrence.html" class="problem-row">
+            <span class="problem-num">28</span>
+            <div class="problem-info"><span class="problem-name">Find First Occurrence</span><span class="problem-technique">Window Scan</span></div>
+          </a>
+          <a href="1768-merge-strings-alternately.html" class="problem-row">
+            <span class="problem-num">1768</span>
+            <div class="problem-info"><span class="problem-name">Merge Strings Alternately</span><span class="problem-technique">Interleave and Append</span></div>
+          </a>
+          <a href="151-reverse-words.html" class="problem-row">
+            <span class="problem-num">151</span>
+            <div class="problem-info"><span class="problem-name">Reverse Words</span><span class="problem-technique">Normalize, Reverse All, Reverse Each</span></div>
+          </a>
+          <a href="345-reverse-vowels.html" class="problem-row">
+            <span class="problem-num">345</span>
+            <div class="problem-info"><span class="problem-name">Reverse Vowels</span><span class="problem-technique">Two-Pointer Vowel Swap</span></div>
+          </a>
+          <a href="459-repeated-substring-pattern.html" class="problem-row">
+            <span class="problem-num">459</span>
+            <div class="problem-info"><span class="problem-name">Repeated Substring Pattern</span><span class="problem-technique">Double, Trim, Search</span></div>
+          </a>
+          <a href="709-to-lower-case.html" class="problem-row">
+            <span class="problem-num">709</span>
+            <div class="problem-info"><span class="problem-name">To Lower Case</span><span class="problem-technique">ASCII Arithmetic</span></div>
+          </a>
+          <a href="67-add-binary.html" class="problem-row">
+            <span class="problem-num">67</span>
+            <div class="problem-info"><span class="problem-name">Add Binary</span><span class="problem-technique">Column Addition with Carry</span></div>
+          </a>
+          <a href="273-integer-to-english-words.html" class="problem-row">
+            <span class="problem-num">273</span>
+            <div class="problem-info"><span class="problem-name">Integer to English Words</span><span class="problem-technique">Scale Decomposition</span></div>
+          </a>
+          <a href="68-text-justification.html" class="problem-row">
+            <span class="problem-num">68</span>
+            <div class="problem-info"><span class="problem-name">Text Justification</span><span class="problem-technique">Greedy Packing + Space Distribution</span></div>
+          </a>
+          <a href="65-valid-number.html" class="problem-row">
+            <span class="problem-num">65</span>
+            <div class="problem-info"><span class="problem-name">Valid Number</span><span class="problem-technique">Single-Pass Flag Scanner</span></div>
+          </a>
+          <a href="443-string-compression.html" class="problem-row">
+            <span class="problem-num">443</span>
+            <div class="problem-info"><span class="problem-name">String Compression</span><span class="problem-technique">In-Place Run-Length Encoding</span></div>
+          </a>
+          <a href="6-zigzag-conversion.html" class="problem-row">
+            <span class="problem-num">6</span>
+            <div class="problem-info"><span class="problem-name">Zigzag Conversion</span><span class="problem-technique">Row-Bouncing Simulation</span></div>
+          </a>
+        </div>
+      </section>
+
+      <section class="category" data-cat="matrix">
+        <div class="cat-header"><h2>Matrix</h2><span class="cat-count">7</span></div>
+        <div class="cat-card">
+          <a href="1672-richest-customer-wealth.html" class="problem-row">
+            <span class="problem-num">1672</span>
+            <div class="problem-info"><span class="problem-name">Richest Customer Wealth</span><span class="problem-technique">Row-Sum Maximum</span></div>
+          </a>
+          <a href="1572-matrix-diagonal-sum.html" class="problem-row">
+            <span class="problem-num">1572</span>
+            <div class="problem-info"><span class="problem-name">Matrix Diagonal Sum</span><span class="problem-technique">Primary + Secondary Diagonals</span></div>
+          </a>
+          <a href="73-set-matrix-zeroes.html" class="problem-row">
+            <span class="problem-num">73</span>
+            <div class="problem-info"><span class="problem-name">Set Matrix Zeroes</span><span class="problem-technique">In-Place Marker Propagation</span></div>
+          </a>
+          <a href="54-spiral-matrix.html" class="problem-row">
+            <span class="problem-num">54</span>
+            <div class="problem-info"><span class="problem-name">Spiral Matrix</span><span class="problem-technique">Boundary Shrinking</span></div>
+          </a>
+          <a href="48-rotate-image.html" class="problem-row">
+            <span class="problem-num">48</span>
+            <div class="problem-info"><span class="problem-name">Rotate Image</span><span class="problem-technique">Transpose + Reverse</span></div>
+          </a>
+          <a href="36-valid-sudoku.html" class="problem-row">
+            <span class="problem-num">36</span>
+            <div class="problem-info"><span class="problem-name">Valid Sudoku</span><span class="problem-technique">Row, Column, and Box Validation</span></div>
+          </a>
+          <a href="289-game-of-life.html" class="problem-row">
+            <span class="problem-num">289</span>
+            <div class="problem-info"><span class="problem-name">Game of Life</span><span class="problem-technique">Transitional State Encoding</span></div>
+          </a>
+        </div>
+      </section>
+
+      <section class="category" data-cat="math">
+        <div class="cat-header"><h2>Math</h2><span class="cat-count">3</span></div>
+        <div class="cat-card">
+          <a href="9-palindrome-number.html" class="problem-row">
+            <span class="problem-num">9</span>
+            <div class="problem-info"><span class="problem-name">Palindrome Number</span><span class="problem-technique">Half Reversal</span></div>
+          </a>
+          <a href="66-plus-one.html" class="problem-row">
+            <span class="problem-num">66</span>
+            <div class="problem-info"><span class="problem-name">Plus One</span><span class="problem-technique">Right-to-Left Carry</span></div>
+          </a>
+          <a href="657-robot-return-to-origin.html" class="problem-row">
+            <span class="problem-num">657</span>
+            <div class="problem-info"><span class="problem-name">Robot Return to Origin</span><span class="problem-technique">Axis Displacement</span></div>
+          </a>
+        </div>
+      </section>
+
+      <section class="category" data-cat="hashing">
+        <div class="cat-header"><h2>Hashing</h2><span class="cat-count">1</span></div>
+        <div class="cat-card">
+          <a href="1-two-sum.html" class="problem-row">
+            <span class="problem-num">1</span>
+            <div class="problem-info"><span class="problem-name">Two Sum</span><span class="problem-technique">Complement Lookup</span></div>
+          </a>
+        </div>
+      </section>
+
+      <section class="category" data-cat="search">
+        <div class="cat-header"><h2>Search</h2><span class="cat-count">1</span></div>
+        <div class="cat-card">
+          <a href="704-binary-search.html" class="problem-row">
+            <span class="problem-num">704</span>
+            <div class="problem-info"><span class="problem-name">Binary Search</span><span class="problem-technique">Decision Boundaries</span></div>
+          </a>
+        </div>
+      </section>
+
+      <section class="category" data-cat="linked-list">
+        <div class="cat-header"><h2>Linked List</h2><span class="cat-count">3</span></div>
+        <div class="cat-card">
+          <a href="206-reverse-linked-list.html" class="problem-row">
+            <span class="problem-num">206</span>
+            <div class="problem-info"><span class="problem-name">Reverse Linked List</span><span class="problem-technique">Pointer Rewiring</span></div>
+          </a>
+          <a href="21-merge-two-sorted-lists.html" class="problem-row">
+            <span class="problem-num">21</span>
+            <div class="problem-info"><span class="problem-name">Merge Two Sorted Lists</span><span class="problem-technique">Tail-Pointer Merge</span></div>
+          </a>
+          <a href="141-linked-list-cycle.html" class="problem-row">
+            <span class="problem-num">141</span>
+            <div class="problem-info"><span class="problem-name">Linked List Cycle</span><span class="problem-technique">Floyd's Tortoise and Hare</span></div>
+          </a>
+        </div>
+      </section>
+
     </div>
 
-    <p class="group-label">String</p>
-    <div class="link-list">
-                  <a href="1071-gcd-of-strings.html">
-        <span>1071 GCD of Strings — Concatenation Test and Length GCD</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="14-longest-common-prefix.html">
-        <span>14 Longest Common Prefix — Vertical Column Scan</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="13-roman-to-integer.html">
-        <span>13 Roman to Integer — Lookahead Subtraction</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="58-length-of-last-word.html">
-        <span>58 Length of Last Word — Reverse Scan</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="28-find-first-occurrence.html">
-        <span>28 Find First Occurrence — Window Scan</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="1768-merge-strings-alternately.html">
-        <span>1768 Merge Strings Alternately — Interleave and Append</span>
-        <span class="link-meta">Open</span>
-      </a>
-                  <a href="151-reverse-words.html">
-        <span>151 Reverse Words — Normalize, Reverse All, Reverse Each</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="345-reverse-vowels.html">
-        <span>345 Reverse Vowels — Two-Pointer Vowel Swap</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="459-repeated-substring-pattern.html">
-        <span>459 Repeated Substring Pattern — Double, Trim, Search</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="709-to-lower-case.html">
-        <span>709 To Lower Case — ASCII Arithmetic</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="67-add-binary.html">
-        <span>67 Add Binary — Column Addition with Carry</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="273-integer-to-english-words.html">
-        <span>273 Integer to English Words — Scale Decomposition</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="68-text-justification.html">
-        <span>68 Text Justification — Greedy Packing + Space Distribution</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="65-valid-number.html">
-        <span>65 Valid Number — Single-Pass Flag Scanner</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="443-string-compression.html">
-        <span>443 String Compression — In-Place Run-Length Encoding</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="6-zigzag-conversion.html">
-        <span>6 Zigzag Conversion — Row-Bouncing Simulation</span>
-        <span class="link-meta">Open</span>
-      </a>
-    </div>
-
-    <p class="group-label">Matrix</p>
-    <div class="link-list">
-      <a href="1672-richest-customer-wealth.html">
-        <span>1672 Richest Customer Wealth — Row-Sum Maximum</span>
-        <span class="link-meta">Open</span>
-      </a>
-            <a href="1572-matrix-diagonal-sum.html">
-        <span>1572 Matrix Diagonal Sum — Primary + Secondary Diagonals</span>
-        <span class="link-meta">Open</span>
-      </a>
-            <a href="73-set-matrix-zeroes.html">
-        <span>73 Set Matrix Zeroes — In-Place Marker Propagation</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="54-spiral-matrix.html">
-        <span>54 Spiral Matrix — Boundary Shrinking</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="48-rotate-image.html">
-        <span>48 Rotate Image — Transpose + Reverse</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="36-valid-sudoku.html">
-        <span>36 Valid Sudoku — Row, Column, and Box Validation</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="289-game-of-life.html">
-        <span>289 Game of Life — Transitional State Encoding</span>
-        <span class="link-meta">Open</span>
-      </a>
-    </div>
-
-    
-    <p class="group-label">Math</p>
-    <div class="link-list">
-            <a href="9-palindrome-number.html">
-        <span>9 Palindrome Number — Half Reversal</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="66-plus-one.html">
-        <span>66 Plus One — Right-to-Left Carry</span>
-        <span class="link-meta">Open</span>
-      </a>
-          <a href="657-robot-return-to-origin.html">
-        <span>657 Robot Return to Origin — Axis Displacement</span>
-        <span class="link-meta">Open</span>
-      </a>
-    </div>
-
-    <p class="group-label">Hashing</p>
-    <div class="link-list">
-      <a href="1-two-sum.html">
-        <span>1 Two Sum — Complement Lookup</span>
-        <span class="link-meta">Open</span>
-      </a>
-    </div>
-
-    <p class="group-label">Search</p>
-    <div class="link-list">
-      <a href="704-binary-search.html">
-        <span>704 Binary Search — Decision Boundaries</span>
-        <span class="link-meta">Open</span>
-      </a>
-    </div>
-
-    <p class="group-label">Linked List</p>
-    <div class="link-list">
-      <a href="206-reverse-linked-list.html">
-        <span>206 Reverse Linked List — Pointer Rewiring</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="21-merge-two-sorted-lists.html">
-        <span>21 Merge Two Sorted Lists — Tail-Pointer Merge</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="141-linked-list-cycle.html">
-        <span>141 Linked List Cycle — Floyd's Tortoise and Hare</span>
-        <span class="link-meta">Open</span>
-      </a>
-    </div>
-
-    <p class="section-label" style="margin-top: 48px;">Formal Proofs — Array and String Mechanics</p>
-    <div class="link-list">
-      <a href="12-integer-to-roman.html">
-        <span>12 Integer to Roman</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="80-remove-duplicates-II.html">
-        <span>80 Remove Duplicates II</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="88-merge-sorted-array.html">
-        <span>88 Merge Sorted Array</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="169-majority-element.html">
-        <span>169 Majority Element</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="189-rotate-array.html">
-        <span>189 Rotate Array</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="274-hindex.html">
-        <span>274 H-Index</span>
-        <span class="link-meta">Open</span>
-      </a>
-      <a href="334-increasing-triplet-subsequence.html">
-        <span>334 Increasing Triplet Subsequence</span>
-        <span class="link-meta">Open</span>
-      </a>
-    </div>
+    <section class="proofs-section">
+      <div class="cat-header"><h2>Formal Proofs</h2><span class="cat-count">7</span></div>
+      <div class="cat-card">
+        <a href="12-integer-to-roman.html" class="problem-row">
+          <span class="problem-num">12</span>
+          <div class="problem-info"><span class="problem-name">Integer to Roman</span></div>
+        </a>
+        <a href="80-remove-duplicates-II.html" class="problem-row">
+          <span class="problem-num">80</span>
+          <div class="problem-info"><span class="problem-name">Remove Duplicates II</span></div>
+        </a>
+        <a href="88-merge-sorted-array.html" class="problem-row">
+          <span class="problem-num">88</span>
+          <div class="problem-info"><span class="problem-name">Merge Sorted Array</span></div>
+        </a>
+        <a href="169-majority-element.html" class="problem-row">
+          <span class="problem-num">169</span>
+          <div class="problem-info"><span class="problem-name">Majority Element</span></div>
+        </a>
+        <a href="189-rotate-array.html" class="problem-row">
+          <span class="problem-num">189</span>
+          <div class="problem-info"><span class="problem-name">Rotate Array</span></div>
+        </a>
+        <a href="274-hindex.html" class="problem-row">
+          <span class="problem-num">274</span>
+          <div class="problem-info"><span class="problem-name">H-Index</span></div>
+        </a>
+        <a href="334-increasing-triplet-subsequence.html" class="problem-row">
+          <span class="problem-num">334</span>
+          <div class="problem-info"><span class="problem-name">Increasing Triplet Subsequence</span></div>
+        </a>
+      </div>
+    </section>
   </main>
+
+  <script>
+  (function () {
+    var pills = document.querySelectorAll('.pill');
+    var categories = document.querySelectorAll('.category');
+    var proofs = document.querySelector('.proofs-section');
+    var wrap = document.querySelector('.categories');
+
+    pills.forEach(function (pill) {
+      pill.addEventListener('click', function () {
+        var filter = this.dataset.filter;
+
+        pills.forEach(function (p) {
+          p.classList.remove('active');
+          p.setAttribute('aria-selected', 'false');
+        });
+        this.classList.add('active');
+        this.setAttribute('aria-selected', 'true');
+
+        wrap.style.opacity = '0';
+        if (proofs) proofs.style.opacity = '0';
+
+        setTimeout(function () {
+          categories.forEach(function (cat) {
+            cat.classList.toggle('hidden', filter !== 'all' && cat.dataset.cat !== filter);
+          });
+          if (proofs) proofs.classList.toggle('hidden', filter !== 'all');
+
+          wrap.style.opacity = '1';
+          if (proofs) proofs.style.opacity = '1';
+        }, 200);
+      });
+    });
+  })();
+  </script>
 </body>
 </html>
