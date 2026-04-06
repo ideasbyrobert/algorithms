@@ -1,95 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Formal Proof of the Boyer-Moore Voting Algorithm</title>
-  <meta name="description" content="Formal proof and correctness analysis for the Boyer-Moore voting algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/169-majority-element.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithm Proofs" />
-  <meta property="og:title" content="Formal Proof of the Boyer-Moore Voting Algorithm" />
-  <meta property="og:description" content="Formal proof and correctness analysis for the Boyer-Moore voting algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/169-majority-element.html" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Formal Proof of the Boyer-Moore Voting Algorithm" />
-  <meta name="twitter:description" content="Formal proof and correctness analysis for the Boyer-Moore voting algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms." />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Formal Proof of the Boyer-Moore Voting Algorithm","description":"Formal proof and correctness analysis for the Boyer-Moore voting algorithm. Part of The Mechanics of Problem-Solving, a growing collection of formal proofs for LeetCode and interview algorithms.","url":"https://ideasbyrobert.github.io/algorithms/169-majority-element.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/169-majority-element.html","inLanguage":"en","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"formal proof, algorithm correctness, LeetCode, interview algorithms, Boyer-Moore Voting"}</script>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/default.png" />
-  <link rel="stylesheet" href="assets/styles/document-page.css" />
-  <script src="assets/scripts/mathjax-config.js"></script>
-  <script src="assets/scripts/load-mathjax.js" data-cdn-source="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" data-local-source="assets/vendor/mathjax/tex-mml-chtml.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Majority Element — Boyer-Moore Voting | Interactive Visualization</title>
+<meta name="description" content="Interactive visualization of LeetCode 169 Majority Element. Watch Boyer-Moore voting track candidate and balance.">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/169-majority-element.html">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Majority Element — Interactive Visualization">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/169-majority-element.html">
+<meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/default.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=&apos;http://www.w3.org/2000/svg&apos; viewBox=&apos;0 0 100 100&apos;><text y=&apos;.9em&apos; font-size=&apos;90&apos;>&#x1f9ee;</text></svg>">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","name":"Majority Element — Interactive Visualization","url":"https://ideasbyrobert.github.io/algorithms/169-majority-element.html"}
+</script>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.vote-panel {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+.vote-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 1.5px solid #C7C7CC;
+    background: #FFFFFF;
+    transition: border-color 0.25s ease, background 0.25s ease;
+    min-width: 80px;
+}
+.vote-box.active { border-color: #1D1D1F; background: #F5F5F7; }
+.vote-box.restart { border-color: #1D1D1F; background: #1D1D1F; }
+.vote-box.restart .vote-val { color: #FFFFFF; }
+.vote-box.restart .vote-lbl { color: #AEAEB2; }
+.vote-lbl {
+    font: 500 10px/1 'SF Pro Text', -apple-system, sans-serif;
+    color: #8E8E93; letter-spacing: 0.5px; text-transform: uppercase;
+}
+.vote-val {
+    font: 600 20px/1 'Menlo', monospace;
+    color: #1D1D1F; transition: color 0.25s ease;
+}
+@media (max-width: 600px) {
+    .vote-box { padding: 8px 14px; min-width: 64px; }
+    .vote-val { font-size: 17px; }
+}
+</style>
 </head>
 <body>
-  <main>
-    <article><h1>Formal Proof of the Boyer-Moore Voting Algorithm</h1>
-<p>To establish the correctness of the Boyer-Moore Voting algorithm, we must rigorously prove three properties: that removing a pair of distinct values from a sequence preserves its majority element, that the three-way branch implements this pairwise cancellation in a streaming fashion, and that the loop invariant guarantees the surviving candidate is the majority element. We will dismantle the problem into a cancellation lemma (§2), a streaming vote mapping (§3), and a Boyer-Moore invariant (§4).</p>
-<h2>1. First Principles &amp; System Definitions</h2>
-<p><strong>Problem objects.</strong> Let <span class="inline-math">$A = (a_0, a_1, \ldots, a_{n-1})$</span> be a finite sequence of integers. Define the <em>multiplicity function</em>:</p>
-<div class="equation">$$\mu(v) = |\{i \in \{0, 1, \ldots, n-1\} : a_i = v\}|$$</div>
-<p>A value <span class="inline-math">$m$</span> is the <em>majority element</em> of <span class="inline-math">$A$</span> if:</p>
-<div class="equation">$$\mu(m) &gt; \frac{n}{2}$$</div>
-<p><strong>Preconditions and contract assumptions.</strong></p>
-<ul><li><p><span class="inline-math">$n \ge 1$</span>.</p></li><li><p>A majority element exists: there exists <span class="inline-math">$m$</span> such that <span class="inline-math">$\mu(m) &gt; n/2$</span>.</p></li></ul>
-<p><strong>Postcondition.</strong></p>
-<div class="equation">$$\text{The algorithm returns } m.$$</div>
-<p><strong>State variables.</strong></p>
-<ul><li><p><span class="inline-math">$r \in \{0, 1, \ldots, n\}$</span> — read pointer; scans each position exactly once.</p></li><li><p><span class="inline-math">$\gamma \in \mathbb{Z}$</span> — current candidate value.</p></li><li><p><span class="inline-math">$\beta \in \mathbb{Z}_{\ge 0}$</span> — balance; accumulated vote count for the current candidate.</p></li></ul>
-<p><strong>Initialization.</strong></p>
-<div class="equation">$$r = 0, \quad \beta = 0, \quad \gamma \text{ undefined}$$</div>
-<p>No mutation model is needed — the algorithm reads <span class="inline-math">$A$</span> without modifying it.</p>
-<h2>2. The Cancellation Lemma</h2>
-<p><strong>Theorem 1: Removing a distinct-value pair preserves the majority.</strong></p>
-<p>Let <span class="inline-math">$A$</span> be a sequence of length <span class="inline-math">$n$</span> with majority element <span class="inline-math">$m$</span>. If two elements <span class="inline-math">$a_i$</span> and <span class="inline-math">$a_j$</span> with <span class="inline-math">$a_i \ne a_j$</span> are removed, the resulting sequence of length <span class="inline-math">$n - 2$</span> still has <span class="inline-math">$m$</span> as its majority element.</p>
-<p><em>Proof:</em></p>
-<p>Since <span class="inline-math">$a_i \ne a_j$</span>, at most one of them equals <span class="inline-math">$m$</span>. The count of <span class="inline-math">$m$</span> in the reduced sequence satisfies:</p>
-<div class="equation">$$\mu'(m) \ge \mu(m) - 1 &gt; \frac{n}{2} - 1 = \frac{n - 2}{2}$$</div>
-<p>Therefore <span class="inline-math">$m$</span> has strict majority in the reduced sequence. <span class="inline-math">$\blacksquare$</span></p>
-<p><strong>Corollary 1.1: Repeated cancellation preserves the majority.</strong></p>
-<p>If <span class="inline-math">$k$</span> disjoint distinct-value pairs are removed from <span class="inline-math">$A$</span>, the majority element of the remaining <span class="inline-math">$n - 2k$</span> elements is still <span class="inline-math">$m$</span>. The remaining sequence is non-empty because the non-<span class="inline-math">$m$</span> values number <span class="inline-math">$n - \mu(m) &lt; n/2$</span>, at most <span class="inline-math">$n - \mu(m)$</span> copies of <span class="inline-math">$m$</span> can participate in distinct-value pairs, and the uncanceled copies of <span class="inline-math">$m$</span> number at least <span class="inline-math">$\mu(m) - (n - \mu(m)) = 2\mu(m) - n &gt; 0$</span>.</p>
-<h2>3. Algorithm Mapping: The Streaming Vote Mechanism</h2>
-<p>The Boyer-Moore algorithm processes elements left-to-right through a three-way branch:</p>
-<ol><li><p><strong>Start</strong> (<span class="inline-math">$\beta = 0$</span>): Set <span class="inline-math">$\gamma \gets a_r$</span>, <span class="inline-math">$\beta \gets 1$</span>. The algorithm begins a new phase after the previous phase fully canceled.</p></li><li><p><strong>Reinforce</strong> (<span class="inline-math">$a_r = \gamma$</span>, <span class="inline-math">$\beta &gt; 0$</span>): <span class="inline-math">$\beta \gets \beta + 1$</span>. The candidate gains one vote.</p></li><li><p><strong>Cancel</strong> (<span class="inline-math">$a_r \ne \gamma$</span>, <span class="inline-math">$\beta &gt; 0$</span>): <span class="inline-math">$\beta \gets \beta - 1$</span>. One copy of <span class="inline-math">$\gamma$</span> from the residue is paired with <span class="inline-math">$a_r$</span> to form a canceled distinct-value pair.</p></li></ol>
-<p><strong>Lemma 1: The three-way branch implements pairwise cancellation.</strong></p>
-<p>At any point during execution, the processed prefix <span class="inline-math">$A[0..r-1]$</span> decomposes into a set of canceled distinct-value pairs and an uncanceled residue of <span class="inline-math">$\beta$</span> copies of <span class="inline-math">$\gamma$</span>.</p>
-<p><em>Proof:</em></p>
-<p>Every "cancel" step produces one distinct-value pair by consuming one copy of <span class="inline-math">$\gamma$</span> from the residue and pairing it with <span class="inline-math">$a_r \ne \gamma$</span>. Every "reinforce" step adds one copy of <span class="inline-math">$\gamma$</span> to the residue. Every "start" step begins a fresh residue of one element, possible only when <span class="inline-math">$\beta = 0$</span> (the previous phase was fully canceled). The residue is always homogeneous: <span class="inline-math">$\beta$</span> copies of the current <span class="inline-math">$\gamma$</span>. <span class="inline-math">$\blacksquare$</span></p>
-<h2>4. Proof of Correctness: The Boyer-Moore Invariant</h2>
-<p><strong>Theorem 2: Upon termination, <span class="inline-math">$\gamma = m$</span>.</strong></p>
-<p><em>Proof:</em></p>
-<p>Define the <em>live multiset</em> at the start of iteration <span class="inline-math">$r$</span> as the union of the uncanceled residue and the unscanned suffix:</p>
-<div class="equation">$$L_r = \underbrace{\{\!\{\gamma, \ldots, \gamma\}\!\}}_{\beta \text{ copies}} \cup \{\!\{a_r, a_{r+1}, \ldots, a_{n-1}\}\!\}$$</div>
-<p>with <span class="inline-math">$|L_r| = \beta + (n - r)$</span>. When <span class="inline-math">$\beta = 0$</span>, the residue contributes nothing.</p>
-<p>Define the loop invariant:</p>
-<div class="equation">$$\text{INV}(r): \quad m \text{ is the majority element of } L_r$$</div>
-<ol><li><p><em>Base case (<span class="inline-math">$r = 0$</span>).</em> <span class="inline-math">$\beta = 0$</span>, so <span class="inline-math">$L_0 = A$</span>. By the precondition, <span class="inline-math">$m$</span> is the majority of <span class="inline-math">$A$</span>. <span class="inline-math">$\text{INV}(0)$</span> holds.</p></li><li><p><em>Inductive step.</em> Assume <span class="inline-math">$\text{INV}(r)$</span> holds.</p>
-<p><em>Case 1 — Start (<span class="inline-math">$\beta = 0$</span>):</em> <span class="inline-math">$L_r = \{\!\{a_r, \ldots, a_{n-1}\}\!\}$</span>. The branch sets <span class="inline-math">$\gamma = a_r$</span>, <span class="inline-math">$\beta = 1$</span>. The new live multiset is:</p>
-<div class="equation">$$L_{r+1} = \{\!\{a_r\}\!\} \cup \{\!\{a_{r+1}, \ldots, a_{n-1}\}\!\} = L_r$$</div>
-<p>The multiset is unchanged. <span class="inline-math">$\text{INV}(r+1)$</span> holds.</p>
-<p><em>Case 2 — Reinforce (<span class="inline-math">$a_r = \gamma$</span>, <span class="inline-math">$\beta &gt; 0$</span>):</em> Element <span class="inline-math">$a_r$</span> moves from the suffix into the residue. The new live multiset is:</p>
-<div class="equation">$$L_{r+1} = \underbrace{\{\!\{\gamma, \ldots, \gamma\}\!\}}_{\beta + 1} \cup \{\!\{a_{r+1}, \ldots, a_{n-1}\}\!\} = L_r$$</div>
-<p>The multiset is unchanged. <span class="inline-math">$\text{INV}(r+1)$</span> holds.</p>
-<p><em>Case 3 — Cancel (<span class="inline-math">$a_r \ne \gamma$</span>, <span class="inline-math">$\beta &gt; 0$</span>):</em> The branch removes one copy of <span class="inline-math">$\gamma$</span> from the residue and discards <span class="inline-math">$a_r$</span> from the suffix, forming a distinct-value pair <span class="inline-math">$(\gamma, a_r)$</span> with <span class="inline-math">$\gamma \ne a_r$</span>. The new live multiset is:</p>
-<div class="equation">$$L_{r+1} = \underbrace{\{\!\{\gamma, \ldots, \gamma\}\!\}}_{\beta - 1} \cup \{\!\{a_{r+1}, \ldots, a_{n-1}\}\!\}$$</div>
-<p>This is <span class="inline-math">$L_r$</span> with the pair <span class="inline-math">$(\gamma, a_r)$</span> removed. By Theorem 1, removing a distinct-value pair preserves the majority. <span class="inline-math">$\text{INV}(r+1)$</span> holds.</p></li><li><p><em>Termination.</em> At <span class="inline-math">$r = n$</span>, the suffix is empty. By <span class="inline-math">$\text{INV}(n)$</span>, <span class="inline-math">$m$</span> is the majority of <span class="inline-math">$L_n$</span>, which consists of <span class="inline-math">$\beta$</span> copies of <span class="inline-math">$\gamma$</span>.</p>
-<p>Since the residue is homogeneous — every element equals <span class="inline-math">$\gamma$</span> — the only value that can be the majority is <span class="inline-math">$\gamma$</span>. Therefore <span class="inline-math">$\gamma = m$</span>.</p>
-<p>The case <span class="inline-math">$\beta = 0$</span> cannot occur: by Corollary 1.1, the total number of canceled pairs is at most <span class="inline-math">$n - \mu(m) &lt; n/2$</span>, and the uncanceled copies of <span class="inline-math">$m$</span> number at least <span class="inline-math">$2\mu(m) - n &gt; 0$</span>, so the residue is non-empty at termination. <span class="inline-math">$\blacksquare$</span></p></li></ol>
-<p><strong>Corollary 2.1:</strong> If all elements are identical (<span class="inline-math">$a_i = v$</span> for all <span class="inline-math">$i$</span>), the candidate is set to <span class="inline-math">$v$</span> at the first element and never changed. Every subsequent element reinforces, and <span class="inline-math">$\beta = n$</span> at termination.</p>
-<p><strong>Corollary 2.2:</strong> For a single-element input (<span class="inline-math">$n = 1$</span>), the algorithm starts with <span class="inline-math">$\gamma = a_0$</span>, <span class="inline-math">$\beta = 1$</span>, and the loop terminates immediately.</p>
-<p><strong>Corollary 2.3:</strong> For a minimum-strength majority (<span class="inline-math">$\mu(m) = \lfloor n/2 \rfloor + 1$</span>), the non-<span class="inline-math">$m$</span> elements number <span class="inline-math">$\lceil n/2 \rceil - 1$</span>, which is the maximum possible. The algorithm still terminates with <span class="inline-math">$\beta \ge 1$</span> because even in the worst case, cancellation consumes fewer copies of <span class="inline-math">$m$</span> than exist.</p>
-<hr />
-<h2>5. Mechanical Execution (System Trace)</h2>
-<p><strong>Input System.</strong> <span class="inline-math">$A = (2, 2, 1, 1, 1, 2, 2)$</span>, <span class="inline-math">$n = 7$</span>, <span class="inline-math">$m = 2$</span> (<span class="inline-math">$\mu(2) = 4 &gt; 7/2$</span>).</p>
-<div class="table-wrap"><table><thead><tr><th>Step</th><th><span class="inline-math">$r$</span></th><th><span class="inline-math">$a_r$</span></th><th>Branch</th><th>Action</th><th><span class="inline-math">$\gamma$</span></th><th><span class="inline-math">$\beta$</span></th></tr></thead><tbody><tr><td><strong>1</strong></td><td><span class="inline-math">$0$</span></td><td><span class="inline-math">$2$</span></td><td>start</td><td><span class="inline-math">$\gamma \gets 2$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$1$</span></td></tr><tr><td><strong>2</strong></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$2$</span></td><td>reinforce</td><td><span class="inline-math">$\beta + 1$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$2$</span></td></tr><tr><td><strong>3</strong></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$1$</span></td><td>cancel</td><td><span class="inline-math">$\beta - 1$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$1$</span></td></tr><tr><td><strong>4</strong></td><td><span class="inline-math">$3$</span></td><td><span class="inline-math">$1$</span></td><td>cancel</td><td><span class="inline-math">$\beta - 1$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$0$</span></td></tr><tr><td><strong>5</strong></td><td><span class="inline-math">$4$</span></td><td><span class="inline-math">$1$</span></td><td>start</td><td><span class="inline-math">$\gamma \gets 1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$1$</span></td></tr><tr><td><strong>6</strong></td><td><span class="inline-math">$5$</span></td><td><span class="inline-math">$2$</span></td><td>cancel</td><td><span class="inline-math">$\beta - 1$</span></td><td><span class="inline-math">$1$</span></td><td><span class="inline-math">$0$</span></td></tr><tr><td><strong>7</strong></td><td><span class="inline-math">$6$</span></td><td><span class="inline-math">$2$</span></td><td>start</td><td><span class="inline-math">$\gamma \gets 2$</span></td><td><span class="inline-math">$2$</span></td><td><span class="inline-math">$1$</span></td></tr></tbody></table></div>
-<p><strong>Result:</strong> <span class="inline-math">$\gamma = 2 = m$</span>, <span class="inline-math">$\beta = 1$</span>.</p>
-<p><em>Note on Step 5: After <span class="inline-math">$\beta$</span> reached 0 in Step 4, the prefix <span class="inline-math">$(2, 2, 1, 1)$</span> has been fully decomposed into two distinct-value pairs — two copies of the majority element 2 canceled against two copies of 1. The algorithm restarts with <span class="inline-math">$\gamma = 1$</span>, which is not the majority element. This is safe: by Corollary 1.1, <span class="inline-math">$m = 2$</span> remains the majority of the suffix <span class="inline-math">$(1, 2, 2)$</span>, where <span class="inline-math">$\mu(2) = 2 &gt; 3/2$</span>. The incorrect candidate survives only one step before Step 6 cancels it — the majority element's numerical superiority in the suffix makes the wrong candidate's tenure unsustainable.</em></p>
-<p>The theoretical guarantees translate into the mechanical result: Theorem 1 ensured each cancellation step preserved the majority, Lemma 1 confirmed the three-way branch maintained a valid decomposition into canceled pairs and a homogeneous residue, and Theorem 2's invariant guaranteed that the final candidate <span class="inline-math">$\gamma = 2$</span> is the majority element.</p></article>
-  </main>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h1 class="viz-title">Majority Element</h1>
+    <p class="viz-subtitle">LeetCode 169 · Boyer-Moore Voting Algorithm</p>
+    <p class="viz-body">
+        Find the element that appears more than ⌊n/2⌋ times. The voting
+        algorithm needs only one pass and O(1) space — no hash map, no
+        sorting.
+    </p>
+</div>
+</section>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Candidate and Balance</h2>
+    <p class="viz-body">
+        Maintain a <em>candidate</em> and a <em>balance counter</em>.
+        When balance hits zero, adopt the current value as the new
+        candidate. Matching values reinforce (balance++); mismatches
+        cancel (balance−−). The true majority always survives because
+        it can't be fully cancelled.
+    </p>
+</div>
+</section>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Algorithm</h2>
+    <div class="viz-code-block">
+<pre><code>candidate ← null, balance ← 0
+for each value:
+    if balance == 0:
+        candidate ← value, balance ← 1
+    else if value == candidate:
+        balance += 1
+    else:
+        balance -= 1
+return candidate</code></pre>
+    </div>
+</div>
+</section>
+
+<div id="interactiveMount"></div>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Edge Patterns</h2>
+    <p class="viz-body">
+        <strong>Immediate restart</strong> — when balance drops to zero
+        mid-array, the next element becomes the new candidate.<br><br>
+        <strong>Uniform array</strong> — balance simply increments every
+        step; no cancellation occurs.<br><br>
+        <strong>Guarantee</strong> — Boyer-Moore only works when a majority
+        is guaranteed to exist. Without that guarantee, a verification
+        pass is needed.
+    </p>
+</div>
+</section>
+
+<section class="viz-section">
+<div class="viz-container">
+    <h2 class="viz-heading">Complexity</h2>
+    <p class="viz-body">
+        <strong>Time:</strong> O(n) — single pass.<br>
+        <strong>Space:</strong> O(1) — two variables.
+    </p>
+</div>
+</section>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [{ dot: true, label: "current element" }],
+    gridClass: "viz-array",
+    status: [
+        { id: "action", label: "Action" },
+        { id: "balance", label: "Balance" }
+    ],
+    values: [],
+    showOrder: false
+});
+
+/* Vote panel */
+var vp = document.createElement("div");
+vp.innerHTML =
+    '<div class="vote-panel">' +
+    '<div class="vote-box" id="candBox"><span class="vote-lbl">Candidate</span><span class="vote-val" id="candVal">\u2014</span></div>' +
+    '<div class="vote-box" id="balBox"><span class="vote-lbl">Balance</span><span class="vote-val" id="balVal">0</span></div>' +
+    '</div>';
+refs.grid.parentNode.insertBefore(vp, refs.grid);
+var candBox = document.getElementById("candBox");
+var balBox = document.getElementById("balBox");
+var candVal = document.getElementById("candVal");
+var balVal = document.getElementById("balVal");
+
+var PRESETS = [
+    { name: "[2,2,1,1,1,2,2]", data: [2,2,1,1,1,2,2] },
+    { name: "[3,2,3,3]", mobileDefault: true, data: [3,2,3,3] },
+    { name: "[3,3,4,3,4,3,3]", data: [3,3,4,3,4,3,3] },
+    { name: "[1,1,1,1,1]", data: [1,1,1,1,1] },
+    { name: "[1,2,1,2,1]", data: [1,2,1,2,1] },
+    { name: "[7]", data: [7] }
+];
+
+function buildTrace(preset) {
+    var nums = preset.data;
+    var steps = [];
+    var candidate = null, balance = 0;
+
+    for (var i = 0; i < nums.length; i++) {
+        var v = nums[i];
+        var action;
+        if (balance === 0) {
+            candidate = v; balance = 1; action = "restart";
+        } else if (v === candidate) {
+            balance++; action = "reinforce";
+        } else {
+            balance--; action = "cancel";
+        }
+        steps.push({ index: i, value: v, candidate: candidate, balance: balance, action: action });
+    }
+
+    return { steps: steps, nums: nums };
+}
+
+function onRender(engine) {
+    var pos = engine.position;
+    var trace = engine.trace;
+    var step = pos >= 0 ? trace.steps[pos] : null;
+
+    var highlights = new Map();
+    if (step) highlights.set(step.index, "current");
+    VizArray.renderCells(refs.grid, { array: trace.nums, highlights: highlights });
+
+    candVal.textContent = step ? step.candidate : "\u2014";
+    balVal.textContent = step ? step.balance : "0";
+
+    candBox.className = "vote-box" + (step && step.action === "restart" ? " restart" : step ? " active" : "");
+    balBox.className = "vote-box" + (step ? " active" : "");
+
+    if (step) {
+        var labels = { restart: "New candidate", reinforce: "Reinforce +1", cancel: "Cancel \u22121" };
+        refs.status.action.textContent = labels[step.action];
+        refs.status.balance.textContent = step.balance;
+    } else {
+        refs.status.action.textContent = "\u2014";
+        refs.status.balance.textContent = "0";
+    }
+}
+
+function describeStep(engine) {
+    if (engine.position < 0) return "Ready \u2014 press Play or Next";
+    var s = engine.currentStep();
+    if (s.action === "restart") return "balance=0 \u2192 adopt " + s.value + " as candidate (balance=1)";
+    if (s.action === "reinforce") return s.value + " matches candidate \u2192 balance=" + s.balance;
+    return s.value + " \u2260 " + s.candidate + " \u2192 cancel, balance=" + s.balance;
+}
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 450
+});
+engine.init();
+VizEngine.onResize(function() { if (engine.trace) onRender(engine); });
+
+</script>
 </body>
 </html>
