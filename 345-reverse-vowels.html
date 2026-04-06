@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reverse Vowels — Two-Pointer Vowel Swap</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.cell.vowel {
+    background: #1D1D1F;
+    color: #FFF;
+}
+.cell.consonant {
+    background: #F5F5F7;
+    color: #1D1D1F;
+}
+.cell.swapping {
+    border: 2px solid #636366;
+    transform: scale(1.08);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.cell.swapped {
+    background: #1D1D1F;
+    color: #FFF;
+    opacity: 0.75;
+}
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 345 Reverse Vowels of a String. Watch two pointers converge, skipping consonants and swapping only vowels.">
+<meta property="og:title" content="Reverse Vowels — Two-Pointer Vowel Swap">
+<meta property="og:description" content="Step through the two-pointer vowel swap algorithm with an interactive walkthrough.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/345-reverse-vowels.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/345-reverse-vowels.html">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Reverse Vowels · Optimal Solution</span>
+        <h1>Swap only the vowels, leave the frame intact.</h1>
+        <p class="hero-text">
+            Two pointers start at opposite ends of the string and converge inward.
+            Each pointer skips consonants — only when both land on a vowel do they
+            swap. Consonants never move, so the skeleton of the word stays fixed
+            while the vowels mirror themselves across it.
+            <code>O(n)</code> time. <code>O(n)</code> space for the char array.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch two pointers converge and swap</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>The two-pointer vowel invariant</h2>
+        <p class="section-intro">
+            The left pointer only advances past consonants; the right pointer only
+            retreats past consonants. A swap happens exactly when both pointers
+            sit on vowels — guaranteeing every vowel finds its mirror partner.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>left pointer</h3>
+                <p>Scans rightward from the start, skipping every consonant until it finds a vowel or meets the right pointer.</p>
+            </article>
+            <article class="concept-card">
+                <h3>right pointer</h3>
+                <p>Scans leftward from the end, skipping every consonant until it finds a vowel or meets the left pointer.</p>
+            </article>
+            <article class="concept-card">
+                <h3>vowel swap</h3>
+                <p>When both pointers rest on vowels, the characters swap. Both pointers then step inward and the search continues.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Convert, converge, swap, rebuild</h2>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Convert the string to a char array</h4>
+                    <p>Strings are immutable, so copy the characters into a mutable array to allow in-place swaps.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Initialize two pointers</h4>
+                    <p>Set <code>left = 0</code> and <code>right = length − 1</code>. They will walk toward each other.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Skip consonants, swap vowels</h4>
+                    <p>While <code>left &lt; right</code>: skip left if it's a consonant, skip right if it's a consonant, otherwise swap both characters and advance both pointers inward.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Return the new string</h4>
+                    <p>Join the modified char array back into a string. All vowels are now reversed; consonants remain in place.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where the pointers reveal the structure</h2>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>No vowels at all</h3>
+                <p>
+                    Both pointers race past consonants until they cross.
+                    No swap ever occurs — the string returns unchanged.
+                    The algorithm gracefully handles consonant-only inputs like "rhythm."
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>All vowels</h3>
+                <p>
+                    Every character is a vowel, so neither pointer ever skips.
+                    The string fully reverses — identical to reversing the whole string.
+                    The algorithm performs ⌊n/2⌋ swaps.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Palindrome vowels</h3>
+                <p>
+                    When the vowel sequence reads the same forwards and backwards,
+                    swaps still happen but produce the same characters.
+                    The output equals the input — e.g., "racecar" stays "racecar."
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "vowel pair" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "left",   label: "Left" },
+        { id: "right",  label: "Right" },
+        { id: "action", label: "Action" }
+    ],
+    values: [
+        { id: "swaps",  label: "Swaps" },
+        { id: "result", label: "Current String" }
+    ],
+    orderTitle: "Swap Log"
+});
+
+var ptrElements = VizArray.createPointers(refs.container, [
+    { id: "left",  label: "left",  position: "above" },
+    { id: "right", label: "right", position: "below" }
+]);
+
+/* ── Helpers ────────────────────────────────────────────── */
+
+var VOWELS = "aeiouAEIOU";
+
+function isVowel(ch) {
+    return VOWELS.indexOf(ch) !== -1;
+}
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    { name: '"hello" → "holle"',       data: { text: "hello" },    desc: "Classic example: two vowels e and o swap while consonants h, l, l stay fixed." },
+    { name: '"IceCreAm" → "AceCreIm"', data: { text: "IceCreAm" }, desc: "Mixed-case vowels I, e, A swap positions: I↔A at the ends, e stays in the middle." },
+    { name: '"aeiou" → "uoiea"',       data: { text: "aeiou" },    desc: "All vowels — the entire string reverses. Every character participates in a swap." },
+    { name: '"rhythm" → "rhythm"',     data: { text: "rhythm" },   desc: "No vowels at all. Both pointers skip through consonants and cross without a single swap." },
+    { name: '"cat" → "cat"',           data: { text: "cat" },      desc: "Only one vowel — the pointers cross before finding a partner. String unchanged." },
+    { name: '"leetcode" → "leotcede"', data: { text: "leetcode" }, desc: "Four vowels in an eight-character string. Two swaps rearrange e,e,o,e into e,o,e,e.", mobileDefault: true },
+    { name: '"ae" → "ea"',             data: { text: "ae" },       desc: "Minimal swap case: two vowels, one swap, done." },
+    { name: '"racecar" → "racecar"',   data: { text: "racecar" },  desc: "Vowel sequence a,e,a is a palindrome. Swaps occur but produce the same characters." }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var text = preset.data.text;
+    var chars = text.split("");
+    var steps = [];
+    var order = [];
+    var left = 0;
+    var right = chars.length - 1;
+    var swapCount = 0;
+
+    while (left < right) {
+        if (!isVowel(chars[left])) {
+            steps.push({
+                left: left,
+                right: right,
+                leftChar: chars[left],
+                rightChar: chars[right],
+                action: "move-left",
+                chars: chars.slice(),
+                swapCount: swapCount
+            });
+            order.push("Skip '" + chars[left] + "' (left)");
+            left++;
+            continue;
+        }
+
+        if (!isVowel(chars[right])) {
+            steps.push({
+                left: left,
+                right: right,
+                leftChar: chars[left],
+                rightChar: chars[right],
+                action: "move-right",
+                chars: chars.slice(),
+                swapCount: swapCount
+            });
+            order.push("Skip '" + chars[right] + "' (right)");
+            right--;
+            continue;
+        }
+
+        var leftChar = chars[left];
+        var rightChar = chars[right];
+        chars[left] = rightChar;
+        chars[right] = leftChar;
+        swapCount++;
+
+        steps.push({
+            left: left,
+            right: right,
+            leftChar: leftChar,
+            rightChar: rightChar,
+            action: "swap",
+            chars: chars.slice(),
+            swapCount: swapCount
+        });
+        order.push("Swap '" + leftChar + "' \u2194 '" + rightChar + "'");
+
+        left++;
+        right--;
+    }
+
+    return { steps: steps, order: order, original: text, desc: preset.desc, finalText: chars.join("") };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+
+    /* Collect all indices that have been swapped so far */
+    var swappedSet = {};
+    for (var s = 0; s <= engine.position && s < trace.steps.length; s++) {
+        if (trace.steps[s].action === "swap") {
+            swappedSet[trace.steps[s].left] = true;
+            swappedSet[trace.steps[s].right] = true;
+        }
+    }
+
+    /* Determine display array */
+    var displayChars = step ? step.chars : trace.original.split("");
+
+    /* Build highlights map */
+    var highlights = new Map();
+    for (var i = 0; i < displayChars.length; i++) {
+        if (isVowel(displayChars[i])) {
+            if (step && step.action === "swap" && (i === step.left || i === step.right)) {
+                highlights.set(i, "vowel swapping");
+            } else if (swappedSet[i]) {
+                highlights.set(i, "vowel swapped");
+            } else {
+                highlights.set(i, "vowel");
+            }
+        } else {
+            highlights.set(i, "consonant");
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: displayChars,
+        highlights: highlights
+    });
+
+    /* Status bar */
+    if (!step) {
+        refs.status.left.textContent   = "0";
+        refs.status.right.textContent  = String(displayChars.length - 1);
+        refs.status.action.textContent = "\u2014";
+    } else {
+        refs.status.left.textContent   = step.left + " ('" + step.chars[step.left] + "')";
+        refs.status.right.textContent  = step.right + " ('" + step.chars[step.right] + "')";
+        if (step.action === "move-left") {
+            refs.status.action.textContent = "Skip '" + step.leftChar + "' \u2192 left++";
+        } else if (step.action === "move-right") {
+            refs.status.action.textContent = "Skip '" + step.rightChar + "' \u2192 right--";
+        } else {
+            refs.status.action.textContent = "Swap '" + step.leftChar + "' \u2194 '" + step.rightChar + "'";
+        }
+    }
+
+    /* Values bar */
+    refs.values.swaps.textContent  = step ? String(step.swapCount) : "0";
+    refs.values.result.textContent = step ? step.chars.join("") : trace.original;
+
+    /* Note */
+    refs.note.textContent = describeStep(engine);
+
+    /* Position pointers */
+    requestAnimationFrame(function() {
+        var ptrs = {};
+        if (!step) {
+            ptrs.left  = { index: 0 };
+            ptrs.right = { index: displayChars.length - 1 };
+        } else {
+            ptrs.left  = { index: step.left };
+            ptrs.right = { index: step.right };
+        }
+
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: ptrs,
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    if (!step) return engine.trace.desc + " Press Play or Next to begin.";
+
+    if (step.action === "move-left") {
+        return "Left at '" + step.leftChar + "' \u2014 consonant, skip right.";
+    }
+    if (step.action === "move-right") {
+        return "Right at '" + step.rightChar + "' \u2014 consonant, skip left.";
+    }
+    return "Swap '" + step.leftChar + "' at " + step.left + " with '" + step.rightChar + "' at " + step.right + ". String becomes '" + step.chars.join("") + "'.";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palindrome Number — Half Reversal Without String Conversion</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+#interactiveMount .cell.reversed {
+    background: #1D1D1F;
+}
+
+#interactiveMount .cell.reversed .cell-value {
+    color: #FFF;
+}
+
+#interactiveMount .cell.active-digit {
+    background: #1D1D1F;
+    border: 2.5px solid #8E8E93;
+    transform: scale(1.08);
+    z-index: 3;
+}
+
+#interactiveMount .cell.active-digit .cell-value {
+    color: #FFF;
+}
+
+#interactiveMount .cell.rejected {
+    background: #F5F5F7;
+    opacity: 0.45;
+}
+
+#interactiveMount .cell.rejected .cell-value {
+    color: #8E8E93;
+}
+
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 9 Palindrome Number. Watch the half-reversal technique peel digits and compare halves without string conversion.">
+<meta property="og:title" content="Palindrome Number — Half Reversal Without String Conversion">
+<meta property="og:description" content="Step through the half-reversal palindrome check with an interactive walkthrough.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/9-palindrome-number.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/9-palindrome-number.html">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Palindrome Number · Optimal Solution</span>
+        <h1>Reverse half the digits, compare the mirror.</h1>
+        <p class="hero-text">
+            A palindrome reads the same forwards and backwards. Instead of converting to a string
+            or reversing all digits — risking overflow — reverse only the trailing half of the
+            number and compare it with the remaining leading half. When the two halves meet in the
+            middle, the loop stops. For even-length numbers, the halves must match exactly. For
+            odd-length numbers, the middle digit is dropped from the reversed half before comparing.
+            <code>O(log₁₀ n)</code> time. <code>O(1)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the halves converge</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Why reverse only half?</h2>
+        <p class="section-intro">
+            Full reversal requires building the entire reversed number, which can overflow for
+            large integers. Half reversal avoids this by stopping as soon as the reversed portion
+            meets or exceeds the remaining portion — processing at most half the digits.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>half reversal</h3>
+                <p>Peel digits from the trailing end one at a time, building the reversed half. Stop when the reversed half is at least as large as the remaining leading half.</p>
+            </article>
+            <article class="concept-card">
+                <h3>midpoint detection</h3>
+                <p>The loop condition <code>leading &gt; reversed</code> naturally stops at the midpoint. For odd-length numbers, the reversed half absorbs the center digit.</p>
+            </article>
+            <article class="concept-card">
+                <h3>no string conversion</h3>
+                <p>Working purely with integer arithmetic avoids string allocation and character-by-character comparison. The solution uses only division and modulo.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Guard, reverse, compare</h2>
+        <p class="section-intro">
+            Two guard checks eliminate impossible palindromes instantly. Then a tight loop
+            reverses the trailing half until it meets the leading half.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Reject negatives</h4>
+                    <p>A negative number has a minus sign that can never mirror. Return false immediately.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Reject trailing zeroes</h4>
+                    <p>If the number ends in 0 but isn't 0 itself, it would need a leading zero to mirror — impossible. Return false.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Reverse the trailing half</h4>
+                    <p>While <code>leading &gt; reversed</code>: peel the last digit of the leading half with <code>% 10</code>, append it to the reversed half with <code>× 10 + digit</code>, and shrink the leading half with <code>÷ 10</code>.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">4</span>
+                <div class="step-body">
+                    <h4>Compare the halves</h4>
+                    <p>Even length: <code>leading == reversed</code>. Odd length: <code>leading == reversed / 10</code> — the integer division drops the absorbed middle digit.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Guard rails that matter</h2>
+        <p class="section-intro">
+            Two early-exit guards and one boundary case ensure correctness before
+            the reversal loop ever runs.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Negative numbers</h3>
+                <p>
+                    The minus sign cannot appear at both ends. Every negative value is
+                    rejected before reversal begins — no arithmetic needed.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Trailing zeroes</h3>
+                <p>
+                    A number like 10 ends in zero but doesn't start with zero. Without the
+                    guard, the half-reversal loop would incorrectly accept it because the
+                    leading zero is silently dropped during integer division.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Zero itself</h3>
+                <p>
+                    Zero passes the trailing-zero guard because <code>value != 0</code> fails.
+                    The reversal loop sees <code>0 &gt; 0</code> as false and skips entirely.
+                    Both halves are 0 — an exact match.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "digit being moved" }
+    ],
+    gridClass: "viz-array",
+    status: [
+        { id: "phase",      label: "Phase" },
+        { id: "action",     label: "Action" },
+        { id: "comparison", label: "Comparison" }
+    ],
+    values: [
+        { id: "leading",  label: "Leading Half" },
+        { id: "reversed", label: "Reversed Half" }
+    ],
+    orderTitle: "Reversal Steps"
+});
+
+var ptrElements = VizArray.createPointers(refs.container, [
+    { id: "leading",  label: "leading",  position: "above" },
+    { id: "reversed", label: "reversed", position: "below" }
+]);
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "12321 \u2014 odd-length palindrome",
+        data: { value: 12321 },
+        desc: "Five digits with a center pivot. The reversed trailing half accumulates three digits before the comparison drops the middle."
+    },
+    {
+        name: "1221 \u2014 even-length palindrome",
+        data: { value: 1221 },
+        desc: "Four digits, perfectly symmetric. Both halves are exactly two digits and match without dropping anything."
+    },
+    {
+        name: "1231 \u2014 not a palindrome",
+        data: { value: 1231 },
+        desc: "Almost symmetric, but the inner digits differ. The halves won\u2019t match."
+    },
+    {
+        name: "\u2212121 \u2014 negative (instant reject)",
+        data: { value: -121 },
+        desc: "Negative numbers carry a minus sign that can never mirror. Rejected before any reversal."
+    },
+    {
+        name: "10 \u2014 trailing zero (instant reject)",
+        data: { value: 10 },
+        desc: "Ends in 0 but isn\u2019t 0. A leading zero would be needed to mirror \u2014 impossible."
+    },
+    {
+        name: "0 \u2014 zero is a palindrome",
+        data: { value: 0 },
+        desc: "Zero reads the same in every direction. The loop never executes \u2014 both halves start and stay equal."
+    },
+    {
+        name: "1234321 \u2014 seven-digit palindrome",
+        data: { value: 1234321 },
+        desc: "Seven digits with four reversal steps. The reversed half grows past the midpoint, then the center digit is dropped.",
+        mobileDefault: true
+    },
+    {
+        name: "7 \u2014 single digit",
+        data: { value: 7 },
+        desc: "Any single digit is trivially a palindrome. One reversal step consumes the entire number."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var value = preset.data.value;
+    var steps = [];
+    var absValue = Math.abs(value);
+    var digits = absValue === 0 ? [0] : String(absValue).split("").map(Number);
+    var n = digits.length;
+
+    if (value < 0) {
+        steps.push({ phase: "guard", action: "reject-negative", isPalindrome: false });
+        return { steps: steps, order: ["\u2717"], digits: digits, value: value, desc: preset.desc };
+    }
+
+    if (value % 10 === 0 && value !== 0) {
+        steps.push({ phase: "guard", action: "reject-trailing-zero", isPalindrome: false });
+        return { steps: steps, order: ["\u2717"], digits: digits, value: value, desc: preset.desc };
+    }
+
+    var remaining = value;
+    var reversed = 0;
+    var stepIdx = 0;
+
+    while (remaining > reversed) {
+        var digit = remaining % 10;
+        reversed = reversed * 10 + digit;
+        remaining = Math.floor(remaining / 10);
+
+        steps.push({
+            phase: "reverse",
+            digitMoved: digit,
+            leadingValue: remaining,
+            reversedValue: reversed,
+            splitIndex: n - 1 - stepIdx,
+            stepIndex: stepIdx
+        });
+        stepIdx++;
+    }
+
+    var exactMatch = remaining === reversed;
+    var middleDropped = !exactMatch && remaining === Math.floor(reversed / 10);
+    var isPalindrome = exactMatch || middleDropped;
+
+    steps.push({
+        phase: "compare",
+        leadingValue: remaining,
+        reversedValue: reversed,
+        exactMatch: exactMatch,
+        middleDropped: middleDropped,
+        isPalindrome: isPalindrome,
+        splitIndex: n - stepIdx
+    });
+
+    var order = [];
+    for (var i = 0; i < steps.length; i++) {
+        if (steps[i].phase === "reverse") order.push(String(steps[i].digitMoved));
+    }
+    order.push(isPalindrome ? "\u2713" : "\u2717");
+
+    return { steps: steps, order: order, digits: digits, value: value, desc: preset.desc };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var digits = trace.digits;
+    var n = digits.length;
+    var highlights = new Map();
+    var leadingIdx = -1;
+    var reversedIdx = -1;
+
+    if (!step) {
+        VizArray.renderCells(refs.grid, { array: digits });
+        refs.status.phase.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+        refs.status.comparison.textContent = "\u2014";
+        refs.values.leading.textContent = String(trace.value);
+        refs.values.reversed.textContent = "0";
+        leadingIdx = n > 0 ? Math.floor((n - 1) / 2) : -1;
+
+    } else if (step.phase === "guard") {
+        for (var gi = 0; gi < n; gi++) highlights.set(gi, "rejected");
+        VizArray.renderCells(refs.grid, { array: digits, highlights: highlights });
+        refs.status.phase.textContent = "Guard";
+        refs.status.action.textContent = step.action === "reject-negative"
+            ? "Reject (negative)" : "Reject (trailing zero)";
+        refs.status.comparison.textContent = "Not a palindrome";
+        refs.values.leading.textContent = String(trace.value);
+        refs.values.reversed.textContent = "\u2014";
+
+    } else if (step.phase === "reverse") {
+        var split = step.splitIndex;
+        highlights.set(split, "active-digit");
+        for (var ri = split + 1; ri < n; ri++) highlights.set(ri, "reversed");
+        VizArray.renderCells(refs.grid, { array: digits, highlights: highlights });
+        refs.status.phase.textContent = "Reverse";
+        refs.status.action.textContent = "Peel digit " + step.digitMoved;
+        refs.status.comparison.textContent = step.leadingValue + " vs " + step.reversedValue;
+        refs.values.leading.textContent = String(step.leadingValue);
+        refs.values.reversed.textContent = String(step.reversedValue);
+        leadingIdx = split > 0 ? Math.floor((split - 1) / 2) : -1;
+        reversedIdx = Math.floor((split + n - 1) / 2);
+
+    } else {
+        var csplit = step.splitIndex;
+        for (var ci = csplit; ci < n; ci++) highlights.set(ci, "reversed");
+        VizArray.renderCells(refs.grid, { array: digits, highlights: highlights });
+        refs.status.phase.textContent = "Compare";
+        refs.status.action.textContent = step.isPalindrome ? "Match \u2713" : "No match \u2717";
+        if (step.exactMatch) {
+            refs.status.comparison.textContent = step.leadingValue + " = " + step.reversedValue;
+        } else if (step.middleDropped) {
+            refs.status.comparison.textContent = step.leadingValue + " = " + step.reversedValue + " \u00f7 10";
+        } else {
+            refs.status.comparison.textContent = step.leadingValue + " \u2260 " + step.reversedValue;
+        }
+        refs.values.leading.textContent = String(step.leadingValue);
+        refs.values.reversed.textContent = String(step.reversedValue);
+        leadingIdx = csplit > 0 ? Math.floor((csplit - 1) / 2) : -1;
+        reversedIdx = csplit < n ? Math.floor((csplit + n - 1) / 2) : -1;
+    }
+
+    refs.note.textContent = describeStep(engine);
+
+    requestAnimationFrame(function() {
+        VizArray.positionPointers(refs.container, refs.grid, {
+            pointers: {
+                leading:  { index: leadingIdx },
+                reversed: { index: reversedIdx }
+            },
+            elements: ptrElements
+        });
+    });
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    var trace = engine.trace;
+
+    if (!step) {
+        return "Value " + trace.value + ". " + trace.desc +
+            " Press Play or Next to begin.";
+    }
+
+    if (step.phase === "guard") {
+        if (step.action === "reject-negative") {
+            return "Value " + trace.value + " is negative. Not a palindrome.";
+        }
+        return "Value " + trace.value +
+            " ends in 0 but isn\u2019t 0. Not a palindrome.";
+    }
+
+    if (step.phase === "reverse") {
+        return "Peel digit " + step.digitMoved +
+            ": leading half becomes " + step.leadingValue +
+            ", reversed half becomes " + step.reversedValue + ".";
+    }
+
+    if (step.exactMatch) {
+        return "Leading half " + step.leadingValue +
+            " equals reversed half " + step.reversedValue +
+            " \u2192 palindrome!";
+    }
+    if (step.middleDropped) {
+        return "Leading half " + step.leadingValue +
+            " equals reversed half " + step.reversedValue +
+            " \u00f7 10 \u2192 palindrome (odd length)!";
+    }
+    return "Leading half " + step.leadingValue +
+        " \u2260 reversed half " + step.reversedValue +
+        " \u2192 not a palindrome.";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 800
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>

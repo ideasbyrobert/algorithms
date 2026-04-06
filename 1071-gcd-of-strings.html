@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GCD of Strings — Concatenation Test and Length GCD</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.gcd-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.gcd-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.gcd-row-label {
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: #636366;
+    min-width: 72px;
+    text-align: right;
+    flex-shrink: 0;
+}
+.gcd-cells {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+.gcd-cell {
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 15px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 1.5px solid #C7C7CC;
+    color: #1D1D1F;
+    transition: all 0.25s ease;
+}
+.gcd-cell.in-candidate {
+    background: #1D1D1F;
+    color: #FFFFFF;
+    border-color: #1D1D1F;
+    font-weight: 600;
+}
+.gcd-cell.match {
+    background: #34C759;
+    color: #FFFFFF;
+    border-color: #34C759;
+    font-weight: 600;
+}
+.gcd-cell.mismatch {
+    border-color: #FF3B30;
+    border-width: 2px;
+    border-style: dashed;
+    color: #FF3B30;
+}
+.gcd-cell.active {
+    background: #007AFF;
+    color: #FFFFFF;
+    border-color: #007AFF;
+    font-weight: 600;
+}
+.gcd-cell.dimmed {
+    opacity: 0.22;
+    border-color: transparent;
+}
+.gcd-separator {
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 18px;
+    color: #636366;
+    margin: 0 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 40px;
+    flex-shrink: 0;
+}
+.gcd-eq-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+.gcd-eq-label {
+    font-family: 'SF Pro Display', 'SF Pro', system-ui, sans-serif;
+    font-size: 14px;
+    color: #636366;
+    min-width: 72px;
+    text-align: right;
+    flex-shrink: 0;
+}
+.gcd-eq-value {
+    font-family: 'Menlo', 'SF Mono', monospace;
+    font-size: 14px;
+    color: #1D1D1F;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #F2F2F7;
+}
+.gcd-eq-value.eq-match { background: #D1FAE5; color: #065F46; }
+.gcd-eq-value.eq-mismatch { background: #FEE2E2; color: #991B1B; }
+@media (max-width: 600px) {
+    .gcd-cell {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+        border-radius: 6px;
+    }
+    .gcd-row-label {
+        font-size: 11px;
+        min-width: 52px;
+    }
+    .gcd-separator {
+        font-size: 14px;
+        width: 14px;
+        height: 28px;
+    }
+    .gcd-eq-value { font-size: 12px; }
+}
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 1071 GCD of Strings — Concatenation Test and Length GCD.">
+<meta property="og:title" content="1071 GCD of Strings — Concatenation Test and Length GCD">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/1071-gcd-of-strings.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/1071-gcd-of-strings.html">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Greatest Common Divisor of Strings · Optimal Solution</span>
+        <h1>If the concatenations agree, the GCD of their lengths tells you everything.</h1>
+        <p class="hero-text">
+            A content pipeline checks whether two template fragments share a common repeating
+            tile — like "ABCABC" and "ABC" both being copies of "ABC". Given two strings,
+            find the largest string that divides both. The key insight: if <code>str1 + str2</code>
+            equals <code>str2 + str1</code>, a common divisor exists, and its length is the GCD
+            of the two string lengths. <code>O(n + m)</code> time. <code>O(n + m)</code> space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the concatenation test and GCD extraction</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Why concatenation order reveals divisibility</h2>
+        <p class="section-intro">
+            The concatenation equality test is both necessary and sufficient for the existence
+            of a common divisor string.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>the commutativity test</h3>
+                <p>If both strings are built from the same tile <code>t</code>, then <code>str1 + str2</code> is just <code>t</code> repeated <code>a + b</code> times — the same regardless of which string comes first. Equal concatenations prove a shared tile exists.</p>
+            </article>
+            <article class="concept-card">
+                <h3>GCD gives the longest tile</h3>
+                <p>If a tile of length <code>k</code> divides both strings, then <code>k</code> divides both <code>len1</code> and <code>len2</code>. The longest such tile has length <code>GCD(len1, len2)</code> — guaranteed by the Euclidean algorithm.</p>
+            </article>
+            <article class="concept-card">
+                <h3>no brute-force verification needed</h3>
+                <p>Once the concatenation test passes, extracting the first <code>GCD(len1, len2)</code> characters is guaranteed to produce a valid tile. No need to check that it actually tiles both strings — the commutativity already proved it.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>One test, one GCD, one substring</h2>
+        <p class="section-intro">
+            No looping over possible divisor lengths. No pattern matching.
+            Just a string comparison, an integer GCD, and a prefix extraction.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Test concatenation commutativity</h4>
+                    <p>Check whether <code>str1 + str2 === str2 + str1</code>. If not, return the empty string — no common divisor exists.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Compute GCD of lengths</h4>
+                    <p>Use the Euclidean algorithm: <code>GCD(a, b) = GCD(b, a % b)</code> until <code>b</code> reaches zero. The result is the length of the longest common tile.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Extract the candidate prefix</h4>
+                    <p>Return <code>str1.substring(0, gcdLength)</code>. This prefix tiles both strings and is the greatest common divisor string.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where the answer is immediate</h2>
+        <p class="section-intro">
+            Some inputs resolve at the very first check.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>No common divisor</h3>
+                <p>
+                    When <code>str1 + str2 ≠ str2 + str1</code>, no common tile exists.
+                    The concatenation test catches this instantly — no GCD computation needed.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Equal strings</h3>
+                <p>
+                    When both strings are identical, <code>GCD(n, n) = n</code>, so the entire
+                    string is its own greatest common divisor. The answer is the string itself.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>One divides the other</h3>
+                <p>
+                    When one string is an exact multiple of the other, the shorter string is the
+                    GCD. The Euclidean algorithm reaches zero in one step.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [{ dot: true, label: "GCD candidate" }],
+    gridClass: "gcd-grid",
+    status: [
+        { id: "phase", label: "Phase" },
+        { id: "action", label: "Action" }
+    ],
+    values: [
+        { id: "concat1", label: "str1 + str2" },
+        { id: "concat2", label: "str2 + str1" },
+        { id: "gcdLen", label: "GCD Length" },
+        { id: "result", label: "Result" }
+    ],
+    orderTitle: "Steps"
+});
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "\"ABCABC\" + \"ABC\" \u2014 classic, GCD is \"ABC\"",
+        str1: "ABCABC", str2: "ABC",
+        desc: "str1 is two copies of \"ABC\", str2 is one. Concatenations match, GCD(6,3) = 3, result is \"ABC\"."
+    },
+    {
+        name: "\"ABABAB\" + \"ABAB\" \u2014 GCD is \"AB\"",
+        str1: "ABABAB", str2: "ABAB",
+        desc: "Both are multiples of \"AB\". GCD(6,4) = 2, so the two-character prefix is the answer."
+    },
+    {
+        name: "\"LEET\" + \"CODE\" \u2014 no common divisor",
+        str1: "LEET", str2: "CODE",
+        desc: "Concatenations differ immediately. No shared tile exists. Result is empty."
+    },
+    {
+        name: "\"ABC\" + \"ABC\" \u2014 equal strings",
+        str1: "ABC", str2: "ABC",
+        desc: "Identical strings. GCD(3,3) = 3. The entire string is its own GCD."
+    },
+    {
+        name: "\"AAAAAA\" + \"AAA\" \u2014 all same character",
+        str1: "AAAAAA", str2: "AAA",
+        desc: "Both are copies of \"A\". GCD(6,3) = 3. Result is \"AAA\".",
+        mobileDefault: true
+    },
+    {
+        name: "\"A\" + \"A\" \u2014 single character",
+        str1: "A", str2: "A",
+        desc: "Minimal case. GCD(1,1) = 1. The single character is the answer."
+    },
+    {
+        name: "\"AB\" + \"ABABAB\" \u2014 longer second string",
+        str1: "AB", str2: "ABABAB",
+        desc: "str2 is longer but both share the \"AB\" tile. GCD(2,6) = 2. Result is \"AB\"."
+    },
+    {
+        name: "\"ABCDEF\" + \"ABCXYZ\" \u2014 same prefix, no divisor",
+        str1: "ABCDEF", str2: "ABCXYZ",
+        desc: "Same first three characters but concatenations diverge. No shared tile."
+    }
+];
+
+/* ── GCD helper ────────────────────────────────────────── */
+
+function euclideanGCD(a, b) {
+    var steps = [{ a: a, b: b }];
+    while (b !== 0) {
+        var t = b;
+        b = a % b;
+        a = t;
+        steps.push({ a: a, b: b });
+    }
+    return { value: a, steps: steps };
+}
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var str1 = preset.str1;
+    var str2 = preset.str2;
+    var concat1 = str1 + str2;
+    var concat2 = str2 + str1;
+    var concatMatch = concat1 === concat2;
+
+    var steps = [];
+    var order = [];
+
+    /* Phase 1: concatenation comparison, character by character */
+    var concatLen = concat1.length;
+    var firstMismatch = -1;
+    for (var i = 0; i < concatLen; i++) {
+        var charMatch = concat1[i] === concat2[i];
+        if (!charMatch && firstMismatch === -1) {
+            firstMismatch = i;
+        }
+        steps.push({
+            phase: "concat",
+            idx: i,
+            c1: concat1[i],
+            c2: concat2[i],
+            charMatch: charMatch,
+            allMatchSoFar: firstMismatch === -1
+        });
+        order.push(concat1[i] + (charMatch ? "\u2713" : "\u2717"));
+        if (!charMatch) break;
+    }
+
+    /* Phase 2: GCD of lengths (only if concatenations match) */
+    var gcdResult = null;
+    var gcdLen = 0;
+    if (concatMatch) {
+        gcdResult = euclideanGCD(str1.length, str2.length);
+        gcdLen = gcdResult.value;
+        for (var g = 0; g < gcdResult.steps.length; g++) {
+            var gs = gcdResult.steps[g];
+            steps.push({
+                phase: "gcd",
+                gcdStep: g,
+                a: gs.a,
+                b: gs.b,
+                isDone: gs.b === 0
+            });
+            if (gs.b === 0) {
+                order.push("GCD=" + gs.a);
+            } else {
+                order.push(gs.a + "%" + gs.b);
+            }
+        }
+    }
+
+    /* Phase 3: extract candidate (only if concatenations match) */
+    var candidate = concatMatch ? str1.substring(0, gcdLen) : "";
+    if (concatMatch) {
+        steps.push({
+            phase: "extract",
+            candidate: candidate,
+            gcdLen: gcdLen
+        });
+        order.push("\u201C" + candidate + "\u201D");
+    }
+
+    return {
+        str1: str1,
+        str2: str2,
+        concat1: concat1,
+        concat2: concat2,
+        concatMatch: concatMatch,
+        firstMismatch: firstMismatch,
+        gcdResult: gcdResult,
+        gcdLen: gcdLen,
+        candidate: candidate,
+        steps: steps,
+        order: order,
+        desc: preset.desc
+    };
+}
+
+/* ── Render helpers ────────────────────────────────────── */
+
+function buildCellsHTML(chars, options) {
+    var html = "";
+    for (var i = 0; i < chars.length; i++) {
+        var cls = "gcd-cell";
+        if (options.candidateEnd > 0 && i < options.candidateEnd) cls += " in-candidate";
+        if (options.matchUpTo >= 0 && i <= options.matchUpTo) cls += " match";
+        if (options.mismatchAt === i) cls += " mismatch";
+        if (options.activeIdx === i) cls += " active";
+        if (options.dimAfter >= 0 && i > options.dimAfter) cls += " dimmed";
+        html += '<span class="' + cls + '">' + chars[i] + "</span>";
+    }
+    return html;
+}
+
+function buildRowHTML(label, chars, options) {
+    return '<div class="gcd-row">' +
+        '<span class="gcd-row-label">' + label + "</span>" +
+        '<div class="gcd-cells">' + buildCellsHTML(chars, options) + "</div>" +
+        "</div>";
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+    var html = "";
+
+    if (!step) {
+        /* Initial state: show str1 and str2 */
+        html += buildRowHTML("str1", trace.str1.split(""), { candidateEnd: 0, matchUpTo: -1, mismatchAt: -1, activeIdx: -1, dimAfter: -1 });
+        html += buildRowHTML("str2", trace.str2.split(""), { candidateEnd: 0, matchUpTo: -1, mismatchAt: -1, activeIdx: -1, dimAfter: -1 });
+    } else if (step.phase === "concat") {
+        /* Show both concatenations with comparison progress */
+        var c1Chars = trace.concat1.split("");
+        var c2Chars = trace.concat2.split("");
+        var matchUpTo = step.charMatch ? step.idx : step.idx - 1;
+        var mismatchIdx = step.charMatch ? -1 : step.idx;
+
+        html += buildRowHTML("str1+str2", c1Chars, { candidateEnd: 0, matchUpTo: matchUpTo, mismatchAt: mismatchIdx, activeIdx: step.charMatch ? step.idx : -1, dimAfter: -1 });
+        html += buildRowHTML("str2+str1", c2Chars, { candidateEnd: 0, matchUpTo: matchUpTo, mismatchAt: mismatchIdx, activeIdx: step.charMatch ? step.idx : -1, dimAfter: -1 });
+
+        /* Separator showing equality status */
+        var eqClass = step.charMatch && step.allMatchSoFar ? "" : (mismatchIdx >= 0 ? " eq-mismatch" : "");
+        if (step.idx === trace.concat1.length - 1 && step.charMatch) eqClass = " eq-match";
+        html += '<div class="gcd-eq-row">' +
+            '<span class="gcd-eq-label">status</span>' +
+            '<span class="gcd-eq-value' + eqClass + '">' +
+            (mismatchIdx >= 0 ? "Mismatch at index " + mismatchIdx :
+             (step.idx === trace.concat1.length - 1 ? "All characters match \u2713" :
+              "Comparing index " + step.idx + "\u2026")) +
+            "</span></div>";
+    } else if (step.phase === "gcd") {
+        /* Show str1 and str2 with GCD computation */
+        html += buildRowHTML("str1", trace.str1.split(""), { candidateEnd: 0, matchUpTo: -1, mismatchAt: -1, activeIdx: -1, dimAfter: -1 });
+        html += buildRowHTML("str2", trace.str2.split(""), { candidateEnd: 0, matchUpTo: -1, mismatchAt: -1, activeIdx: -1, dimAfter: -1 });
+
+        /* GCD computation steps */
+        html += '<div class="gcd-eq-row">' +
+            '<span class="gcd-eq-label">Euclidean</span>' +
+            '<span class="gcd-eq-value">';
+        var gcdParts = [];
+        for (var gi = 0; gi <= step.gcdStep; gi++) {
+            var gs = trace.gcdResult.steps[gi];
+            if (gs.b === 0) {
+                gcdParts.push("GCD = " + gs.a);
+            } else {
+                gcdParts.push("GCD(" + gs.a + ", " + gs.b + ")");
+            }
+        }
+        html += gcdParts.join(" \u2192 ");
+        html += "</span></div>";
+    } else if (step.phase === "extract") {
+        /* Show both strings with candidate highlighted */
+        var s1Opts = { candidateEnd: step.gcdLen, matchUpTo: -1, mismatchAt: -1, activeIdx: -1, dimAfter: -1 };
+        var s2Opts = { candidateEnd: step.gcdLen, matchUpTo: -1, mismatchAt: -1, activeIdx: -1, dimAfter: -1 };
+        html += buildRowHTML("str1", trace.str1.split(""), s1Opts);
+        html += buildRowHTML("str2", trace.str2.split(""), s2Opts);
+
+        html += '<div class="gcd-eq-row">' +
+            '<span class="gcd-eq-label">result</span>' +
+            '<span class="gcd-eq-value eq-match">\u201C' + step.candidate + '\u201D (length ' + step.gcdLen + ")</span>" +
+            "</div>";
+    }
+
+    refs.grid.innerHTML = html;
+
+    /* Status panel */
+    var isDone = pos === trace.steps.length - 1;
+    if (!step) {
+        refs.status.phase.textContent = "Ready";
+        refs.status.action.textContent = "\u2014";
+    } else if (step.phase === "concat") {
+        refs.status.phase.textContent = step.charMatch && step.idx === trace.concat1.length - 1 ? "Concat \u2713" : (step.charMatch ? "Concat Test" : "Concat \u2717");
+        refs.status.action.textContent = step.charMatch ? "Match at index " + step.idx : "Mismatch at index " + step.idx;
+    } else if (step.phase === "gcd") {
+        refs.status.phase.textContent = step.isDone ? "GCD Done" : "GCD Compute";
+        refs.status.action.textContent = step.isDone ? "GCD = " + step.a : "GCD(" + step.a + ", " + step.b + ")";
+    } else if (step.phase === "extract") {
+        refs.status.phase.textContent = "Done";
+        refs.status.action.textContent = "Extract prefix[0.." + step.gcdLen + "]";
+    }
+
+    /* Values panel */
+    refs.values.concat1.textContent = trace.concat1;
+    refs.values.concat2.textContent = trace.concat2;
+    refs.values.gcdLen.textContent = trace.gcdLen > 0 ? String(trace.gcdLen) : "\u2014";
+
+    if (!step) {
+        refs.values.result.textContent = "\u2014";
+    } else if (isDone) {
+        refs.values.result.textContent = trace.candidate ? "\u201C" + trace.candidate + "\u201D" : "\u201C\u201D (empty)";
+    } else if (step.phase === "concat" && !step.charMatch) {
+        refs.values.result.textContent = "\u201C\u201D (empty)";
+    } else {
+        refs.values.result.textContent = "\u2026";
+    }
+
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    if (!step) {
+        return "\u201C" + trace.str1 + "\u201D (length " + trace.str1.length + ") and \u201C" +
+            trace.str2 + "\u201D (length " + trace.str2.length + "). " + trace.desc +
+            " Press Play or Next to begin.";
+    }
+
+    if (step.phase === "concat") {
+        if (!step.charMatch) {
+            return "Comparing concatenations: \u201C" + trace.concat1 + "\u201D vs \u201C" +
+                trace.concat2 + "\u201D \u2014 mismatch at index " + step.idx +
+                " (\u2018" + step.c1 + "\u2019 \u2260 \u2018" + step.c2 +
+                "\u2019). No common divisor exists. Result is empty.";
+        }
+        if (step.idx === trace.concat1.length - 1) {
+            return "Comparing concatenations: \u201C" + trace.concat1 + "\u201D vs \u201C" +
+                trace.concat2 + "\u201D \u2014 all " + trace.concat1.length +
+                " characters match. A common divisor exists.";
+        }
+        return "Comparing index " + step.idx + ": \u2018" + step.c1 +
+            "\u2019 = \u2018" + step.c2 + "\u2019 \u2713. " +
+            (step.idx + 1) + " of " + trace.concat1.length + " characters verified.";
+    }
+
+    if (step.phase === "gcd") {
+        var chain = [];
+        for (var gi = 0; gi <= step.gcdStep; gi++) {
+            var gs = trace.gcdResult.steps[gi];
+            if (gs.b === 0) {
+                chain.push(String(gs.a));
+            } else {
+                chain.push("GCD(" + gs.a + ", " + gs.b + ")");
+            }
+        }
+        if (step.isDone) {
+            return "GCD(" + trace.str1.length + ", " + trace.str2.length + ") \u2192 " +
+                chain.join(" \u2192 ") + ". The candidate has length " + step.a + ".";
+        }
+        return "Computing GCD: " + chain.join(" \u2192 ") + "\u2026";
+    }
+
+    if (step.phase === "extract") {
+        return "Candidate \u201C" + step.candidate + "\u201D (first " + step.gcdLen +
+            " characters of str1) tiles both strings. GCD is \u201C" + step.candidate + "\u201D.";
+    }
+
+    return "";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+</script>
+</body>
+</html>

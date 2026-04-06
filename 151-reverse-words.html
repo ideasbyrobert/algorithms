@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reverse Words — Normalize, Reverse All, Reverse Each</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.cell.space-char {
+    background: #F5F5F7;
+    color: #AEAEB2;
+    font-family: 'Menlo', 'SF Mono', monospace;
+}
+.cell.active-swap {
+    border: 2px solid #636366;
+    transform: scale(1.08);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.cell.word-boundary {
+    background: #1D1D1F;
+    color: #FFF;
+}
+.cell.normalized {
+    background: #F5F5F7;
+    color: #1D1D1F;
+}
+.cell.skipped {
+    background: #FF3B30;
+    color: #FFF;
+    opacity: 0.6;
+}
+.cell.kept {
+    background: #34C759;
+    color: #FFF;
+}
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 151 Reverse Words — Normalize, Reverse All, Reverse Each.">
+<meta property="og:title" content="151 Reverse Words — Normalize, Reverse All, Reverse Each">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/151-reverse-words.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/151-reverse-words.html">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Reverse Words in a String · Optimal Solution</span>
+        <h1>Three steps: normalize, reverse all, reverse each word.</h1>
+        <p class="hero-text">
+            Strip extra spaces, reverse the entire character array, then reverse
+            each word individually. The words end up in reverse order with their
+            letters restored — all in <code>O(n)</code> time and <code>O(n)</code>
+            space for the character array.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the three-step pipeline transform the string</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Why reversing twice restores letter order</h2>
+        <p class="section-intro">
+            Reversing the whole string puts words in the right order but spells
+            each word backwards. A second pass reverses each word individually,
+            fixing the letters while preserving the new word order.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>Normalize</h3>
+                <p>Trim leading and trailing spaces, collapse runs of multiple spaces into a single space. This gives a clean sequence of words separated by exactly one space.</p>
+            </article>
+            <article class="concept-card">
+                <h3>Reverse all</h3>
+                <p>Reverse the entire normalized string character by character. Words move to their final positions but each word is now spelled backwards.</p>
+            </article>
+            <article class="concept-card">
+                <h3>Reverse each word</h3>
+                <p>Walk through the reversed string, find each word's boundaries, and reverse it in place. This restores the correct spelling of every word.</p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Normalize, flip, restore</h2>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Normalize the input</h4>
+                    <p>Walk through the string, skip leading spaces, collapse consecutive spaces to one, and trim trailing spaces. Build a clean character array.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Reverse the entire array</h4>
+                    <p>Use two pointers at each end, swap characters inward until they meet. Every word is now in the correct position but spelled backwards.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Reverse each individual word</h4>
+                    <p>Scan for word boundaries (space-delimited). For each word, reverse its characters in place using two pointers. Letters are restored to correct order.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Where spacing and length matter</h2>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Single word</h3>
+                <p>
+                    After normalization only one word remains. Reversing the whole
+                    string spells it backwards, but the per-word reversal restores it
+                    immediately — output equals input.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Extra whitespace everywhere</h3>
+                <p>
+                    Leading, trailing, and multiple interior spaces are all collapsed
+                    during normalization. The algorithm never needs to reason about
+                    irregular spacing after step one.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Single-character words</h3>
+                <p>
+                    Words like "a b c" have nothing to reverse individually — the
+                    per-word reversal is a no-op for length-1 words. Only the
+                    full-string reversal matters.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [{ dot: true, label: "active range" }],
+    gridClass: "viz-array",
+    status: [
+        { id: "phase",  label: "Phase" },
+        { id: "action", label: "Action" },
+        { id: "range",  label: "Range" }
+    ],
+    values: [
+        { id: "current", label: "Current String" }
+    ],
+    orderTitle: "Pipeline Steps"
+});
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    { name: '"  the sky   is blue  "',  data: { text: "  the sky   is blue  " },  desc: "Canonical example: extra spaces everywhere, four words reverse to \"blue is sky the\"." },
+    { name: '"hello"',                  data: { text: "hello" },                  desc: "Single word — normalization is trivial, reversals cancel out." },
+    { name: '"hello world"',            data: { text: "hello world" },            desc: "Two words swap positions: \"world hello\"." },
+    { name: '"  a  good   example "',   data: { text: "  a  good   example " },   desc: "Extra spaces collapse, three words reverse to \"example good a\".", mobileDefault: true },
+    { name: '"  hello  "',             data: { text: "  hello  " },               desc: "Leading and trailing spaces stripped, single word unchanged." },
+    { name: '"Alice loves Bob"',        data: { text: "Alice loves Bob" },        desc: "Three clean words reverse to \"Bob loves Alice\"." },
+    { name: '"a b c"',                  data: { text: "a b c" },                  desc: "Single-character words — per-word reversal is a no-op." },
+    { name: '"one"',                    data: { text: "one" },                    desc: "Already a single word — output equals input." }
+];
+
+/* ── Helpers ────────────────────────────────────────────── */
+
+function displayChar(ch) {
+    return ch === " " ? "\u23B5" : ch;
+}
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var text = preset.data.text;
+    var originalChars = text.split("");
+    var steps = [];
+    var order = [];
+
+    /* Phase 1: Normalize — build clean char array */
+    var normalized = [];
+    var normSteps = [];
+    var i;
+    for (i = 0; i < originalChars.length; i++) {
+        var ch = originalChars[i];
+        if (ch === " ") {
+            /* skip leading spaces */
+            if (normalized.length === 0) {
+                normSteps.push({ index: i, action: "skip", reason: "leading space", ch: ch });
+                continue;
+            }
+            /* skip if previous char is already a space */
+            if (normalized[normalized.length - 1] === " ") {
+                normSteps.push({ index: i, action: "skip", reason: "extra space", ch: ch });
+                continue;
+            }
+            normalized.push(ch);
+            normSteps.push({ index: i, action: "keep", reason: "word separator", ch: ch });
+        } else {
+            normalized.push(ch);
+            normSteps.push({ index: i, action: "keep", reason: "character", ch: ch });
+        }
+    }
+    /* trim trailing space */
+    if (normalized.length > 0 && normalized[normalized.length - 1] === " ") {
+        normalized.pop();
+    }
+
+    /* Record normalize steps */
+    var runningNorm = [];
+    for (i = 0; i < normSteps.length; i++) {
+        var ns = normSteps[i];
+        if (ns.action === "keep") {
+            runningNorm.push(ns.ch);
+        }
+        /* trim trailing space from running snapshot */
+        var snapshot = runningNorm.slice();
+        if (snapshot.length > 0 && snapshot[snapshot.length - 1] === " " && i === normSteps.length - 1) {
+            snapshot.pop();
+        }
+        steps.push({
+            phase: "normalize",
+            origChars: originalChars.slice(),
+            origIndex: ns.index,
+            normChars: snapshot.slice(),
+            action: ns.action,
+            reason: ns.reason,
+            ch: ns.ch
+        });
+    }
+    order.push("Normalize");
+
+    /* Phase 2: Reverse entire normalized string */
+    var chars = normalized.slice();
+    var left = 0;
+    var right = chars.length - 1;
+    order.push("Reverse all");
+    while (left < right) {
+        var tmp = chars[left];
+        chars[left] = chars[right];
+        chars[right] = tmp;
+        steps.push({
+            phase: "reverse-all",
+            chars: chars.slice(),
+            left: left,
+            right: right
+        });
+        left++;
+        right--;
+    }
+
+    /* Phase 3: Reverse each word */
+    var wordStart = 0;
+    var wordIndex = 0;
+    while (wordStart < chars.length) {
+        /* find word end */
+        var wordEnd = wordStart;
+        while (wordEnd < chars.length && chars[wordEnd] !== " ") {
+            wordEnd++;
+        }
+        var wordStr = chars.slice(wordStart, wordEnd).join("");
+        var reversedWord = wordStr.split("").reverse().join("");
+        order.push("Reverse '" + wordStr + "'");
+
+        /* reverse within [wordStart, wordEnd - 1] */
+        left = wordStart;
+        right = wordEnd - 1;
+        while (left < right) {
+            tmp = chars[left];
+            chars[left] = chars[right];
+            chars[right] = tmp;
+            steps.push({
+                phase: "reverse-word",
+                chars: chars.slice(),
+                left: left,
+                right: right,
+                wordStart: wordStart,
+                wordEnd: wordEnd - 1,
+                wordIndex: wordIndex,
+                wordLabel: reversedWord
+            });
+            left++;
+            right--;
+        }
+
+        wordIndex++;
+        wordStart = wordEnd + 1;
+    }
+
+    return {
+        steps: steps,
+        order: order,
+        original: text,
+        originalChars: originalChars,
+        normalizedChars: normalized.slice(),
+        finalChars: chars.slice(),
+        desc: preset.desc
+    };
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+
+    var displayArr, highlights, i;
+    highlights = new Map();
+
+    if (!step) {
+        /* Initial state — show original with spaces highlighted */
+        displayArr = trace.originalChars.map(displayChar);
+        for (i = 0; i < trace.originalChars.length; i++) {
+            highlights.set(i, trace.originalChars[i] === " " ? "space-char" : "normalized");
+        }
+    } else if (step.phase === "normalize") {
+        /* Show original chars, highlight current index */
+        displayArr = step.origChars.map(displayChar);
+        for (i = 0; i < step.origChars.length; i++) {
+            if (i < step.origIndex) {
+                highlights.set(i, step.origChars[i] === " " ? "space-char" : "normalized");
+            } else if (i === step.origIndex) {
+                highlights.set(i, step.action === "skip" ? "skipped" : "kept");
+            } else {
+                highlights.set(i, step.origChars[i] === " " ? "space-char" : "normalized");
+            }
+        }
+    } else if (step.phase === "reverse-all") {
+        displayArr = step.chars.map(displayChar);
+        for (i = 0; i < step.chars.length; i++) {
+            if (i === step.left || i === step.right) {
+                highlights.set(i, "active-swap");
+            } else if (step.chars[i] === " ") {
+                highlights.set(i, "space-char");
+            } else {
+                highlights.set(i, "normalized");
+            }
+        }
+    } else if (step.phase === "reverse-word") {
+        displayArr = step.chars.map(displayChar);
+        for (i = 0; i < step.chars.length; i++) {
+            if (i === step.left || i === step.right) {
+                highlights.set(i, "active-swap");
+            } else if (i >= step.wordStart && i <= step.wordEnd) {
+                highlights.set(i, "word-boundary");
+            } else if (step.chars[i] === " ") {
+                highlights.set(i, "space-char");
+            } else {
+                highlights.set(i, "normalized");
+            }
+        }
+    }
+
+    VizArray.renderCells(refs.grid, {
+        array: displayArr,
+        highlights: highlights
+    });
+
+    /* Status bar */
+    if (!step) {
+        refs.status.phase.textContent  = "Ready";
+        refs.status.action.textContent = "\u2014";
+        refs.status.range.textContent  = "\u2014";
+    } else if (step.phase === "normalize") {
+        refs.status.phase.textContent  = "Normalize";
+        refs.status.action.textContent = step.action === "skip"
+            ? "Skip " + step.reason + " at " + step.origIndex
+            : "Keep '" + displayChar(step.ch) + "' at " + step.origIndex;
+        refs.status.range.textContent  = "index " + step.origIndex;
+    } else if (step.phase === "reverse-all") {
+        refs.status.phase.textContent  = "Reverse All";
+        refs.status.action.textContent = "Swap '" + displayChar(step.chars[step.left]) + "' \u21C4 '" + displayChar(step.chars[step.right]) + "'";
+        refs.status.range.textContent  = "[" + step.left + "] \u21C4 [" + step.right + "]";
+    } else if (step.phase === "reverse-word") {
+        refs.status.phase.textContent  = "Reverse '" + step.wordLabel + "'";
+        refs.status.action.textContent = "Swap '" + displayChar(step.chars[step.left]) + "' \u21C4 '" + displayChar(step.chars[step.right]) + "'";
+        refs.status.range.textContent  = "[" + step.left + "] \u21C4 [" + step.right + "]";
+    }
+
+    /* Values bar */
+    if (!step) {
+        refs.values.current.textContent = '"' + trace.original + '"';
+    } else if (step.phase === "normalize") {
+        refs.values.current.textContent = '"' + step.normChars.join("") + '"';
+    } else {
+        refs.values.current.textContent = '"' + step.chars.join("") + '"';
+    }
+
+    /* Note */
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    if (!step) return engine.trace.desc + " Press Play or Next to begin.";
+
+    if (step.phase === "normalize") {
+        if (step.action === "skip") {
+            return "Remove extra space at index " + step.origIndex + ".";
+        }
+        return "Keep character '" + displayChar(step.ch) + "' at index " + step.origIndex + ".";
+    }
+    if (step.phase === "reverse-all") {
+        /* Show pre-swap characters */
+        var lc = displayChar(step.chars[step.right]);
+        var rc = displayChar(step.chars[step.left]);
+        return "Swap '" + rc + "' at " + step.left + " with '" + lc + "' at " + step.right + ".";
+    }
+    if (step.phase === "reverse-word") {
+        var wlc = displayChar(step.chars[step.right]);
+        var wrc = displayChar(step.chars[step.left]);
+        return "Reverse word '" + step.wordLabel + "': swap '" + wrc + "' at " + step.left + " with '" + wlc + "' at " + step.right + ".";
+    }
+    return "";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 500
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>

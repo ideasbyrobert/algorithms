@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Longest Common Prefix — Vertical Column Scan</title>
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+.prefix-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+}
+.prefix-row-wrapper {
+    display: flex;
+    align-items: center;
+}
+.word-label {
+    font: 400 13px/1 -apple-system, 'SF Pro Text', sans-serif;
+    color: #8E8E93;
+    width: 60px;
+    text-align: right;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+.prefix-row {
+    display: flex;
+    gap: 2px;
+}
+.prefix-cell {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 500 17px/1 'Menlo', 'SF Mono', monospace;
+    color: #1D1D1F;
+    background: #F5F5F7;
+    border: 1.5px solid #C7C7CC;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+.prefix-cell.active-col {
+    border-color: #1D1D1F;
+    border-width: 2px;
+}
+.prefix-cell.matched {
+    background: #1D1D1F;
+    color: #FFF;
+    border-color: #1D1D1F;
+}
+.prefix-cell.mismatch {
+    background: #FFF;
+    border-color: #8E8E93;
+    border-style: dashed;
+    color: #8E8E93;
+}
+.prefix-cell.in-prefix {
+    background: #1D1D1F;
+    color: #FFF;
+    border-color: #1D1D1F;
+}
+@media (max-width: 640px) {
+    .prefix-cell {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+    .word-label {
+        font-size: 11px;
+        width: 48px;
+    }
+}
+</style>
+<meta name="description" content="Interactive visualization of LeetCode 14 Longest Common Prefix. Watch the vertical column scan compare characters across all strings to find the shared prefix.">
+<meta property="og:title" content="Longest Common Prefix — Vertical Column Scan">
+<meta property="og:description" content="Step through the column-by-column comparison algorithm with an interactive walkthrough.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/14-longest-common-prefix.html">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/14-longest-common-prefix.html">
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">Longest Common Prefix · Optimal Solution</span>
+        <h1>Read down the columns, not across the rows.</h1>
+        <p class="hero-text">
+            Instead of comparing strings pair-by-pair, scan every string at the same
+            column index simultaneously. At column 0 check the first character of every
+            word; at column 1 the second character, and so on. The moment any word
+            disagrees — or the shortest word runs out — the prefix is complete.
+            <code>O(S)</code> time where <code>S</code> is the sum of all characters.
+            <code>O(1)</code> extra space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch the column scanner find the shared prefix</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Why scan vertically?</h2>
+        <p class="section-intro">
+            Horizontal pair-by-pair comparison can over-count if the first two strings
+            happen to share a long prefix that later strings don't. Vertical scanning
+            guarantees every word is consulted before advancing the column pointer.
+        </p>
+        <div class="concept-cards">
+            <article>
+                <h3>Column-first thinking</h3>
+                <p>
+                    Imagine the words stacked in a table. Reading down column 0 asks
+                    "does every word start with the same letter?" before ever looking at
+                    column 1.
+                </p>
+            </article>
+            <article>
+                <h3>Shortest word governs</h3>
+                <p>
+                    No prefix can be longer than the shortest input. Computing
+                    <code>min(len)</code> up front gives an upper bound on the loop and
+                    prevents out-of-bounds access.
+                </p>
+            </article>
+            <article>
+                <h3>Early exit</h3>
+                <p>
+                    The first character mismatch terminates the entire search. In the
+                    best case only one column is examined; in the worst case all
+                    characters of the shortest word are checked.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Vertical column scan in four steps</h2>
+        <ol class="steps">
+            <li>
+                <strong>Find the shortest word length.</strong>
+                This is the maximum number of columns to scan. If any word is empty the
+                answer is immediately <code>""</code>.
+            </li>
+            <li>
+                <strong>For each column index 0 … shortest − 1:</strong>
+                take the character from the first word as the candidate for that column.
+            </li>
+            <li>
+                <strong>Compare the candidate against every other word.</strong>
+                If a word's character at this column differs, return the prefix collected
+                so far. Otherwise continue to the next word.
+            </li>
+            <li>
+                <strong>All words matched at this column — extend the prefix</strong>
+                by one character and advance to the next column.
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>Guard rails to remember</h2>
+        <div class="guard-cards">
+            <article>
+                <h3>Empty string in the array</h3>
+                <p>
+                    If any word has length 0, the shortest-word length is 0 and the
+                    outer loop never executes. The result is <code>""</code>.
+                </p>
+            </article>
+            <article>
+                <h3>Single word</h3>
+                <p>
+                    With only one word there is nothing to compare against. The entire
+                    word is its own prefix. Return it directly.
+                </p>
+            </article>
+            <article>
+                <h3>All words identical</h3>
+                <p>
+                    Every column matches and the loop runs to the end of the shortest
+                    word (all words). The prefix equals the full word.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-array.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { dot: true, label: "current column" }
+    ],
+    gridClass: "prefix-grid",
+    status: [
+        { id: "column",    label: "Column" },
+        { id: "candidate", label: "Candidate" },
+        { id: "checking",  label: "Checking" },
+        { id: "result",    label: "Result" }
+    ],
+    values: [
+        { id: "prefix", label: "Prefix So Far" },
+        { id: "length", label: "Prefix Length" }
+    ],
+    orderTitle: "Column Log"
+});
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "\"flower\", \"flow\", \"flight\" — classic mismatch at col 2",
+        data: { words: ["flower", "flow", "flight"] },
+        desc: "The third string breaks at column 2: 'o' vs 'i'. Prefix is \"fl\"."
+    },
+    {
+        name: "\"inter\", \"inter\", \"inter\" — all identical",
+        data: { words: ["inter", "inter", "inter"] },
+        desc: "Every column matches. The prefix equals the full word \"inter\"."
+    },
+    {
+        name: "\"abc\", \"xyz\" — no match at column 0",
+        data: { words: ["abc", "xyz"] },
+        desc: "Mismatch at the very first column. Prefix is empty."
+    },
+    {
+        name: "\"apple\", \"ape\", \"acid\" — single char prefix",
+        data: { words: ["apple", "ape", "acid"] },
+        desc: "Only column 0 matches ('a'). Column 1 breaks: 'p' vs 'c'. Prefix is \"a\"."
+    },
+    {
+        name: "\"interspecies\", \"interstellar\", \"interstate\" — long common",
+        data: { words: ["interspecies", "interstellar", "interstate"] },
+        desc: "Six columns match before divergence. Prefix is \"inters\".",
+        mobileDefault: true
+    },
+    {
+        name: "\"\", \"b\" — empty string",
+        data: { words: ["", "b"] },
+        desc: "Shortest word length is 0. No columns to scan. Prefix is empty."
+    },
+    {
+        name: "\"alone\" — single word",
+        data: { words: ["alone"] },
+        desc: "One word is its own prefix. Result is \"alone\"."
+    },
+    {
+        name: "\"ab\", \"a\" — shortest word limits prefix",
+        data: { words: ["ab", "a"] },
+        desc: "The shortest word has length 1. Only column 0 is checked. Prefix is \"a\"."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var words = preset.data.words;
+    var steps = [];
+    var order = [];
+    var prefix = "";
+
+    if (words.length === 1) {
+        prefix = words[0];
+        for (var c = 0; c < words[0].length; c++) {
+            steps.push({
+                columnIndex: c,
+                candidateChar: words[0][c],
+                wordIndex: 0,
+                wordChar: words[0][c],
+                matches: true,
+                prefixSoFar: words[0].substring(0, c + 1),
+                allMatched: true,
+                columnComplete: true,
+                isMismatch: false
+            });
+            order.push("Col " + c + ": '" + words[0][c] + "' \u2713");
+        }
+        return {
+            words: words, steps: steps, order: order,
+            prefix: prefix, desc: preset.desc,
+            totalSteps: steps.length
+        };
+    }
+
+    var shortestLen = words[0].length;
+    for (var i = 1; i < words.length; i++) {
+        if (words[i].length < shortestLen) shortestLen = words[i].length;
+    }
+
+    var stopped = false;
+    for (var col = 0; col < shortestLen && !stopped; col++) {
+        var candidate = words[0][col];
+        var colAllMatched = true;
+
+        for (var w = 1; w < words.length; w++) {
+            var ch = words[w][col];
+            var match = ch === candidate;
+
+            if (!match) {
+                colAllMatched = false;
+                steps.push({
+                    columnIndex: col,
+                    candidateChar: candidate,
+                    wordIndex: w,
+                    wordChar: ch,
+                    matches: false,
+                    prefixSoFar: prefix,
+                    allMatched: false,
+                    columnComplete: false,
+                    isMismatch: true
+                });
+                order.push("Col " + col + ": mismatch at word " + w);
+                stopped = true;
+                break;
+            }
+
+            steps.push({
+                columnIndex: col,
+                candidateChar: candidate,
+                wordIndex: w,
+                wordChar: ch,
+                matches: true,
+                prefixSoFar: prefix + candidate,
+                allMatched: w === words.length - 1,
+                columnComplete: w === words.length - 1,
+                isMismatch: false
+            });
+        }
+
+        if (colAllMatched) {
+            prefix += candidate;
+            order.push("Col " + col + ": '" + candidate + "' \u2713");
+        }
+    }
+
+    return {
+        words: words, steps: steps, order: order,
+        prefix: prefix, desc: preset.desc,
+        totalSteps: steps.length
+    };
+}
+
+/* ── Grid rendering ────────────────────────────────────── */
+
+function renderGrid(gridEl, trace, step, pos) {
+    var words = trace.words;
+    var maxLen = 0;
+    for (var i = 0; i < words.length; i++) {
+        if (words[i].length > maxLen) maxLen = words[i].length;
+    }
+    if (maxLen === 0) maxLen = 1;
+
+    var confirmedCols = 0;
+    if (pos >= 0 && step) {
+        if (step.isMismatch) {
+            confirmedCols = step.columnIndex;
+        } else if (step.columnComplete) {
+            confirmedCols = step.columnIndex + 1;
+        } else {
+            confirmedCols = step.columnIndex;
+        }
+    }
+
+    var html = "";
+    for (var r = 0; r < words.length; r++) {
+        html += '<div class="prefix-row-wrapper">';
+        html += '<span class="word-label">word ' + r + '</span>';
+        html += '<div class="prefix-row">';
+        for (var c = 0; c < maxLen; c++) {
+            var ch = c < words[r].length ? words[r][c] : "";
+            var cls = "prefix-cell";
+
+            if (pos >= 0 && step) {
+                if (c < confirmedCols) {
+                    cls += " in-prefix";
+                } else if (c === step.columnIndex) {
+                    cls += " active-col";
+                    if (r === step.wordIndex && step.isMismatch) {
+                        cls += " mismatch";
+                    } else if (r === step.wordIndex && step.matches) {
+                        cls += " matched";
+                    } else if (r === 0) {
+                        cls += " matched";
+                    } else if (r < step.wordIndex && r > 0) {
+                        cls += " matched";
+                    }
+                }
+            }
+
+            html += '<span class="' + cls + '">' + ch + '</span>';
+        }
+        html += '</div></div>';
+    }
+
+    gridEl.innerHTML = html;
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    renderGrid(refs.grid, trace, step, pos);
+
+    if (step) {
+        refs.status.column.textContent = String(step.columnIndex);
+        refs.status.candidate.textContent = "'" + step.candidateChar + "'";
+        refs.status.checking.textContent = "word " + step.wordIndex + " → '" + step.wordChar + "'";
+        refs.status.result.textContent = step.matches ? "match" : "mismatch";
+        refs.values.prefix.textContent = step.prefixSoFar ? '"' + step.prefixSoFar + '"' : '""';
+        refs.values.length.textContent = String(step.prefixSoFar.length);
+    } else {
+        refs.status.column.textContent = "\u2014";
+        refs.status.candidate.textContent = "\u2014";
+        refs.status.checking.textContent = "\u2014";
+        refs.status.result.textContent = "\u2014";
+        refs.values.prefix.textContent = '""';
+        refs.values.length.textContent = "0";
+    }
+
+    refs.note.textContent = describeStep(engine);
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+    var pos = engine.position;
+
+    if (!step) {
+        if (trace.words.length === 0) {
+            return "No words provided. Press Play or Next to begin.";
+        }
+        var wordList = trace.words.map(function(w) { return '"' + w + '"'; }).join(", ");
+        return "Words: [" + wordList + "] (" + trace.totalSteps + " comparison" +
+            (trace.totalSteps !== 1 ? "s" : "") + "). " +
+            trace.desc + " Press Play or Next to begin.";
+    }
+
+    var desc = "Column " + step.columnIndex + ": candidate '" + step.candidateChar +
+        "'. Word " + step.wordIndex + " has '" + step.wordChar + "' \u2014 ";
+
+    if (step.matches) {
+        desc += "match.";
+    } else {
+        desc += "mismatch.";
+    }
+
+    desc += " Prefix: \"" + step.prefixSoFar + "\".";
+
+    if (step.columnComplete && step.matches) {
+        desc += " Column complete — all words agree on '" + step.candidateChar + "'.";
+    }
+
+    if (step.isMismatch) {
+        desc += " Search stops here.";
+    }
+
+    if (pos === trace.steps.length - 1) {
+        desc += " Done: longest common prefix is \"" + trace.prefix + "\".";
+    }
+
+    return desc;
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 600
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
