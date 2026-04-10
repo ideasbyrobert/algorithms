@@ -529,8 +529,8 @@ function drawRandomArcs(svgEl, parentRect, nodeEls, nodesData, count, highlightF
         var y2 = tgtRect.top + 4 - parentRect.top;
 
         var isHigh = (i === highlightFrom);
-        var color = isHigh ? "#1D1D1F" : "#AEAEB2";
-        var sw = isHigh ? "2" : "1";
+        var color = isHigh ? "#1D1D1F" : "#8E8E93";
+        var sw = isHigh ? "2" : "1.2";
 
         if (i === j) {
             drawSelfLoop(svgEl, x1, y1, srcRect.width / 2, color, sw);
