@@ -27,7 +27,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 14px;
     width: fit-content;
     min-width: 100%;
     margin: 0 auto;
@@ -49,26 +49,26 @@
 
 .chain-row-label {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 600;
     color: var(--ink-tertiary);
-    width: 56px;
+    width: 50px;
     text-align: right;
     flex-shrink: 0;
     letter-spacing: 0.02em;
-    padding-bottom: 28px;
+    padding-bottom: 22px;
 }
 
 .chain-wrap {
     position: relative;
-    padding-top: 52px;
+    padding-top: 38px;
 }
 
 .node-chain {
     display: flex;
     align-items: center;
     gap: 0;
-    min-height: 72px;
+    min-height: 56px;
 }
 
 .chain-empty {
@@ -82,11 +82,11 @@
 
 .ll-node {
     position: relative;
-    width: 72px;
-    height: 72px;
+    width: 56px;
+    height: 56px;
     display: grid;
     place-items: center;
-    border-radius: 16px;
+    border-radius: 14px;
     background: transparent;
     flex-shrink: 0;
     transition: opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
@@ -98,7 +98,7 @@
     position: relative;
     z-index: 1;
     font-family: var(--font-mono);
-    font-size: 1.15rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--ink);
     transition: color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -133,8 +133,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 72px;
+    width: 28px;
+    height: 56px;
     flex-shrink: 0;
 }
 
@@ -176,14 +176,14 @@
 /* ── Responsive ────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-    .clone-viz { gap: 16px; }
-    .chain-row { gap: 8px; }
-    .chain-row-label { width: 44px; font-size: 0.62rem; padding-bottom: 20px; }
-    .chain-wrap { padding-top: 40px; }
-    .node-chain { min-height: 56px; }
-    .ll-node { width: 56px; height: 56px; }
-    .ll-node .cell-value { font-size: 0.95rem; }
-    .ll-arrow { width: 24px; height: 56px; }
+    .clone-viz { gap: 10px; }
+    .chain-row { gap: 6px; }
+    .chain-row-label { width: 38px; font-size: 0.58rem; padding-bottom: 16px; }
+    .chain-wrap { padding-top: 30px; }
+    .node-chain { min-height: 44px; }
+    .ll-node { width: 44px; height: 44px; border-radius: 12px; }
+    .ll-node .cell-value { font-size: 0.85rem; }
+    .ll-arrow { width: 20px; height: 44px; }
     .viz-container:has(.clone-viz) {
         padding-top: 16px;
         padding-bottom: 40px;
@@ -491,20 +491,20 @@ function makeArrow() {
     el.className = "ll-arrow";
 
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", "36");
+    svg.setAttribute("width", "28");
     svg.setAttribute("height", "12");
-    svg.setAttribute("viewBox", "0 0 36 12");
+    svg.setAttribute("viewBox", "0 0 28 12");
 
     var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.setAttribute("class", "arrow-line");
     line.setAttribute("x1", "0");
     line.setAttribute("y1", "6");
-    line.setAttribute("x2", "30");
+    line.setAttribute("x2", "22");
     line.setAttribute("y2", "6");
 
     var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     head.setAttribute("class", "arrow-head");
-    head.setAttribute("points", "28,2 36,6 28,10");
+    head.setAttribute("points", "20,2 28,6 20,10");
 
     svg.appendChild(line);
     svg.appendChild(head);
@@ -529,14 +529,14 @@ function drawRandomArcs(svgEl, parentRect, nodeEls, nodesData, count, highlightF
         var y2 = tgtRect.top + 4 - parentRect.top;
 
         var isHigh = (i === highlightFrom);
-        var color = isHigh ? "#1D1D1F" : "#636366";
-        var sw = isHigh ? "2.5" : "1.5";
+        var color = isHigh ? "#1D1D1F" : "#AEAEB2";
+        var sw = isHigh ? "2" : "1";
 
         if (i === j) {
             drawSelfLoop(svgEl, x1, y1, srcRect.width / 2, color, sw);
         } else {
             var dist = Math.abs(j - i);
-            var arcH = Math.min(24 + dist * 14, 46);
+            var arcH = Math.min(18 + dist * 10, 36);
             var cx = (x1 + x2) / 2;
             var cy = Math.min(y1, y2) - arcH;
 
@@ -545,7 +545,7 @@ function drawRandomArcs(svgEl, parentRect, nodeEls, nodesData, count, highlightF
             p.setAttribute("fill", "none");
             p.setAttribute("stroke", color);
             p.setAttribute("stroke-width", sw);
-            p.setAttribute("stroke-dasharray", "5 3");
+            p.setAttribute("stroke-dasharray", "4 3");
             svgEl.appendChild(p);
 
             addArrowhead(svgEl, cx, cy, x2, y2, color);
@@ -556,17 +556,19 @@ function drawRandomArcs(svgEl, parentRect, nodeEls, nodesData, count, highlightF
 function drawMappingLines(svgEl, parentRect, origEls, copyEls, phase, activeIdx) {
     var count = Math.min(origEls.length, copyEls.length);
     for (var i = 0; i < count; i++) {
+        var isActive = (i === activeIdx);
+        if (!isActive && phase !== "split") continue;
+
         var oRect = origEls[i].getBoundingClientRect();
         var cRect = copyEls[i].getBoundingClientRect();
 
         var x1 = oRect.left + oRect.width / 2 - parentRect.left;
-        var y1 = oRect.top + oRect.height - parentRect.top + 4;
+        var y1 = oRect.top + oRect.height - parentRect.top + 2;
         var x2 = cRect.left + cRect.width / 2 - parentRect.left;
-        var y2 = cRect.top - parentRect.top - 4;
+        var y2 = cRect.top - parentRect.top - 2;
 
-        var isActive = (i === activeIdx);
-        var color = isActive ? "#1D1D1F" : "#AEAEB2";
-        var sw = isActive ? "1.5" : "1";
+        var color = isActive ? "#1D1D1F" : "#C7C7CC";
+        var sw = isActive ? "1.5" : "0.75";
 
         var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         line.setAttribute("x1", x1);
@@ -578,25 +580,25 @@ function drawMappingLines(svgEl, parentRect, origEls, copyEls, phase, activeIdx)
         line.setAttribute("stroke-dasharray", "3 3");
         svgEl.appendChild(line);
 
-        addArrowhead(svgEl, x1, y1, x2, y2, color);
+        if (isActive) addArrowhead(svgEl, x1, y1, x2, y2, color);
     }
 }
 
 function drawSelfLoop(svgEl, x, y, halfW, color, sw) {
-    var r = halfW + 8;
+    var r = halfW + 6;
     var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
     p.setAttribute("d",
-        "M " + (x - 8) + " " + y +
-        " C " + (x - 12) + " " + (y - r * 1.6) +
-        " " + (x + 12) + " " + (y - r * 1.6) +
-        " " + (x + 8) + " " + y);
+        "M " + (x - 6) + " " + y +
+        " C " + (x - 10) + " " + (y - r * 1.4) +
+        " " + (x + 10) + " " + (y - r * 1.4) +
+        " " + (x + 6) + " " + y);
     p.setAttribute("fill", "none");
     p.setAttribute("stroke", color);
     p.setAttribute("stroke-width", sw);
-    p.setAttribute("stroke-dasharray", "5 3");
+    p.setAttribute("stroke-dasharray", "4 3");
     svgEl.appendChild(p);
 
-    addArrowhead(svgEl, x + 12, y - r * 1.6, x + 8, y, color);
+    addArrowhead(svgEl, x + 10, y - r * 1.4, x + 6, y, color);
 }
 
 function addArrowhead(svgEl, fromX, fromY, toX, toY, color) {
