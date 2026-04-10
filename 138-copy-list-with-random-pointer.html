@@ -553,36 +553,6 @@ function drawRandomArcs(svgEl, parentRect, nodeEls, nodesData, count, highlightF
     }
 }
 
-function drawMappingLines(svgEl, parentRect, origEls, copyEls, phase, activeIdx) {
-    var count = Math.min(origEls.length, copyEls.length);
-    for (var i = 0; i < count; i++) {
-        var oRect = origEls[i].getBoundingClientRect();
-        var cRect = copyEls[i].getBoundingClientRect();
-
-        var x1 = oRect.left + oRect.width / 2 - parentRect.left;
-        var y1 = oRect.top + oRect.height - parentRect.top + 2;
-        var x2 = cRect.left + cRect.width / 2 - parentRect.left;
-        var y2 = cRect.top - parentRect.top - 2;
-
-        var isActive = (i === activeIdx);
-        var color = isActive ? "#1D1D1F" : "#AEAEB2";
-        var sw = isActive ? "1.5" : "1";
-
-        var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-        line.setAttribute("x1", x1);
-        line.setAttribute("y1", y1);
-        line.setAttribute("x2", x2);
-        line.setAttribute("y2", y2);
-        line.setAttribute("stroke", color);
-        line.setAttribute("stroke-width", sw);
-        line.setAttribute("stroke-dasharray", "3 3");
-        svgEl.appendChild(line);
-
-        if (isActive) addArrowhead(svgEl, x1, y1, x2, y2, color);
-        else addArrowhead(svgEl, x1, y1, x2, y2, "#C7C7CC");
-    }
-}
-
 function drawSelfLoop(svgEl, x, y, halfW, color, sw) {
     var r = halfW + 6;
     var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -744,11 +714,6 @@ function renderCloneViz(gridEl, trace, step) {
             if (copyNodeEls.length > 0 && arcsVis > 0) {
                 drawRandomArcs(overlaySvg, gridRect, copyNodeEls, nodes, arcsVis,
                                phase === "assign" ? activeIdx : -1);
-            }
-
-            if (copyNodeEls.length > 0) {
-                drawMappingLines(overlaySvg, gridRect, origNodeEls, copyNodeEls,
-                                 phase, activeIdx);
             }
         });
     });
