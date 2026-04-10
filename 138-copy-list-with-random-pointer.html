@@ -62,6 +62,7 @@
 .chain-wrap {
     position: relative;
     padding-top: 44px;
+    padding-bottom: 44px;
 }
 
 .node-chain {
@@ -438,26 +439,26 @@ function buildTrace(preset) {
     for (var i = 0; i < n; i++) {
         steps.push({
             phase: "interleave",
-            nodeIndex: i,
-            clonesVisible: i + 1,
-            arcsAssigned: 0
+            activeOrig: i,
+            clonesInserted: i + 1,
+            randomsAssigned: 0
         });
     }
 
     for (var i = 0; i < n; i++) {
         steps.push({
             phase: "assign",
-            nodeIndex: i,
-            clonesVisible: n,
-            arcsAssigned: i + 1
+            activeOrig: i,
+            clonesInserted: n,
+            randomsAssigned: i + 1
         });
     }
 
     steps.push({
         phase: "split",
-        nodeIndex: -1,
-        clonesVisible: n,
-        arcsAssigned: n
+        activeOrig: -1,
+        clonesInserted: n,
+        randomsAssigned: n
     });
 
     var order = nodes.map(function(nd) { return String(nd.val); });
@@ -512,33 +513,58 @@ function makeArrow() {
     return el;
 }
 
+function makeChainRow(labelText) {
+    var row = document.createElement("div");
+    row.className = "chain-row";
+    var lbl = document.createElement("span");
+    lbl.className = "chain-row-label";
+    lbl.textContent = labelText;
+    row.appendChild(lbl);
+    var wrap = document.createElement("div");
+    wrap.className = "chain-wrap";
+    var chain = document.createElement("div");
+    chain.className = "node-chain";
+    wrap.appendChild(chain);
+    row.appendChild(wrap);
+    return { row: row, chain: chain };
+}
+
 /* ── Arc drawing ───────────────────────────────────────── */
 
-function drawRandomArcs(svgEl, parentRect, nodeEls, nodesData, count, highlightFrom) {
+function drawArcs(svgEl, parentRect, srcEls, tgtEls, nodesData, count, highlightIdx, curveDown) {
     for (var i = 0; i < count; i++) {
         var j = nodesData[i].random;
         if (j === null || j === undefined) continue;
-        if (!nodeEls[i] || !nodeEls[j]) continue;
+        if (!srcEls[i] || !tgtEls[j]) continue;
 
-        var srcRect = nodeEls[i].getBoundingClientRect();
-        var tgtRect = nodeEls[j].getBoundingClientRect();
+        var srcRect = srcEls[i].getBoundingClientRect();
+        var tgtRect = tgtEls[j].getBoundingClientRect();
 
         var x1 = srcRect.left + srcRect.width / 2 - parentRect.left;
-        var y1 = srcRect.top + 4 - parentRect.top;
         var x2 = tgtRect.left + tgtRect.width / 2 - parentRect.left;
-        var y2 = tgtRect.top + 4 - parentRect.top;
+        var y1, y2;
 
-        var isHigh = (i === highlightFrom);
+        if (curveDown) {
+            y1 = srcRect.top + srcRect.height - 4 - parentRect.top;
+            y2 = tgtRect.top + tgtRect.height - 4 - parentRect.top;
+        } else {
+            y1 = srcRect.top + 4 - parentRect.top;
+            y2 = tgtRect.top + 4 - parentRect.top;
+        }
+
+        var isHigh = (i === highlightIdx);
         var color = isHigh ? "#1D1D1F" : "#8E8E93";
         var sw = isHigh ? "2" : "1.2";
 
         if (i === j) {
-            drawSelfLoop(svgEl, x1, y1, srcRect.width / 2, color, sw);
+            drawSelfLoop(svgEl, x1, y1, srcRect.width / 2, color, sw, curveDown);
         } else {
-            var dist = Math.abs(j - i);
-            var arcH = Math.min(18 + dist * 10, 36);
+            var dist = Math.abs(x2 - x1);
+            var arcH = Math.min(18 + (dist / 80) * 10, 40);
             var cx = (x1 + x2) / 2;
-            var cy = Math.min(y1, y2) - arcH;
+            var cy = curveDown
+                ? Math.max(y1, y2) + arcH
+                : Math.min(y1, y2) - arcH;
 
             var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
             p.setAttribute("d", "M " + x1 + " " + y1 + " Q " + cx + " " + cy + " " + x2 + " " + y2);
@@ -553,13 +579,14 @@ function drawRandomArcs(svgEl, parentRect, nodeEls, nodesData, count, highlightF
     }
 }
 
-function drawSelfLoop(svgEl, x, y, halfW, color, sw) {
+function drawSelfLoop(svgEl, x, y, halfW, color, sw, curveDown) {
     var r = halfW + 6;
+    var dir = curveDown ? 1 : -1;
     var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
     p.setAttribute("d",
         "M " + (x - 6) + " " + y +
-        " C " + (x - 10) + " " + (y - r * 1.4) +
-        " " + (x + 10) + " " + (y - r * 1.4) +
+        " C " + (x - 10) + " " + (y + dir * r * 1.4) +
+        " " + (x + 10) + " " + (y + dir * r * 1.4) +
         " " + (x + 6) + " " + y);
     p.setAttribute("fill", "none");
     p.setAttribute("stroke", color);
@@ -567,7 +594,7 @@ function drawSelfLoop(svgEl, x, y, halfW, color, sw) {
     p.setAttribute("stroke-dasharray", "4 3");
     svgEl.appendChild(p);
 
-    addArrowhead(svgEl, x + 10, y - r * 1.4, x + 6, y, color);
+    addArrowhead(svgEl, x + 10, y + dir * r * 1.4, x + 6, y, color);
 }
 
 function addArrowhead(svgEl, fromX, fromY, toX, toY, color) {
@@ -602,100 +629,56 @@ function renderCloneViz(gridEl, trace, step) {
     var nodes = trace.nodes;
     var n = trace.n;
     var phase = step ? step.phase : "initial";
-    var clonesVis = step ? step.clonesVisible : 0;
-    var arcsVis = step ? step.arcsAssigned : 0;
-    var activeIdx = step ? step.nodeIndex : -1;
-    var rTarget = (phase === "assign" && activeIdx >= 0) ? nodes[activeIdx].random : null;
+    var clonesIns = step ? step.clonesInserted : 0;
+    var randsSet = step ? step.randomsAssigned : 0;
+    var activeOrig = step ? step.activeOrig : -1;
+    var rTarget = (phase === "assign" && activeOrig >= 0) ? nodes[activeOrig].random : null;
 
-    /* ── Original row ── */
-
-    var origRow = document.createElement("div");
-    origRow.className = "chain-row";
-
-    var origLbl = document.createElement("span");
-    origLbl.className = "chain-row-label";
-    origLbl.textContent = "original";
-    origRow.appendChild(origLbl);
-
-    var origWrap = document.createElement("div");
-    origWrap.className = "chain-wrap";
-
-    var origChain = document.createElement("div");
-    origChain.className = "node-chain";
-
-    var origNodeEls = [];
-    for (var i = 0; i < n; i++) {
-        var nd = makeNode(nodes[i].val, false);
-
-        if ((phase === "interleave" || phase === "assign") && i === activeIdx) {
-            nd.classList.add("current");
-        }
-        if (phase === "assign" && rTarget !== null && i === rTarget && i !== activeIdx) {
-            nd.classList.add("ring");
-        }
-
-        origChain.appendChild(nd);
-        origNodeEls.push(nd);
-
-        if (i < n - 1) origChain.appendChild(makeArrow());
-    }
-
-    origWrap.appendChild(origChain);
-    origRow.appendChild(origWrap);
-    gridEl.appendChild(origRow);
-
-    /* ── Divider ── */
-
-    var divEl = document.createElement("div");
-    divEl.className = "clone-flow-divider";
-    gridEl.appendChild(divEl);
-
-    /* ── Copy row ── */
-
-    var copyRow = document.createElement("div");
-    copyRow.className = "chain-row";
-
-    var copyLbl = document.createElement("span");
-    copyLbl.className = "chain-row-label";
-    copyLbl.textContent = "copy";
-    copyRow.appendChild(copyLbl);
-
-    var copyWrap = document.createElement("div");
-    copyWrap.className = "chain-wrap";
-
-    var copyChain = document.createElement("div");
-    copyChain.className = "node-chain";
-
-    var copyNodeEls = [];
-    if (clonesVis === 0) {
-        var empty = document.createElement("span");
-        empty.className = "chain-empty";
-        empty.textContent = "waiting\u2026";
-        copyChain.appendChild(empty);
+    if (phase === "split") {
+        renderSplit(gridEl, nodes, n, randsSet);
     } else {
-        for (var i = 0; i < clonesVis; i++) {
-            var nd = makeNode(nodes[i].val, true);
+        renderInterleaved(gridEl, nodes, n, clonesIns, randsSet, activeOrig, rTarget, phase);
+    }
+}
 
-            if ((phase === "interleave" || phase === "assign") && i === activeIdx) {
-                nd.classList.add("current");
-            }
-            if (phase === "assign" && rTarget !== null && i === rTarget && i !== activeIdx) {
-                nd.classList.add("ring");
-            }
+/* Interleave & Assign phases — single woven chain */
+function renderInterleaved(gridEl, nodes, n, clonesIns, randsSet, activeOrig, rTarget, phase) {
+    var r = makeChainRow("list");
+    var chain = r.chain;
 
-            copyChain.appendChild(nd);
-            copyNodeEls.push(nd);
+    var origEls = [];
+    var cloneEls = [];
 
-            if (i < clonesVis - 1) copyChain.appendChild(makeArrow());
+    for (var i = 0; i < n; i++) {
+        var origNd = makeNode(nodes[i].val, false);
+
+        if (i === activeOrig) origNd.classList.add("current");
+        if (phase === "assign" && rTarget !== null && i === rTarget && i !== activeOrig) {
+            origNd.classList.add("ring");
         }
+
+        chain.appendChild(origNd);
+        origEls.push(origNd);
+
+        if (i < clonesIns) {
+            chain.appendChild(makeArrow());
+            var cloneNd = makeNode(nodes[i].val, true);
+            if (i === activeOrig) cloneNd.classList.add("current");
+            if (phase === "assign" && rTarget !== null && i === rTarget && i !== activeOrig) {
+                cloneNd.classList.add("ring");
+            }
+            chain.appendChild(cloneNd);
+            cloneEls.push(cloneNd);
+        } else {
+            cloneEls.push(null);
+        }
+
+        if (i < n - 1) chain.appendChild(makeArrow());
     }
 
-    copyWrap.appendChild(copyChain);
-    copyRow.appendChild(copyWrap);
-    gridEl.appendChild(copyRow);
+    gridEl.appendChild(r.row);
 
-    /* ── Global overlay SVG for arcs + mapping ── */
-
+    /* Overlay SVG for random arcs */
     var overlaySvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     overlaySvg.setAttribute("class", "arc-overlay");
     gridEl.appendChild(overlaySvg);
@@ -703,17 +686,65 @@ function renderCloneViz(gridEl, trace, step) {
     requestAnimationFrame(function() {
         requestAnimationFrame(function() {
             if (!overlaySvg.parentElement) return;
-
             var gridRect = gridEl.getBoundingClientRect();
             overlaySvg.setAttribute("width", Math.ceil(gridRect.width));
             overlaySvg.setAttribute("height", Math.ceil(gridRect.height));
 
-            drawRandomArcs(overlaySvg, gridRect, origNodeEls, nodes, n,
-                           phase === "assign" ? activeIdx : -1);
+            /* Original random arcs — curve above */
+            drawArcs(overlaySvg, gridRect, origEls, origEls, nodes, n,
+                     phase === "assign" ? activeOrig : -1, false);
 
-            if (copyNodeEls.length > 0 && arcsVis > 0) {
-                drawRandomArcs(overlaySvg, gridRect, copyNodeEls, nodes, arcsVis,
-                               phase === "assign" ? activeIdx : -1);
+            /* Clone random arcs — curve below (only assigned ones) */
+            if (randsSet > 0) {
+                drawArcs(overlaySvg, gridRect, cloneEls, cloneEls, nodes, randsSet,
+                         phase === "assign" ? activeOrig : -1, true);
+            }
+        });
+    });
+}
+
+/* Split phase — two separate restored chains */
+function renderSplit(gridEl, nodes, n, randsSet) {
+    var origR = makeChainRow("original");
+    var copyR = makeChainRow("copy");
+
+    var origEls = [];
+    var cloneEls = [];
+
+    for (var i = 0; i < n; i++) {
+        origR.chain.appendChild(makeNode(nodes[i].val, false));
+        origEls.push(origR.chain.lastChild);
+        if (i < n - 1) origR.chain.appendChild(makeArrow());
+
+        copyR.chain.appendChild(makeNode(nodes[i].val, true));
+        cloneEls.push(copyR.chain.lastChild);
+        if (i < n - 1) copyR.chain.appendChild(makeArrow());
+    }
+
+    gridEl.appendChild(origR.row);
+
+    var divEl = document.createElement("div");
+    divEl.className = "clone-flow-divider";
+    gridEl.appendChild(divEl);
+
+    gridEl.appendChild(copyR.row);
+
+    /* Overlay SVG */
+    var overlaySvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    overlaySvg.setAttribute("class", "arc-overlay");
+    gridEl.appendChild(overlaySvg);
+
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            if (!overlaySvg.parentElement) return;
+            var gridRect = gridEl.getBoundingClientRect();
+            overlaySvg.setAttribute("width", Math.ceil(gridRect.width));
+            overlaySvg.setAttribute("height", Math.ceil(gridRect.height));
+
+            drawArcs(overlaySvg, gridRect, origEls, origEls, nodes, n, -1, false);
+
+            if (randsSet > 0) {
+                drawArcs(overlaySvg, gridRect, cloneEls, cloneEls, nodes, randsSet, -1, true);
             }
         });
     });
@@ -734,12 +765,12 @@ function onRender(engine) {
         refs.status.action.textContent = "\u2014";
     } else if (step.phase === "interleave") {
         refs.status.phase.textContent = "Interleave";
-        refs.status.node.textContent = "node " + trace.nodes[step.nodeIndex].val;
-        refs.status.action.textContent = "clone & insert";
+        refs.status.node.textContent = "node " + trace.nodes[step.activeOrig].val;
+        refs.status.action.textContent = "clone \u2192 splice after";
     } else if (step.phase === "assign") {
-        var rIdx = trace.nodes[step.nodeIndex].random;
+        var rIdx = trace.nodes[step.activeOrig].random;
         refs.status.phase.textContent = "Assign Random";
-        refs.status.node.textContent = "clone " + trace.nodes[step.nodeIndex].val + "\u2032";
+        refs.status.node.textContent = "clone " + trace.nodes[step.activeOrig].val + "\u2032";
         refs.status.action.textContent = rIdx !== null
             ? "random \u2192 " + trace.nodes[rIdx].val + "\u2032"
             : "random \u2192 null";
@@ -751,11 +782,11 @@ function onRender(engine) {
 
     /* Values bar */
     refs.values.cloned.textContent = step
-        ? step.clonesVisible + " of " + trace.n
+        ? step.clonesInserted + " of " + trace.n
         : "0 of " + trace.n;
 
     refs.values.linked.textContent = step
-        ? step.arcsAssigned + " of " + trace.n
+        ? step.randomsAssigned + " of " + trace.n
         : "0 of " + trace.n;
 
     /* Note */
@@ -789,15 +820,16 @@ function describeStep(engine) {
     }
 
     var nodes = trace.nodes;
-    var idx = step.nodeIndex;
+    var idx = step.activeOrig;
 
     if (step.phase === "interleave") {
         var desc = "Clone node " + nodes[idx].val +
-                   " and insert it right after the original in the chain.";
-        if (step.clonesVisible === trace.n) {
-            desc += " All nodes cloned \u2014 interleave complete.";
+                   " and splice it right after the original: " +
+                   nodes[idx].val + " \u2192 " + nodes[idx].val + "\u2032 \u2192 next.";
+        if (step.clonesInserted === trace.n) {
+            desc += " All nodes interleaved.";
         } else {
-            desc += " Cloned " + step.clonesVisible + " of " + trace.n + ".";
+            desc += " Interleaved " + step.clonesInserted + " of " + trace.n + ".";
         }
         return desc;
     }
@@ -808,21 +840,22 @@ function describeStep(engine) {
             return "Node " + nodes[idx].val +
                    " has no random pointer. Clone " + nodes[idx].val +
                    "\u2032 random stays null." +
-                   (step.arcsAssigned === trace.n
+                   (step.randomsAssigned === trace.n
                        ? " All random pointers assigned."
-                       : " Assigned " + step.arcsAssigned + " of " + trace.n + ".");
+                       : " Assigned " + step.randomsAssigned + " of " + trace.n + ".");
         }
-        return "Node " + nodes[idx].val + "\u2019s random points to node " +
-               nodes[rIdx].val + ". Set clone " + nodes[idx].val +
-               "\u2032 random to clone " + nodes[rIdx].val +
-               "\u2032 via original.Random.Next." +
-               (step.arcsAssigned === trace.n
+        return "Node " + nodes[idx].val + ".random \u2192 node " +
+               nodes[rIdx].val + ". One hop: " + nodes[rIdx].val +
+               ".next = " + nodes[rIdx].val + "\u2032. Set clone " +
+               nodes[idx].val + "\u2032.random \u2192 " + nodes[rIdx].val + "\u2032." +
+               (step.randomsAssigned === trace.n
                    ? " All random pointers assigned."
-                   : " Assigned " + step.arcsAssigned + " of " + trace.n + ".");
+                   : " Assigned " + step.randomsAssigned + " of " + trace.n + ".");
     }
 
-    return "Unweave the interleaved chain: restore original next pointers and " +
-           "extract the copy chain. Both lists are now independent with identical structure.";
+    return "Unweave: restore each original\u2019s .next to skip its clone. " +
+           "Link each clone\u2019s .next to the following clone. " +
+           "Both chains emerge intact with correct structure.";
 }
 
 /* ── Initialize ────────────────────────────────────────── */
