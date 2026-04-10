@@ -574,7 +574,13 @@ function drawArcs(svgEl, parentRect, srcEls, tgtEls, nodesData, count, highlight
             p.setAttribute("stroke-dasharray", "4 3");
             svgEl.appendChild(p);
 
-            addArrowhead(svgEl, cx, cy, x2, y2, color);
+            // Automata-style: arrowhead at midpoint of quadratic Bézier
+            var mt = 0.5;
+            var mx = (1-mt)*(1-mt)*x1 + 2*(1-mt)*mt*cx + mt*mt*x2;
+            var my = (1-mt)*(1-mt)*y1 + 2*(1-mt)*mt*cy + mt*mt*y2;
+            var tx = 2*(1-mt)*(cx-x1) + 2*mt*(x2-cx);
+            var ty = 2*(1-mt)*(cy-y1) + 2*mt*(y2-cy);
+            addArrowhead(svgEl, mx - tx * 0.1, my - ty * 0.1, mx + tx * 0.1, my + ty * 0.1, color);
         }
     }
 }
@@ -582,19 +588,29 @@ function drawArcs(svgEl, parentRect, srcEls, tgtEls, nodesData, count, highlight
 function drawSelfLoop(svgEl, x, y, halfW, color, sw, curveDown) {
     var r = halfW + 10;
     var dir = curveDown ? 1 : -1;
+    var sx = x - 8, sy = y;
+    var c1x = x - 14, c1y = y + dir * r * 1.5;
+    var c2x = x + 14, c2y = y + dir * r * 1.5;
+    var ex = x + 8, ey = y;
     var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
     p.setAttribute("d",
-        "M " + (x - 8) + " " + y +
-        " C " + (x - 14) + " " + (y + dir * r * 1.5) +
-        " " + (x + 14) + " " + (y + dir * r * 1.5) +
-        " " + (x + 8) + " " + y);
+        "M " + sx + " " + sy +
+        " C " + c1x + " " + c1y +
+        " " + c2x + " " + c2y +
+        " " + ex + " " + ey);
     p.setAttribute("fill", "none");
     p.setAttribute("stroke", color);
     p.setAttribute("stroke-width", sw);
     p.setAttribute("stroke-dasharray", "4 3");
     svgEl.appendChild(p);
 
-    addArrowhead(svgEl, x + 14, y + dir * r * 1.5, x + 8, y, color);
+    // Midpoint of cubic Bézier at t=0.5
+    var mt = 0.5;
+    var mx = (1-mt)*(1-mt)*(1-mt)*sx + 3*(1-mt)*(1-mt)*mt*c1x + 3*(1-mt)*mt*mt*c2x + mt*mt*mt*ex;
+    var my = (1-mt)*(1-mt)*(1-mt)*sy + 3*(1-mt)*(1-mt)*mt*c1y + 3*(1-mt)*mt*mt*c2y + mt*mt*mt*ey;
+    var tx = 3*(1-mt)*(1-mt)*(c1x-sx) + 6*(1-mt)*mt*(c2x-c1x) + 3*mt*mt*(ex-c2x);
+    var ty = 3*(1-mt)*(1-mt)*(c1y-sy) + 6*(1-mt)*mt*(c2y-c1y) + 3*mt*mt*(ey-c2y);
+    addArrowhead(svgEl, mx - tx * 0.1, my - ty * 0.1, mx + tx * 0.1, my + ty * 0.1, color);
 }
 
 function addArrowhead(svgEl, fromX, fromY, toX, toY, color) {
