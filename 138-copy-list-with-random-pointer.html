@@ -565,8 +565,8 @@ function drawMappingLines(svgEl, parentRect, origEls, copyEls, phase, activeIdx)
         var y2 = cRect.top - parentRect.top - 2;
 
         var isActive = (i === activeIdx);
-        var color = isActive ? "#1D1D1F" : "#C7C7CC";
-        var sw = isActive ? "1.5" : "0.75";
+        var color = isActive ? "#1D1D1F" : "#AEAEB2";
+        var sw = isActive ? "1.5" : "1";
 
         var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
         line.setAttribute("x1", x1);
@@ -579,6 +579,7 @@ function drawMappingLines(svgEl, parentRect, origEls, copyEls, phase, activeIdx)
         svgEl.appendChild(line);
 
         if (isActive) addArrowhead(svgEl, x1, y1, x2, y2, color);
+        else addArrowhead(svgEl, x1, y1, x2, y2, "#C7C7CC");
     }
 }
 
@@ -607,7 +608,7 @@ function addArrowhead(svgEl, fromX, fromY, toX, toY, color) {
     dx /= len;
     dy /= len;
 
-    var sz = 5;
+    var sz = 6;
     var px = -dy;
     var py = dx;
 
