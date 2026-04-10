@@ -27,7 +27,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 28px;
     width: fit-content;
     min-width: 100%;
     margin: 0 auto;
@@ -61,7 +61,7 @@
 
 .chain-wrap {
     position: relative;
-    padding-top: 38px;
+    padding-top: 44px;
 }
 
 .node-chain {
@@ -176,10 +176,10 @@
 /* ── Responsive ────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-    .clone-viz { gap: 10px; }
+    .clone-viz { gap: 20px; }
     .chain-row { gap: 6px; }
     .chain-row-label { width: 38px; font-size: 0.58rem; padding-bottom: 16px; }
-    .chain-wrap { padding-top: 30px; }
+    .chain-wrap { padding-top: 34px; }
     .node-chain { min-height: 44px; }
     .ll-node { width: 44px; height: 44px; border-radius: 12px; }
     .ll-node .cell-value { font-size: 0.85rem; }
@@ -556,9 +556,6 @@ function drawRandomArcs(svgEl, parentRect, nodeEls, nodesData, count, highlightF
 function drawMappingLines(svgEl, parentRect, origEls, copyEls, phase, activeIdx) {
     var count = Math.min(origEls.length, copyEls.length);
     for (var i = 0; i < count; i++) {
-        var isActive = (i === activeIdx);
-        if (!isActive && phase !== "split") continue;
-
         var oRect = origEls[i].getBoundingClientRect();
         var cRect = copyEls[i].getBoundingClientRect();
 
@@ -567,6 +564,7 @@ function drawMappingLines(svgEl, parentRect, origEls, copyEls, phase, activeIdx)
         var x2 = cRect.left + cRect.width / 2 - parentRect.left;
         var y2 = cRect.top - parentRect.top - 2;
 
+        var isActive = (i === activeIdx);
         var color = isActive ? "#1D1D1F" : "#C7C7CC";
         var sw = isActive ? "1.5" : "0.75";
 
