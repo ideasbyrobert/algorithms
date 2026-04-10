@@ -24,6 +24,7 @@
 /* ── Clone Viz Layout ─────────────────────────────────── */
 
 .clone-viz {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -60,10 +61,7 @@
 
 .chain-wrap {
     position: relative;
-}
-
-.chain-wrap.has-arcs {
-    padding-top: 56px;
+    padding-top: 52px;
 }
 
 .node-chain {
@@ -154,14 +152,17 @@
     fill: var(--ink);
 }
 
-/* ── Arc Layer ─────────────────────────────────────────── */
+/* ── Arc Overlay ───────────────────────────────────────── */
 
-.arc-layer {
+.arc-overlay {
     position: absolute;
     top: 0;
     left: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
     overflow: visible;
+    z-index: 5;
 }
 
 /* ── Divider ───────────────────────────────────────────── */
@@ -178,7 +179,7 @@
     .clone-viz { gap: 16px; }
     .chain-row { gap: 8px; }
     .chain-row-label { width: 44px; font-size: 0.62rem; padding-bottom: 20px; }
-    .chain-wrap.has-arcs { padding-top: 44px; }
+    .chain-wrap { padding-top: 40px; }
     .node-chain { min-height: 56px; }
     .ll-node { width: 56px; height: 56px; }
     .ll-node .cell-value { font-size: 0.95rem; }
@@ -513,15 +514,7 @@ function makeArrow() {
 
 /* ── Arc drawing ───────────────────────────────────────── */
 
-function drawArcs(wrapEl, svgEl, nodeEls, nodesData, count, highlightFrom) {
-    svgEl.innerHTML = "";
-    if (count === 0 || nodeEls.length === 0) return;
-    if (!svgEl.parentElement) return;
-
-    var wrapRect = wrapEl.getBoundingClientRect();
-    svgEl.setAttribute("width", Math.ceil(wrapRect.width));
-    svgEl.setAttribute("height", Math.ceil(wrapRect.height));
-
+function drawRandomArcs(svgEl, parentRect, nodeEls, nodesData, count, highlightFrom) {
     for (var i = 0; i < count; i++) {
         var j = nodesData[i].random;
         if (j === null || j === undefined) continue;
@@ -530,20 +523,20 @@ function drawArcs(wrapEl, svgEl, nodeEls, nodesData, count, highlightFrom) {
         var srcRect = nodeEls[i].getBoundingClientRect();
         var tgtRect = nodeEls[j].getBoundingClientRect();
 
-        var x1 = srcRect.left + srcRect.width / 2 - wrapRect.left;
-        var y1 = srcRect.top + 4 - wrapRect.top;
-        var x2 = tgtRect.left + tgtRect.width / 2 - wrapRect.left;
-        var y2 = tgtRect.top + 4 - wrapRect.top;
+        var x1 = srcRect.left + srcRect.width / 2 - parentRect.left;
+        var y1 = srcRect.top + 4 - parentRect.top;
+        var x2 = tgtRect.left + tgtRect.width / 2 - parentRect.left;
+        var y2 = tgtRect.top + 4 - parentRect.top;
 
         var isHigh = (i === highlightFrom);
-        var color = isHigh ? "#1D1D1F" : "#C7C7CC";
-        var width = isHigh ? "1.8" : "1.2";
+        var color = isHigh ? "#1D1D1F" : "#636366";
+        var sw = isHigh ? "2.5" : "1.5";
 
         if (i === j) {
-            drawSelfLoop(svgEl, x1, y1, srcRect.width / 2, color, width);
+            drawSelfLoop(svgEl, x1, y1, srcRect.width / 2, color, sw);
         } else {
             var dist = Math.abs(j - i);
-            var arcH = Math.min(24 + dist * 14, 48);
+            var arcH = Math.min(24 + dist * 14, 46);
             var cx = (x1 + x2) / 2;
             var cy = Math.min(y1, y2) - arcH;
 
@@ -551,8 +544,8 @@ function drawArcs(wrapEl, svgEl, nodeEls, nodesData, count, highlightFrom) {
             p.setAttribute("d", "M " + x1 + " " + y1 + " Q " + cx + " " + cy + " " + x2 + " " + y2);
             p.setAttribute("fill", "none");
             p.setAttribute("stroke", color);
-            p.setAttribute("stroke-width", width);
-            p.setAttribute("stroke-dasharray", "4 3");
+            p.setAttribute("stroke-width", sw);
+            p.setAttribute("stroke-dasharray", "5 3");
             svgEl.appendChild(p);
 
             addArrowhead(svgEl, cx, cy, x2, y2, color);
@@ -560,7 +553,36 @@ function drawArcs(wrapEl, svgEl, nodeEls, nodesData, count, highlightFrom) {
     }
 }
 
-function drawSelfLoop(svgEl, x, y, halfW, color, width) {
+function drawMappingLines(svgEl, parentRect, origEls, copyEls, phase, activeIdx) {
+    var count = Math.min(origEls.length, copyEls.length);
+    for (var i = 0; i < count; i++) {
+        var oRect = origEls[i].getBoundingClientRect();
+        var cRect = copyEls[i].getBoundingClientRect();
+
+        var x1 = oRect.left + oRect.width / 2 - parentRect.left;
+        var y1 = oRect.top + oRect.height - parentRect.top + 4;
+        var x2 = cRect.left + cRect.width / 2 - parentRect.left;
+        var y2 = cRect.top - parentRect.top - 4;
+
+        var isActive = (i === activeIdx);
+        var color = isActive ? "#1D1D1F" : "#AEAEB2";
+        var sw = isActive ? "1.5" : "1";
+
+        var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", x1);
+        line.setAttribute("y1", y1);
+        line.setAttribute("x2", x2);
+        line.setAttribute("y2", y2);
+        line.setAttribute("stroke", color);
+        line.setAttribute("stroke-width", sw);
+        line.setAttribute("stroke-dasharray", "3 3");
+        svgEl.appendChild(line);
+
+        addArrowhead(svgEl, x1, y1, x2, y2, color);
+    }
+}
+
+function drawSelfLoop(svgEl, x, y, halfW, color, sw) {
     var r = halfW + 8;
     var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
     p.setAttribute("d",
@@ -570,8 +592,8 @@ function drawSelfLoop(svgEl, x, y, halfW, color, width) {
         " " + (x + 8) + " " + y);
     p.setAttribute("fill", "none");
     p.setAttribute("stroke", color);
-    p.setAttribute("stroke-width", width);
-    p.setAttribute("stroke-dasharray", "4 3");
+    p.setAttribute("stroke-width", sw);
+    p.setAttribute("stroke-dasharray", "5 3");
     svgEl.appendChild(p);
 
     addArrowhead(svgEl, x + 12, y - r * 1.6, x + 8, y, color);
@@ -625,7 +647,7 @@ function renderCloneViz(gridEl, trace, step) {
     origRow.appendChild(origLbl);
 
     var origWrap = document.createElement("div");
-    origWrap.className = "chain-wrap has-arcs";
+    origWrap.className = "chain-wrap";
 
     var origChain = document.createElement("div");
     origChain.className = "node-chain";
@@ -647,11 +669,7 @@ function renderCloneViz(gridEl, trace, step) {
         if (i < n - 1) origChain.appendChild(makeArrow());
     }
 
-    var origSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    origSvg.setAttribute("class", "arc-layer");
-
     origWrap.appendChild(origChain);
-    origWrap.appendChild(origSvg);
     origRow.appendChild(origWrap);
     gridEl.appendChild(origRow);
 
@@ -673,7 +691,6 @@ function renderCloneViz(gridEl, trace, step) {
 
     var copyWrap = document.createElement("div");
     copyWrap.className = "chain-wrap";
-    if (arcsVis > 0) copyWrap.classList.add("has-arcs");
 
     var copyChain = document.createElement("div");
     copyChain.className = "node-chain";
@@ -702,26 +719,37 @@ function renderCloneViz(gridEl, trace, step) {
         }
     }
 
-    var copySvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    copySvg.setAttribute("class", "arc-layer");
-
     copyWrap.appendChild(copyChain);
-    copyWrap.appendChild(copySvg);
     copyRow.appendChild(copyWrap);
     gridEl.appendChild(copyRow);
 
-    /* ── Deferred arc drawing ── */
+    /* ── Global overlay SVG for arcs + mapping ── */
+
+    var overlaySvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    overlaySvg.setAttribute("class", "arc-overlay");
+    gridEl.appendChild(overlaySvg);
 
     requestAnimationFrame(function() {
-        if (!origSvg.parentElement) return;
+        requestAnimationFrame(function() {
+            if (!overlaySvg.parentElement) return;
 
-        drawArcs(origWrap, origSvg, origNodeEls, nodes, n,
-                 phase === "assign" ? activeIdx : -1);
+            var gridRect = gridEl.getBoundingClientRect();
+            overlaySvg.setAttribute("width", Math.ceil(gridRect.width));
+            overlaySvg.setAttribute("height", Math.ceil(gridRect.height));
 
-        if (copyNodeEls.length > 0 && arcsVis > 0) {
-            drawArcs(copyWrap, copySvg, copyNodeEls, nodes, arcsVis,
-                     phase === "assign" ? activeIdx : -1);
-        }
+            drawRandomArcs(overlaySvg, gridRect, origNodeEls, nodes, n,
+                           phase === "assign" ? activeIdx : -1);
+
+            if (copyNodeEls.length > 0 && arcsVis > 0) {
+                drawRandomArcs(overlaySvg, gridRect, copyNodeEls, nodes, arcsVis,
+                               phase === "assign" ? activeIdx : -1);
+            }
+
+            if (copyNodeEls.length > 0) {
+                drawMappingLines(overlaySvg, gridRect, origNodeEls, copyNodeEls,
+                                 phase, activeIdx);
+            }
+        });
     });
 }
 
