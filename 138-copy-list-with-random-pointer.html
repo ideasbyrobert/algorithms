@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Copy List with Random Pointer — Interleave, Assign, Split · Interactive Visualization</title>
+<meta name="description" content="Interactive step-by-step visualization of Copy List with Random Pointer. Watch the interleaving technique clone a linked list with random pointers in O(1) extra space.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="copy list with random pointer, LeetCode 138, interleave linked list, deep copy, random pointer, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/138-copy-list-with-random-pointer.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Copy List with Random Pointer — Interleave, Assign, Split · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Copy List with Random Pointer. Watch the interleaving technique clone a linked list in O(1) space.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/138-copy-list-with-random-pointer.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Copy List with Random Pointer — Interleave, Assign, Split · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Copy List with Random Pointer.">
+<link rel="stylesheet" href="shared/viz/viz-system.css">
+<style>
+
+/* ── Clone Viz Layout ─────────────────────────────────── */
+
+.clone-viz {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: fit-content;
+    min-width: 100%;
+    margin: 0 auto;
+}
+
+.viz-container:has(.clone-viz) {
+    padding-top: 24px;
+    padding-bottom: 56px;
+    overflow-x: auto;
+}
+
+/* ── Chain Rows ────────────────────────────────────────── */
+
+.chain-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.chain-row-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-tertiary);
+    width: 56px;
+    text-align: right;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+    padding-bottom: 28px;
+}
+
+.chain-wrap {
+    position: relative;
+}
+
+.chain-wrap.has-arcs {
+    padding-top: 56px;
+}
+
+.node-chain {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    min-height: 72px;
+}
+
+.chain-empty {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--ink-quaternary);
+    font-style: italic;
+}
+
+/* ── Linked List Nodes ─────────────────────────────────── */
+
+.ll-node {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: transparent;
+    flex-shrink: 0;
+    transition: opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                background 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-node .cell-value {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--ink);
+    transition: color 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ll-node.clone-node {
+    border: 1.5px dashed var(--fill-secondary);
+}
+
+.ll-node.current {
+    background: var(--ink);
+    transform: scale(1.06);
+    z-index: 3;
+}
+
+.ll-node.current .cell-value {
+    color: var(--white);
+}
+
+.ll-node.current.clone-node {
+    border-color: transparent;
+}
+
+.ll-node.ring {
+    box-shadow: 0 0 0 2.5px var(--ink);
+    z-index: 2;
+}
+
+/* ── Arrows ────────────────────────────────────────────── */
+
+.ll-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 72px;
+    flex-shrink: 0;
+}
+
+.ll-arrow svg {
+    overflow: visible;
+}
+
+.ll-arrow .arrow-line {
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    fill: none;
+}
+
+.ll-arrow .arrow-head {
+    fill: var(--ink);
+}
+
+/* ── Arc Layer ─────────────────────────────────────────── */
+
+.arc-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    overflow: visible;
+}
+
+/* ── Divider ───────────────────────────────────────────── */
+
+.clone-flow-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.06);
+}
+
+/* ── Responsive ────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .clone-viz { gap: 16px; }
+    .chain-row { gap: 8px; }
+    .chain-row-label { width: 44px; font-size: 0.62rem; padding-bottom: 20px; }
+    .chain-wrap.has-arcs { padding-top: 44px; }
+    .node-chain { min-height: 56px; }
+    .ll-node { width: 56px; height: 56px; }
+    .ll-node .cell-value { font-size: 0.95rem; }
+    .ll-arrow { width: 24px; height: 56px; }
+    .viz-container:has(.clone-viz) {
+        padding-top: 16px;
+        padding-bottom: 40px;
+    }
+}
+
+</style>
+</head>
+<body>
+<main class="page">
+
+    <!-- ── Hero ── -->
+
+    <section class="hero hero-full">
+        <span class="label">138 · Copy List with Random Pointer</span>
+        <h1>Clone a linked list — random pointers and all.</h1>
+        <p class="hero-text">
+            Think of a master blueprint where each page has both forward instructions and
+            handwritten cross-references to arbitrary other pages. A simple photocopy
+            duplicates the forward chain — but its cross-references still point into the
+            original manual. The interleaving trick solves this: slip each copied page right
+            after its original, so every cross-reference is exactly one page-turn from its
+            duplicate. Assign cross-references through that single-hop path, then separate
+            the copies into their own manual. Three passes through the list.
+            O(n)&nbsp;time. O(1)&nbsp;extra space.
+        </p>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Interactive Visualization ── -->
+
+    <section>
+        <span class="label">Interactive</span>
+        <h2>Watch interleave, assign, and split in action</h2>
+        <div id="interactiveMount"></div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Core Concept ── -->
+
+    <section>
+        <span class="label">Concept</span>
+        <h2>Three passes, no hash map</h2>
+        <p class="section-intro">
+            The interleaving technique deep-copies a linked list with random pointers
+            using constant extra space. Each phase solves a specific part of the problem.
+        </p>
+
+        <div class="concept-cards">
+            <article class="concept-card">
+                <h3>Interleave</h3>
+                <p>Clone each node and splice it right after the original:
+                A&nbsp;→&nbsp;A′&nbsp;→&nbsp;B&nbsp;→&nbsp;B′&nbsp;→&nbsp;C&nbsp;→&nbsp;C′.
+                Every clone now sits exactly one <code>.next</code> hop from its original.
+                No hash map is needed to locate a clone — it's always at
+                <code>original.Next</code>.</p>
+                <span class="guard-code">original.Next = clone; clone.Next = nextOriginal</span>
+            </article>
+            <article class="concept-card">
+                <h3>One-hop random</h3>
+                <p>Because each clone sits right after its original,
+                <code>original.Random.Next</code> is always the clone of the random
+                target. This single-hop detour is the key insight that makes the O(1)
+                space approach possible — every random connection can be resolved
+                through one extra pointer dereference.</p>
+                <span class="guard-code">clone.Random = original.Random.Next</span>
+            </article>
+            <article class="concept-card">
+                <h3>Split</h3>
+                <p>Unweave the interleaved chain: restore each original's
+                <code>.next</code> to skip its clone, and link each clone's
+                <code>.next</code> to the following clone. Both the original and
+                copied lists emerge fully intact with correct structure.</p>
+                <span class="guard-code">original.Next = clone.Next; clone.Next = nextClone</span>
+            </article>
+        </div>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Algorithm Steps ── -->
+
+    <section>
+        <span class="label">Algorithm</span>
+        <h2>Interleave, assign random, split — three clean passes</h2>
+        <p class="section-intro">
+            Each pass walks the list once. The interleave creates the woven structure,
+            the assign leverages it, and the split undoes it — leaving two independent
+            lists with identical topology.
+        </p>
+
+        <ol class="steps">
+            <li class="step">
+                <span class="step-marker">1</span>
+                <div class="step-body">
+                    <h4>Interleave clones</h4>
+                    <p>Walk the original list. For each node, create a clone with the same
+                    value and splice it in immediately after: <code>original → clone →
+                    nextOriginal</code>. Advance to <code>clone.Next</code> (the next
+                    original). After this pass, the list is twice as long with each
+                    original followed by its clone.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">2</span>
+                <div class="step-body">
+                    <h4>Assign random pointers</h4>
+                    <p>Walk the woven list two nodes at a time. For each original that has
+                    a random pointer, set <code>clone.Random = original.Random.Next</code>.
+                    The <code>.Next</code> of any original is its clone — so this one hop
+                    resolves the target without a lookup table.</p>
+                </div>
+            </li>
+            <li class="step">
+                <span class="step-marker">3</span>
+                <div class="step-body">
+                    <h4>Split the woven list</h4>
+                    <p>Walk the woven list one last time. Restore each original's
+                    <code>.next</code> pointer to skip its clone. Link each clone's
+                    <code>.next</code> to the following clone. Use a dummy head to
+                    collect the clone chain. Return <code>dummyHead.Next</code>.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <hr class="divider">
+
+    <!-- ── Edge Cases ── -->
+
+    <section>
+        <span class="label">Edge Cases</span>
+        <h2>When cloning is not straightforward</h2>
+        <p class="section-intro">
+            Two situations test whether the copy correctly refers to its own nodes
+            rather than back into the original list.
+        </p>
+
+        <div class="guard-cards">
+            <article class="guard-card">
+                <h3>Null random pointer</h3>
+                <p>
+                    When an original node has no random pointer, the assign phase
+                    simply skips it — the clone's random stays null by default.
+                    The <code>if (original.Random != null)</code> guard prevents
+                    a null-dereference and correctly propagates the absence.
+                    Try the <strong>"No random pointers"</strong> preset.
+                </p>
+            </article>
+            <article class="guard-card">
+                <h3>Self-referencing random</h3>
+                <p>
+                    When a node's random pointer points to itself,
+                    <code>original.Random.Next</code> is the clone sitting right
+                    after that original — which is the node's own clone.
+                    The clone correctly ends up pointing to itself, not back
+                    to the original. Try the <strong>"[1→self]"</strong> preset.
+                </p>
+            </article>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>Built by <a href="https://github.com/features/copilot" target="_blank" rel="noopener">GitHub Copilot</a></p>
+    </footer>
+
+</main>
+
+<script src="shared/viz/viz-engine.js"></script>
+<script src="shared/viz/viz-page.js"></script>
+<script>
+
+/* ── Interactive scaffold ──────────────────────────────── */
+
+var refs = VizPage.createInteractive(document.getElementById("interactiveMount"), {
+    legend: [
+        { className: "solid", label: "processing" },
+        { dot: true, label: "random target" }
+    ],
+    gridClass: "clone-viz",
+    status: [
+        { id: "phase",  label: "phase" },
+        { id: "node",   label: "current" },
+        { id: "action", label: "action" }
+    ],
+    values: [
+        { id: "cloned",  label: "cloned" },
+        { id: "linked",  label: "random set" }
+    ],
+    orderTitle: "Copy Chain"
+});
+
+/* ── Presets ────────────────────────────────────────────── */
+
+var PRESETS = [
+    {
+        name: "Official (5 nodes)",
+        nodes: [
+            { val: 7, random: null },
+            { val: 13, random: 0 },
+            { val: 11, random: 4 },
+            { val: 10, random: 2 },
+            { val: 1, random: 0 }
+        ],
+        desc: "The classic LeetCode example: five nodes with varied random connections. Node 13 and node 1 both point back to 7."
+    },
+    {
+        name: "[7] \u2192 [13\u21927] (2 nodes)",
+        nodes: [
+            { val: 7, random: null },
+            { val: 13, random: 0 }
+        ],
+        mobileDefault: true,
+        desc: "Two nodes where 13\u2019s random reaches back to 7. The smallest case with a non-null random pointer."
+    },
+    {
+        name: "[1\u2192self] (self-reference)",
+        nodes: [
+            { val: 1, random: 0 }
+        ],
+        desc: "A single node whose random points to itself. The clone must also self-reference \u2014 not point back to the original."
+    },
+    {
+        name: "No random pointers",
+        nodes: [
+            { val: 3, random: null },
+            { val: 5, random: null },
+            { val: 2, random: null }
+        ],
+        desc: "Three nodes with all random pointers null. Degenerates into a simple linked list copy."
+    },
+    {
+        name: "Cross-linked (3 nodes)",
+        nodes: [
+            { val: 1, random: 2 },
+            { val: 2, random: 0 },
+            { val: 3, random: 1 }
+        ],
+        desc: "Every node has a random pointer: 1\u21923, 2\u21921, 3\u21922. Tests cross-referencing in all directions."
+    }
+];
+
+/* ── Trace builder ─────────────────────────────────────── */
+
+function buildTrace(preset) {
+    var nodes = preset.nodes;
+    var n = nodes.length;
+    var steps = [];
+
+    for (var i = 0; i < n; i++) {
+        steps.push({
+            phase: "interleave",
+            nodeIndex: i,
+            clonesVisible: i + 1,
+            arcsAssigned: 0
+        });
+    }
+
+    for (var i = 0; i < n; i++) {
+        steps.push({
+            phase: "assign",
+            nodeIndex: i,
+            clonesVisible: n,
+            arcsAssigned: i + 1
+        });
+    }
+
+    steps.push({
+        phase: "split",
+        nodeIndex: -1,
+        clonesVisible: n,
+        arcsAssigned: n
+    });
+
+    var order = nodes.map(function(nd) { return String(nd.val); });
+
+    return {
+        steps: steps,
+        order: order,
+        nodes: nodes,
+        n: n,
+        desc: preset.desc
+    };
+}
+
+/* ── DOM helpers ───────────────────────────────────────── */
+
+function makeNode(val, isClone) {
+    var node = document.createElement("div");
+    node.className = "ll-node";
+    if (isClone) node.classList.add("clone-node");
+
+    var span = document.createElement("span");
+    span.className = "cell-value";
+    span.textContent = isClone ? val + "\u2032" : val;
+    node.appendChild(span);
+
+    return node;
+}
+
+function makeArrow() {
+    var el = document.createElement("span");
+    el.className = "ll-arrow";
+
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "36");
+    svg.setAttribute("height", "12");
+    svg.setAttribute("viewBox", "0 0 36 12");
+
+    var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+    line.setAttribute("class", "arrow-line");
+    line.setAttribute("x1", "0");
+    line.setAttribute("y1", "6");
+    line.setAttribute("x2", "30");
+    line.setAttribute("y2", "6");
+
+    var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    head.setAttribute("class", "arrow-head");
+    head.setAttribute("points", "28,2 36,6 28,10");
+
+    svg.appendChild(line);
+    svg.appendChild(head);
+    el.appendChild(svg);
+    return el;
+}
+
+/* ── Arc drawing ───────────────────────────────────────── */
+
+function drawArcs(wrapEl, svgEl, nodeEls, nodesData, count, highlightFrom) {
+    svgEl.innerHTML = "";
+    if (count === 0 || nodeEls.length === 0) return;
+    if (!svgEl.parentElement) return;
+
+    var wrapRect = wrapEl.getBoundingClientRect();
+    svgEl.setAttribute("width", Math.ceil(wrapRect.width));
+    svgEl.setAttribute("height", Math.ceil(wrapRect.height));
+
+    for (var i = 0; i < count; i++) {
+        var j = nodesData[i].random;
+        if (j === null || j === undefined) continue;
+        if (!nodeEls[i] || !nodeEls[j]) continue;
+
+        var srcRect = nodeEls[i].getBoundingClientRect();
+        var tgtRect = nodeEls[j].getBoundingClientRect();
+
+        var x1 = srcRect.left + srcRect.width / 2 - wrapRect.left;
+        var y1 = srcRect.top + 4 - wrapRect.top;
+        var x2 = tgtRect.left + tgtRect.width / 2 - wrapRect.left;
+        var y2 = tgtRect.top + 4 - wrapRect.top;
+
+        var isHigh = (i === highlightFrom);
+        var color = isHigh ? "#1D1D1F" : "#C7C7CC";
+        var width = isHigh ? "1.8" : "1.2";
+
+        if (i === j) {
+            drawSelfLoop(svgEl, x1, y1, srcRect.width / 2, color, width);
+        } else {
+            var dist = Math.abs(j - i);
+            var arcH = Math.min(24 + dist * 14, 48);
+            var cx = (x1 + x2) / 2;
+            var cy = Math.min(y1, y2) - arcH;
+
+            var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            p.setAttribute("d", "M " + x1 + " " + y1 + " Q " + cx + " " + cy + " " + x2 + " " + y2);
+            p.setAttribute("fill", "none");
+            p.setAttribute("stroke", color);
+            p.setAttribute("stroke-width", width);
+            p.setAttribute("stroke-dasharray", "4 3");
+            svgEl.appendChild(p);
+
+            addArrowhead(svgEl, cx, cy, x2, y2, color);
+        }
+    }
+}
+
+function drawSelfLoop(svgEl, x, y, halfW, color, width) {
+    var r = halfW + 8;
+    var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d",
+        "M " + (x - 8) + " " + y +
+        " C " + (x - 12) + " " + (y - r * 1.6) +
+        " " + (x + 12) + " " + (y - r * 1.6) +
+        " " + (x + 8) + " " + y);
+    p.setAttribute("fill", "none");
+    p.setAttribute("stroke", color);
+    p.setAttribute("stroke-width", width);
+    p.setAttribute("stroke-dasharray", "4 3");
+    svgEl.appendChild(p);
+
+    addArrowhead(svgEl, x + 12, y - r * 1.6, x + 8, y, color);
+}
+
+function addArrowhead(svgEl, fromX, fromY, toX, toY, color) {
+    var dx = toX - fromX;
+    var dy = toY - fromY;
+    var len = Math.sqrt(dx * dx + dy * dy);
+    if (len === 0) return;
+    dx /= len;
+    dy /= len;
+
+    var sz = 5;
+    var px = -dy;
+    var py = dx;
+
+    var p1x = toX - dx * sz + px * sz * 0.5;
+    var p1y = toY - dy * sz + py * sz * 0.5;
+    var p2x = toX - dx * sz - px * sz * 0.5;
+    var p2y = toY - dy * sz - py * sz * 0.5;
+
+    var poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+    poly.setAttribute("points",
+        toX + "," + toY + " " + p1x + "," + p1y + " " + p2x + "," + p2y);
+    poly.setAttribute("fill", color);
+    svgEl.appendChild(poly);
+}
+
+/* ── Main renderer ─────────────────────────────────────── */
+
+function renderCloneViz(gridEl, trace, step) {
+    gridEl.innerHTML = "";
+
+    var nodes = trace.nodes;
+    var n = trace.n;
+    var phase = step ? step.phase : "initial";
+    var clonesVis = step ? step.clonesVisible : 0;
+    var arcsVis = step ? step.arcsAssigned : 0;
+    var activeIdx = step ? step.nodeIndex : -1;
+    var rTarget = (phase === "assign" && activeIdx >= 0) ? nodes[activeIdx].random : null;
+
+    /* ── Original row ── */
+
+    var origRow = document.createElement("div");
+    origRow.className = "chain-row";
+
+    var origLbl = document.createElement("span");
+    origLbl.className = "chain-row-label";
+    origLbl.textContent = "original";
+    origRow.appendChild(origLbl);
+
+    var origWrap = document.createElement("div");
+    origWrap.className = "chain-wrap has-arcs";
+
+    var origChain = document.createElement("div");
+    origChain.className = "node-chain";
+
+    var origNodeEls = [];
+    for (var i = 0; i < n; i++) {
+        var nd = makeNode(nodes[i].val, false);
+
+        if ((phase === "interleave" || phase === "assign") && i === activeIdx) {
+            nd.classList.add("current");
+        }
+        if (phase === "assign" && rTarget !== null && i === rTarget && i !== activeIdx) {
+            nd.classList.add("ring");
+        }
+
+        origChain.appendChild(nd);
+        origNodeEls.push(nd);
+
+        if (i < n - 1) origChain.appendChild(makeArrow());
+    }
+
+    var origSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    origSvg.setAttribute("class", "arc-layer");
+
+    origWrap.appendChild(origChain);
+    origWrap.appendChild(origSvg);
+    origRow.appendChild(origWrap);
+    gridEl.appendChild(origRow);
+
+    /* ── Divider ── */
+
+    var divEl = document.createElement("div");
+    divEl.className = "clone-flow-divider";
+    gridEl.appendChild(divEl);
+
+    /* ── Copy row ── */
+
+    var copyRow = document.createElement("div");
+    copyRow.className = "chain-row";
+
+    var copyLbl = document.createElement("span");
+    copyLbl.className = "chain-row-label";
+    copyLbl.textContent = "copy";
+    copyRow.appendChild(copyLbl);
+
+    var copyWrap = document.createElement("div");
+    copyWrap.className = "chain-wrap";
+    if (arcsVis > 0) copyWrap.classList.add("has-arcs");
+
+    var copyChain = document.createElement("div");
+    copyChain.className = "node-chain";
+
+    var copyNodeEls = [];
+    if (clonesVis === 0) {
+        var empty = document.createElement("span");
+        empty.className = "chain-empty";
+        empty.textContent = "waiting\u2026";
+        copyChain.appendChild(empty);
+    } else {
+        for (var i = 0; i < clonesVis; i++) {
+            var nd = makeNode(nodes[i].val, true);
+
+            if ((phase === "interleave" || phase === "assign") && i === activeIdx) {
+                nd.classList.add("current");
+            }
+            if (phase === "assign" && rTarget !== null && i === rTarget && i !== activeIdx) {
+                nd.classList.add("ring");
+            }
+
+            copyChain.appendChild(nd);
+            copyNodeEls.push(nd);
+
+            if (i < clonesVis - 1) copyChain.appendChild(makeArrow());
+        }
+    }
+
+    var copySvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    copySvg.setAttribute("class", "arc-layer");
+
+    copyWrap.appendChild(copyChain);
+    copyWrap.appendChild(copySvg);
+    copyRow.appendChild(copyWrap);
+    gridEl.appendChild(copyRow);
+
+    /* ── Deferred arc drawing ── */
+
+    requestAnimationFrame(function() {
+        if (!origSvg.parentElement) return;
+
+        drawArcs(origWrap, origSvg, origNodeEls, nodes, n,
+                 phase === "assign" ? activeIdx : -1);
+
+        if (copyNodeEls.length > 0 && arcsVis > 0) {
+            drawArcs(copyWrap, copySvg, copyNodeEls, nodes, arcsVis,
+                     phase === "assign" ? activeIdx : -1);
+        }
+    });
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+
+function onRender(engine) {
+    var trace = engine.trace;
+    var step = engine.currentStep();
+
+    renderCloneViz(refs.grid, trace, step);
+
+    /* Status bar */
+    if (!step) {
+        refs.status.phase.textContent = "\u2014";
+        refs.status.node.textContent = "\u2014";
+        refs.status.action.textContent = "\u2014";
+    } else if (step.phase === "interleave") {
+        refs.status.phase.textContent = "Interleave";
+        refs.status.node.textContent = "node " + trace.nodes[step.nodeIndex].val;
+        refs.status.action.textContent = "clone & insert";
+    } else if (step.phase === "assign") {
+        var rIdx = trace.nodes[step.nodeIndex].random;
+        refs.status.phase.textContent = "Assign Random";
+        refs.status.node.textContent = "clone " + trace.nodes[step.nodeIndex].val + "\u2032";
+        refs.status.action.textContent = rIdx !== null
+            ? "random \u2192 " + trace.nodes[rIdx].val + "\u2032"
+            : "random \u2192 null";
+    } else {
+        refs.status.phase.textContent = "Split";
+        refs.status.node.textContent = "all";
+        refs.status.action.textContent = "unweave chains";
+    }
+
+    /* Values bar */
+    refs.values.cloned.textContent = step
+        ? step.clonesVisible + " of " + trace.n
+        : "0 of " + trace.n;
+
+    refs.values.linked.textContent = step
+        ? step.arcsAssigned + " of " + trace.n
+        : "0 of " + trace.n;
+
+    /* Note */
+    refs.note.textContent = describeStep(engine);
+
+    /* Auto-scroll for mobile */
+    requestAnimationFrame(function() {
+        var active = refs.container.querySelector(".ll-node.current");
+        if (active) {
+            var cr = refs.container.getBoundingClientRect();
+            var nr = active.getBoundingClientRect();
+            var dx = (nr.left + nr.width / 2) - (cr.left + cr.width / 2);
+            if (Math.abs(dx) > cr.width * 0.35) {
+                refs.container.scrollBy({ left: dx, behavior: "smooth" });
+            }
+        }
+    });
+
+    if (engine.position < 0) refs.container.scrollLeft = 0;
+}
+
+/* ── Step description ──────────────────────────────────── */
+
+function describeStep(engine) {
+    var step = engine.currentStep();
+    var trace = engine.trace;
+
+    if (!step) {
+        if (trace.n === 0) return "Empty list \u2014 nothing to copy.";
+        return trace.desc + " Press Play or Next to begin.";
+    }
+
+    var nodes = trace.nodes;
+    var idx = step.nodeIndex;
+
+    if (step.phase === "interleave") {
+        var desc = "Clone node " + nodes[idx].val +
+                   " and insert it right after the original in the chain.";
+        if (step.clonesVisible === trace.n) {
+            desc += " All nodes cloned \u2014 interleave complete.";
+        } else {
+            desc += " Cloned " + step.clonesVisible + " of " + trace.n + ".";
+        }
+        return desc;
+    }
+
+    if (step.phase === "assign") {
+        var rIdx = nodes[idx].random;
+        if (rIdx === null) {
+            return "Node " + nodes[idx].val +
+                   " has no random pointer. Clone " + nodes[idx].val +
+                   "\u2032 random stays null." +
+                   (step.arcsAssigned === trace.n
+                       ? " All random pointers assigned."
+                       : " Assigned " + step.arcsAssigned + " of " + trace.n + ".");
+        }
+        return "Node " + nodes[idx].val + "\u2019s random points to node " +
+               nodes[rIdx].val + ". Set clone " + nodes[idx].val +
+               "\u2032 random to clone " + nodes[rIdx].val +
+               "\u2032 via original.Random.Next." +
+               (step.arcsAssigned === trace.n
+                   ? " All random pointers assigned."
+                   : " Assigned " + step.arcsAssigned + " of " + trace.n + ".");
+    }
+
+    return "Unweave the interleaved chain: restore original next pointers and " +
+           "extract the copy chain. Both lists are now independent with identical structure.";
+}
+
+/* ── Initialize ────────────────────────────────────────── */
+
+var engine = VizEngine.create({
+    presets: PRESETS,
+    buildTrace: buildTrace,
+    onRender: onRender,
+    describeStep: describeStep,
+    speed: 1200
+});
+
+engine.init();
+
+VizEngine.onResize(function() {
+    if (engine.trace) onRender(engine);
+});
+
+</script>
+</body>
+</html>
