@@ -628,17 +628,17 @@ function makeArrow(type) {
     if (type === "forward") {
         line.setAttribute("x1", "0"); line.setAttribute("y1", "6");
         line.setAttribute("x2", "36"); line.setAttribute("y2", "6");
-        head.setAttribute("points", "14,2 22,6 14,10");
+        head.setAttribute("points", "12,1 26,6 12,11");
     } else if (type === "reversed") {
         el.classList.add("reversed");
         line.setAttribute("x1", "0"); line.setAttribute("y1", "6");
         line.setAttribute("x2", "36"); line.setAttribute("y2", "6");
-        head.setAttribute("points", "22,2 14,6 22,10");
+        head.setAttribute("points", "24,1 10,6 24,11");
     } else {
         el.classList.add("break-arrow");
         line.setAttribute("x1", "0"); line.setAttribute("y1", "6");
         line.setAttribute("x2", "36"); line.setAttribute("y2", "6");
-        head.setAttribute("points", "14,2 22,6 14,10");
+        head.setAttribute("points", "12,1 26,6 12,11");
     }
 
     svg.appendChild(line);

@@ -505,7 +505,7 @@ function makeArrow() {
 
     var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     head.setAttribute("class", "arrow-head");
-    head.setAttribute("points", "12,2 20,6 12,10");
+    head.setAttribute("points", "10,1 22,6 10,11");
 
     svg.appendChild(line);
     svg.appendChild(head);
@@ -621,19 +621,19 @@ function addArrowhead(svgEl, fromX, fromY, toX, toY, color) {
     dx /= len;
     dy /= len;
 
-    var sz = 6;
+    var sz = 10;
     var px = -dy;
     var py = dx;
 
-    var p1x = toX - dx * sz + px * sz * 0.5;
-    var p1y = toY - dy * sz + py * sz * 0.5;
-    var p2x = toX - dx * sz - px * sz * 0.5;
-    var p2y = toY - dy * sz - py * sz * 0.5;
+    var p1x = toX - dx * sz + px * sz * 0.45;
+    var p1y = toY - dy * sz + py * sz * 0.45;
+    var p2x = toX - dx * sz - px * sz * 0.45;
+    var p2y = toY - dy * sz - py * sz * 0.45;
 
     var poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     poly.setAttribute("points",
         toX + "," + toY + " " + p1x + "," + p1y + " " + p2x + "," + p2y);
-    poly.setAttribute("fill", color);
+    poly.setAttribute("fill", "#1D1D1F");
     svgEl.appendChild(poly);
 }
 
