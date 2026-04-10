@@ -4,25 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization</title>
-  <meta name="description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.…. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization" />
-  <meta property="og:description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.…. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/merge-two-sorted-lists.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.…. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/merge-two-sorted-lists.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization","description":"Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.…. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/merge-two-sorted-lists.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Merge Two Sorted Lists — Tail-Pointer Merge, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <meta name="keywords" content="merge two sorted lists, LeetCode 21, dummy head, tail pointer, linked list merge, algorithm visualization, interactive tutorial, interview algorithms">
+<meta name="description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain. O(n+m) explained visually.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="merge two sorted lists, LeetCode 21, dummy head, tail pointer, linked list merge, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/21-merge-two-sorted-lists.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Merge Two Sorted Lists — Tail-Pointer Merge · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Merge Two Sorted Lists. Watch the dummy head, tail pointer, and front comparisons build a sorted merged chain.">
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
@@ -621,12 +616,12 @@ function makeArrow(isConsumed) {
     line.setAttribute("class", "arrow-line");
     line.setAttribute("x1", "0");
     line.setAttribute("y1", "6");
-    line.setAttribute("x2", "30");
+    line.setAttribute("x2", "36");
     line.setAttribute("y2", "6");
 
     var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     head.setAttribute("class", "arrow-head");
-    head.setAttribute("points", "28,2 36,6 28,10");
+    head.setAttribute("points", "14,2 22,6 14,10");
 
     svg.appendChild(line);
     svg.appendChild(head);

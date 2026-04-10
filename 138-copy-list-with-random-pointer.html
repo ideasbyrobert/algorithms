@@ -500,12 +500,12 @@ function makeArrow() {
     line.setAttribute("class", "arrow-line");
     line.setAttribute("x1", "0");
     line.setAttribute("y1", "6");
-    line.setAttribute("x2", "26");
+    line.setAttribute("x2", "32");
     line.setAttribute("y2", "6");
 
     var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     head.setAttribute("class", "arrow-head");
-    head.setAttribute("points", "24,2 32,6 24,10");
+    head.setAttribute("points", "12,2 20,6 12,10");
 
     svg.appendChild(line);
     svg.appendChild(head);

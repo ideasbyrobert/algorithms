@@ -4,25 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Linked List Cycle — Floyd's Tortoise and Hare · Interactive Visualization</title>
-  <meta name="description" content="Interactive step-by-step visualization of Linked List Cycle detection using Floyd. Part of The Mechanics of Problem-Solving." />
-  <meta name="robots" content="index,follow,max-image-preview:large" />
-  <link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/141-linked-list-cycle.html" />
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="article" />
-  <meta property="og:site_name" content="Ideas by Robert | Algorithms" />
-  <meta property="og:title" content="Linked List Cycle — Floyd's Tortoise and Hare · Interactive Visualization" />
-  <meta property="og:description" content="Interactive step-by-step visualization of Linked List Cycle detection using Floyd. Part of The Mechanics of Problem-Solving." />
-  <meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/141-linked-list-cycle.html" />
-  <meta property="og:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/linked-list-cycle.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Linked List Cycle — Floyd's Tortoise and Hare · Interactive Visualization" />
-  <meta name="twitter:description" content="Interactive step-by-step visualization of Linked List Cycle detection using Floyd. Part of The Mechanics of Problem-Solving." />
-  <meta name="twitter:image" content="https://ideasbyrobert.github.io/algorithms/assets/og/linked-list-cycle.png" />
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"Linked List Cycle — Floyd's Tortoise and Hare · Interactive Visualization","description":"Interactive step-by-step visualization of Linked List Cycle detection using Floyd. Part of The Mechanics of Problem-Solving.","url":"https://ideasbyrobert.github.io/algorithms/141-linked-list-cycle.html","mainEntityOfPage":"https://ideasbyrobert.github.io/algorithms/141-linked-list-cycle.html","inLanguage":"en","image":"https://ideasbyrobert.github.io/algorithms/assets/og/linked-list-cycle.png","isPartOf":{"@type":"CollectionPage","name":"The Mechanics of Problem-Solving","url":"https://ideasbyrobert.github.io/algorithms/"},"publisher":{"@type":"Organization","name":"Ideas by Robert","url":"https://ideasbyrobert.github.io/algorithms/"},"keywords":"Linked List Cycle — Floyd's Tortoise and Hare, LeetCode, interview algorithms, algorithm visualization, The Mechanics of Problem-Solving"}</script>
-  <meta name="keywords" content="linked list cycle, LeetCode 141, Floyd's algorithm, tortoise and hare, cycle detection, algorithm visualization, interactive tutorial, interview algorithms">
+<meta name="description" content="Interactive step-by-step visualization of Linked List Cycle detection using Floyd's tortoise-and-hare algorithm. Watch slow and fast pointers prove a cycle exists — or reach null. O(n) explained visually.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<meta name="keywords" content="linked list cycle, LeetCode 141, Floyd's algorithm, tortoise and hare, cycle detection, algorithm visualization, interactive tutorial, interview algorithms">
+<link rel="canonical" href="https://ideasbyrobert.github.io/algorithms/141-linked-list-cycle.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Ideas by Robert | Algorithms">
+<meta property="og:title" content="Linked List Cycle — Floyd's Tortoise and Hare · Interactive Visualization">
+<meta property="og:description" content="Interactive step-by-step visualization of Linked List Cycle detection. Watch slow and fast pointers chase through the list.">
+<meta property="og:url" content="https://ideasbyrobert.github.io/algorithms/141-linked-list-cycle.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Linked List Cycle — Floyd's Tortoise and Hare · Interactive Visualization">
+<meta name="twitter:description" content="Interactive step-by-step visualization of Linked List Cycle detection. Watch slow and fast pointers chase through the list.">
 <link rel="stylesheet" href="shared/viz/viz-system.css">
 <style>
 
@@ -582,12 +577,12 @@ function makeForwardArrow() {
     line.setAttribute("class", "arrow-line");
     line.setAttribute("x1", "0");
     line.setAttribute("y1", "6");
-    line.setAttribute("x2", "30");
+    line.setAttribute("x2", "36");
     line.setAttribute("y2", "6");
 
     var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     head.setAttribute("class", "arrow-head");
-    head.setAttribute("points", "28,2 36,6 28,10");
+    head.setAttribute("points", "14,2 22,6 14,10");
 
     svg.appendChild(line);
     svg.appendChild(head);
