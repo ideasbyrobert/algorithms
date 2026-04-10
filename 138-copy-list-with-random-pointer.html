@@ -61,8 +61,8 @@
 
 .chain-wrap {
     position: relative;
-    padding-top: 44px;
-    padding-bottom: 44px;
+    padding-top: 64px;
+    padding-bottom: 64px;
 }
 
 .node-chain {
@@ -134,7 +134,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
+    width: 32px;
     height: 56px;
     flex-shrink: 0;
 }
@@ -177,14 +177,14 @@
 /* ── Responsive ────────────────────────────────────────── */
 
 @media (max-width: 768px) {
-    .clone-viz { gap: 20px; }
+    .clone-viz { gap: 16px; }
     .chain-row { gap: 6px; }
-    .chain-row-label { width: 38px; font-size: 0.58rem; padding-bottom: 16px; }
-    .chain-wrap { padding-top: 34px; }
+    .chain-row-label { width: 38px; font-size: 0.58rem; padding-bottom: 14px; }
+    .chain-wrap { padding-top: 48px; padding-bottom: 48px; }
     .node-chain { min-height: 44px; }
     .ll-node { width: 44px; height: 44px; border-radius: 12px; }
     .ll-node .cell-value { font-size: 0.85rem; }
-    .ll-arrow { width: 20px; height: 44px; }
+    .ll-arrow { width: 24px; height: 44px; }
     .viz-container:has(.clone-viz) {
         padding-top: 16px;
         padding-bottom: 40px;
@@ -492,20 +492,20 @@ function makeArrow() {
     el.className = "ll-arrow";
 
     var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", "28");
+    svg.setAttribute("width", "32");
     svg.setAttribute("height", "12");
-    svg.setAttribute("viewBox", "0 0 28 12");
+    svg.setAttribute("viewBox", "0 0 32 12");
 
     var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
     line.setAttribute("class", "arrow-line");
     line.setAttribute("x1", "0");
     line.setAttribute("y1", "6");
-    line.setAttribute("x2", "22");
+    line.setAttribute("x2", "26");
     line.setAttribute("y2", "6");
 
     var head = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
     head.setAttribute("class", "arrow-head");
-    head.setAttribute("points", "20,2 28,6 20,10");
+    head.setAttribute("points", "24,2 32,6 24,10");
 
     svg.appendChild(line);
     svg.appendChild(head);
@@ -545,22 +545,22 @@ function drawArcs(svgEl, parentRect, srcEls, tgtEls, nodesData, count, highlight
         var y1, y2;
 
         if (curveDown) {
-            y1 = srcRect.top + srcRect.height - 4 - parentRect.top;
-            y2 = tgtRect.top + tgtRect.height - 4 - parentRect.top;
+            y1 = srcRect.top + srcRect.height + 6 - parentRect.top;
+            y2 = tgtRect.top + tgtRect.height + 6 - parentRect.top;
         } else {
-            y1 = srcRect.top + 4 - parentRect.top;
-            y2 = tgtRect.top + 4 - parentRect.top;
+            y1 = srcRect.top - 6 - parentRect.top;
+            y2 = tgtRect.top - 6 - parentRect.top;
         }
 
         var isHigh = (i === highlightIdx);
-        var color = isHigh ? "#1D1D1F" : "#8E8E93";
-        var sw = isHigh ? "2" : "1.2";
+        var color = isHigh ? "#1D1D1F" : "#AEAEB2";
+        var sw = isHigh ? "1.8" : "1";
 
         if (i === j) {
             drawSelfLoop(svgEl, x1, y1, srcRect.width / 2, color, sw, curveDown);
         } else {
             var dist = Math.abs(x2 - x1);
-            var arcH = Math.min(18 + (dist / 80) * 10, 40);
+            var arcH = 24 + (dist / 60) * 12;
             var cx = (x1 + x2) / 2;
             var cy = curveDown
                 ? Math.max(y1, y2) + arcH
@@ -580,21 +580,21 @@ function drawArcs(svgEl, parentRect, srcEls, tgtEls, nodesData, count, highlight
 }
 
 function drawSelfLoop(svgEl, x, y, halfW, color, sw, curveDown) {
-    var r = halfW + 6;
+    var r = halfW + 10;
     var dir = curveDown ? 1 : -1;
     var p = document.createElementNS("http://www.w3.org/2000/svg", "path");
     p.setAttribute("d",
-        "M " + (x - 6) + " " + y +
-        " C " + (x - 10) + " " + (y + dir * r * 1.4) +
-        " " + (x + 10) + " " + (y + dir * r * 1.4) +
-        " " + (x + 6) + " " + y);
+        "M " + (x - 8) + " " + y +
+        " C " + (x - 14) + " " + (y + dir * r * 1.5) +
+        " " + (x + 14) + " " + (y + dir * r * 1.5) +
+        " " + (x + 8) + " " + y);
     p.setAttribute("fill", "none");
     p.setAttribute("stroke", color);
     p.setAttribute("stroke-width", sw);
     p.setAttribute("stroke-dasharray", "4 3");
     svgEl.appendChild(p);
 
-    addArrowhead(svgEl, x + 10, y + dir * r * 1.4, x + 6, y, color);
+    addArrowhead(svgEl, x + 14, y + dir * r * 1.5, x + 8, y, color);
 }
 
 function addArrowhead(svgEl, fromX, fromY, toX, toY, color) {
